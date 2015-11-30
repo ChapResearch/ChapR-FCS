@@ -1,0 +1,40 @@
+#
+# This is the target place to deploy the software.  It is assumed
+# to be a RPi with login "pi" and password "raspberry".
+#
+TARGET = 192.168.101.52
+MAIN = main.py
+HOME = ChapR-FCS/console
+TESTDIR = Tests
+USER = pi
+PASSWORD = raspberry
+
+DEPLOYFILES = main.py hardware.py
+DEPLOYTESTFILES = buttonTest.py
+
+deploy:
+	sshpass -p $(PASSWORD) scp $(DEPLOYFILES) $(USER)@$(TARGET):$(HOME)
+
+deploy-tests:
+	cd $(TESTDIR); sshpass -p $(PASSWORD) scp $(DEPLOYTESTFILES) $(USER)@$(TARGET):$(HOME)/$(TESTDIR)
+
+#
+# start up the application on the RPi
+#
+start:	deploy
+	sshpass -p $(PASSWORD) ssh -t -l $(USER) $(TARGET) "cd $(HOME); sudo python $(MAIN)"
+
+#
+# Tests go here.  Tests are run in order.  Interaction is necessary for all tests.
+#
+tests:	deploy-tests
+	sshpass -p $(PASSWORD) ssh -t -l $(USER) $(TARGET) "cd $(HOME)/$(TESTDIR); sudo python buttonTest.py"
+
+#
+# Misc tools
+#
+#   code-text - generates words to be placed into code - use like:  make word="hello" code-text
+#		A good font to use is "slant" but "standard" is good too.
+#
+code-text:
+	figlet -k -f standard $(word) | sed "s/^/# /"
