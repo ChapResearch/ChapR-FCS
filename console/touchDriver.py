@@ -6,7 +6,6 @@
 import pygame
 import os
 import select
-from clock import Clock
 from time import sleep
 import utils
 from signal import alarm, signal, SIGALRM

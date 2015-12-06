@@ -28,7 +28,6 @@ import time
 from random import randint
 import select
 from HDMIdriver import HDMI
-from clock import Clock
 from touchDriver import touchScreen
 from screen import Screen
 import multiprocessing as mp

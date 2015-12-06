@@ -9,16 +9,12 @@
 #
 #   COMMANDS:
 #
-#     SETCLOCK:<seconds>
-#     STARTCLOCK
-#     STOPCLOCK
 #     TEAM:[NW,NE,SW,SE]:<teamstring>
 #     BATTERY:[NW,NE,SW,SE]:<batterylevel>
 #     STATUS:[NW,NE,SW,SE]:<status>
 #     MATCH:<match>
 #     PREROLL:[ON,OFF]   (note, this may just roll picture from a directory)
 #     BLANK
-#     CLOCK
 #     PAUSE
 #     LOGO:<logofile>    (this puts up a particular picture)
 #     SOUND:<sound>      (plays a sound)
@@ -39,7 +35,6 @@
 import pygame
 import os
 import select
-from clock import Clock
 from time import sleep
 import utils
 from multiprocessing import Queue
@@ -59,9 +54,6 @@ class HDMI:
             print("going init on HDMI...")
             self._initHDMI()
             print("done")
-
-            # height of clock is one third screen height
-            self.clock = Clock(self.screenSize[1]/3,(0,255,0),(255,255,255))
 
             # just go into listen/dispatch loop
 
@@ -137,16 +129,6 @@ class HDMI:
             pygame.quit()
             exit()
 
-    def drawClock(self,mins,secs):
-        if self.role == "server":
-            self._command("CLOCK",mins,secs)
-        else:
-            self.clock.drawTime(int(mins),int(secs))
-            self.screen.blit(self.clock.surface,((self.screenSize[0]-self.clock.width)/2,
-                                                 (self.screenSize[1]-self.clock.height)/2))
-            pygame.display.flip()
-        
-
     def fill(self,r,g,b,fade=0):
         if self.role == "server":
             self._command("FILL",r,g,b,fade)
@@ -176,7 +158,6 @@ class HDMI:
             self._command("INIT")
         else:
             self._initHDMI(framebuffer)   # initialize the display
-#            self.clock = bigClock(100)       # need args from display
             self.cls()
 
     def _command(self,*args):
@@ -209,6 +190,5 @@ class HDMI:
         ( "SI" , showImage ),
         ( "CLS", cls),
         ( "FILL", fill),
-        ( "CLOCK", drawClock),
     )
 
