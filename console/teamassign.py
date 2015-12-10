@@ -1,27 +1,15 @@
-#
-# optionscreen.py
-#
-#   Implements changing options or viewing system information.
-#   Options implemented here are:
-#       - reboot
-#       - rescan HDMI
-#       - set BLE name (FIELD-1 etc.)
-#
-#   Sub-screens will be entered for some of these, such as "set BLE name"
-#
-
 import pygame
 from screen import Screen
 from buttons import Button
 
-class OptionScreen(Screen):
+class TeamAssignScreen(Screen):
 
     def __init__(self):
-        Screen.__init__(self,"option")
-        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.reboot,
+        Screen.__init__(self,"TeamAssign")
+        self.ButtonNW = self.buttons(bgcolor = (100,100,0), callback=self.reboot,
                                      **Button.standardButton("NW","Reboot",self.screen))
         self.ButtonSW = self.buttons(bgcolor = (0,0,255), callback=self.setup,
-                                     **Button.standardButton("SW","Setup",self.screen))
+                                     **Button.standardButton("SW","Yes",self.screen))
         self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.matchSetup,
                                      **Button.standardButton("NE",["Match","Setup"],self.screen))
         self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.quit,
@@ -32,11 +20,11 @@ class OptionScreen(Screen):
 
     def reboot(self):
         print("reboot called")
-        return("matchNumberChangeScreen")
+        return "option"
 
     def setup(self):
         print("setup called")
-        return 
+        return None
 
     def matchSetup(self):
         print("going to match setup")

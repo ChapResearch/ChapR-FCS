@@ -38,8 +38,8 @@ class MatchSetupScreen(Screen):
         
         self.matchButton = self.buttons((self.buttonWidth,self.buttonHeight),self.matchPos,
                                         graphic=self.matchImage, callback=self.editMatchNumber)
-        self.autoButton = self.buttons((self.buttonWidth,self.buttonHeight),self.autoPos,
-                                       graphic=self.autoImage, callback=self.editAutoNumber)
+        self.TimeButton = self.buttons((self.buttonWidth,self.buttonHeight),self.autoPos,
+                                       graphic=self.autoImage, callback=self.time)
         self.teleopButton = self.buttons((self.buttonWidth,self.buttonHeight),self.teleopPos,
                                          graphic=self.teleopImage, callback=self.editTeleopNumber)
         self.endGameButton = self.buttons((self.buttonWidth,self.buttonHeight),self.endGamePos,
@@ -53,7 +53,7 @@ class MatchSetupScreen(Screen):
 
     def editMatchNumber(self):
         return("matchNumberChangeScreen")
-
+"""
     def editTeleopNumber(self):
         return("teleopTimeChangeScreen")
 
@@ -62,7 +62,7 @@ class MatchSetupScreen(Screen):
 
     def editEndGameNumber(self):
         return("endGameTimeChangeScreen")
-
+"""
     #
     # numberImages() - draw the number images and return a list of them
     #

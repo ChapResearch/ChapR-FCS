@@ -28,12 +28,14 @@ import time
 from random import randint
 import select
 from HDMIdriver import HDMI
+# from clock import Clock
 from touchDriver import touchScreen
 from screen import Screen
 import multiprocessing as mp
 from signal import alarm, signal, SIGALRM
 import globalVariables
 from globalVariables import RED,GREEN,BLUE,YELLOW
+
 
 # from rn4020 import RN4020
 
@@ -156,6 +158,8 @@ from startupscreen import StartupScreen
 from optionscreen import OptionScreen
 from matchsetupscreen import MatchSetupScreen
 from numberchangescreen import NumberChangeScreen
+from teamassign import TeamAssignScreen
+from buttontest import ButtonTestScreen
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
@@ -167,10 +171,11 @@ NumberChangeScreen("teleopTimeChangeScreen","teleopTime",0,"Teleop:",GREEN)
 NumberChangeScreen("endGameTimeChangeScreen","endGameTime",0,"End Game:",RED)
 NumberChangeScreen("matchNumberChangeScreen","matchNumber",1,"Match:",BLUE)
 
+OptionScreen()
 #StartupScreen().process()
 print("boop")
+ButtonTestScreen().process()
 OptionScreen().process()
-
 
 bigScreen.end()
 pygame.quit()
