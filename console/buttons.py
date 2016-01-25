@@ -119,34 +119,34 @@ class Button():
         boxHeight = width/9
         boxWidth = height/3
         leftPosition = 0
-        rightPosition = width-boxHeight
+        rightPosition = width-boxWidth
         topPosition = 0
-        bottomPosition = height-boxWidth
+        bottomPosition = height-boxHeight
         midPosition = (width-boxWidth)/2
         midBotPosition = height-boxHeight
 
         if ident == "NW":
             return({"size":(boxWidth,boxHeight),
                     "position":(leftPosition,topPosition),
-                    "rotation":90,
+                    "rotation":0,
                     "labels":name,
                     "gpio":HARDWARE.button.NW})
         elif ident == "SW":
             return({"size":(boxWidth,boxHeight),
                     "position":(leftPosition,bottomPosition),
-                    "rotation":90,
+                    "rotation":0,
                     "labels":name,
                     "gpio":HARDWARE.button.SW})
         elif ident == "NE":
             return({"size":(boxWidth,boxHeight),
                     "position":(rightPosition,topPosition),
-                    "rotation":270,
+                    "rotation":0,
                     "labels":name,
                     "gpio":HARDWARE.button.NE})
         elif ident == "SE":
             return({"size":(boxWidth,boxHeight),
                     "position":(rightPosition,bottomPosition),
-                    "rotation":270,
+                    "rotation":0,
                     "labels":name,
                     "gpio":HARDWARE.button.SE})
         elif ident == "S":
