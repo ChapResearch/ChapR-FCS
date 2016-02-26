@@ -4,8 +4,8 @@ from buttons import Button
 
 class ButtonTestScreen(Screen):
 
-    def __init__(self):
-        Screen.__init__(self,"ButtonTestScreen")
+    def __init__(self,name):
+        Screen.__init__(self,name)
         self.ButtonNW = self.buttons(bgcolor = (255,0,0), callback=self.button1,
                                      **Button.standardButton("NW",["Button","1"],self.screen))
         self.ButtonSW = self.buttons(bgcolor = (255,0,0), callback=self.button2,
