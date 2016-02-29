@@ -7,6 +7,7 @@
 
 import pygame
 from buttons import Button
+from hardware import HARDWARE
 
 class Screen():
 
@@ -91,14 +92,18 @@ class Screen():
 
 
     def processEvents(self):
-        event = pygame.event.wait()
-            
+        while True:
+            HARDWARE.checkButtons()
+            event = pygame.event.poll()
+            if event != pygame.NOEVENT:
+                break
+
         if event.type == pygame.QUIT:
             exit(0)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN or event.type == HARDWARE.BUTTONUP or event.type == HARDWARE.BUTTONDOWN or event.type == HARDWARE.BUTTONHOLD:
             nextScreen = self.buttons.processEvent(event)       # this will call my callbacks
             if nextScreen:
                 return nextScreen
