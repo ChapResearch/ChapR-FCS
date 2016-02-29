@@ -179,3 +179,8 @@ def numberDraw(number,mode,color,height,width=0,title=None,titleColor=(255,255,2
         surface.blit(renderedTitle,(int(pad+boxWidth),int(pad+boxWidth)))
 
     return(surface)
+
+def removeKey(dict,key):
+    del dict[key]
+    return dict
+
