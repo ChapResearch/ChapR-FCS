@@ -34,7 +34,8 @@ class Button():
                  gpio=None,               # the GPIO connected to the associated physical button
                  callback=None,           # callback when the button is pressed (synonym for downCallback)
                  downCallback=None,       # callback when the button is moves down
-                 upCallback=None):        # callback when the button is moves up
+                 upCallback=None,         # callback when the button is moves up
+                 holdCallback=None):      # callback when the button is held down
 
         self.bgcolor = bgcolor
         if not isinstance(labels,list):   # target label needs to always be list of labels
@@ -60,6 +61,7 @@ class Button():
         self.callback = callback
         self.upCallback = upCallback
         self.downCallback = downCallback
+        self.holdCallback = holdCallback
         self.__class__.buttonList.append(self)
 
     #
@@ -81,7 +83,23 @@ class Button():
     @classmethod
     def processEvent(cls,event):
         for button in cls.buttonList:               # need to add GPIO events!
-            if button.inside(event.pos):
+
+            if event.type == HARDWARE.BUTTONUP or event.type == HARDWARE.BUTTONDOWN or event.type == HARDWARE.BUTTONHOLD:
+                if button.gpio == event.button:
+                    if event.type == HARDWARE.BUTTONDOWN:
+                        if hasattr(button,'callback') and button.callback:
+                            return button.callback()
+                        if hasattr(button,'downCallback') and button.downCallback:
+                            return button.downCallback()
+                    elif event.type == HARDWARE.BUTTONUP:
+                        if hasattr(button,'upCallback') and button.upCallback:
+                            return button.upCallback()
+                    elif event.type == HARDWARE.BUTTONHOLD:
+                        if hasattr(button,'holdCallback') and button.holdCallback:
+                            return button.holdCallback()
+
+
+            elif button.inside(event.pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if hasattr(button,'callback') and button.callback:
                         return button.callback()
