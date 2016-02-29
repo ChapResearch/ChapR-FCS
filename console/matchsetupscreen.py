@@ -20,8 +20,8 @@ from globalVariables import RED,GREEN,BLUE,YELLOW
 
 class MatchSetupScreen(Screen):
 
-    def __init__(self):
-        Screen.__init__(self,"matchSetup")
+    def __init__(self,name):
+        Screen.__init__(self,name)
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
 
@@ -39,7 +39,7 @@ class MatchSetupScreen(Screen):
         self.matchButton = self.buttons((self.buttonWidth,self.buttonHeight),self.matchPos,
                                         graphic=self.matchImage, callback=self.editMatchNumber)
         self.TimeButton = self.buttons((self.buttonWidth,self.buttonHeight),self.autoPos,
-                                       graphic=self.autoImage, callback=self.time)
+                                       graphic=self.autoImage, callback=self.editTimeNumber)
         self.teleopButton = self.buttons((self.buttonWidth,self.buttonHeight),self.teleopPos,
                                          graphic=self.teleopImage, callback=self.editTeleopNumber)
         self.endGameButton = self.buttons((self.buttonWidth,self.buttonHeight),self.endGamePos,
@@ -53,7 +53,10 @@ class MatchSetupScreen(Screen):
 
     def editMatchNumber(self):
         return("matchNumberChangeScreen")
-"""
+
+    def editTimeNumber(self):
+        return("matchNumberChangeScreen")
+
     def editTeleopNumber(self):
         return("teleopTimeChangeScreen")
 
@@ -62,7 +65,7 @@ class MatchSetupScreen(Screen):
 
     def editEndGameNumber(self):
         return("endGameTimeChangeScreen")
-"""
+
     #
     # numberImages() - draw the number images and return a list of them
     #

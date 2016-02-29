@@ -16,8 +16,8 @@ from buttons import Button
 
 class OptionScreen(Screen):
 
-    def __init__(self):
-        Screen.__init__(self,"option")
+    def __init__(self,name):
+        Screen.__init__(self,name)
         self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.reboot,
                                      **Button.standardButton("NW","Reboot",self.screen))
         self.ButtonSW = self.buttons(bgcolor = (0,0,255), callback=self.setup,
