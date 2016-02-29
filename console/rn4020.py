@@ -70,11 +70,11 @@ class RN4020:
         self.ser = serial.Serial(HARDWARE.rn4020.tty,HARDWARE.rn4020.baud,timeout=1)
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
-        GPIO.setup(HARDWARE.rn4020.mldp,GPIO.OUT)        # CMD/MLDP drive low
-        GPIO.setup(HARDWARE.rn4020.wake,GPIO.OUT)         # WAKE_SW drive high
+        #GPIO.setup(HARDWARE.rn4020.mldp,GPIO.OUT)        # CMD/MLDP drive low
+        #GPIO.setup(HARDWARE.rn4020.wake,GPIO.OUT)         # WAKE_SW drive high
         GPIO.setup(HARDWARE.rn4020.connected,GPIO.IN)         # goes high when connected
-        GPIO.output(HARDWARE.rn4020.mldp,GPIO.LOW)
-        GPIO.output(HARDWARE.rn4020.wake,GPIO.HIGH)
+        #GPIO.output(HARDWARE.rn4020.mldp,GPIO.LOW)
+        #GPIO.output(HARDWARE.rn4020.wake,GPIO.HIGH)
 
     def sync(self):
         # (re)syncronizes with the rn4020
