@@ -2,16 +2,20 @@
 # This is the target place to deploy the software.  It is assumed
 # to be a RPi with login "pi" and password "raspberry".
 #
-TARGET = 192.168.101.124
+TARGET = 192.168.101.58
 MAIN = main.py
 HOME = ChapR-FCS/console
 TESTDIR = Tests
 USER = pi
 PASSWORD = raspberry
 
-SCREENS = optionscreen.py startupscreen.py matchsetupscreen.py buttons.py screen.py numberchangescreen.py
-DEPLOYFILES = $(SCREENS) main.py hardware.py HDMIdriver.py clock.py pipetester.py touchDriver.py utils.py globalVariables.py Media Font 
-DEPLOYTESTFILES = buttonTest.py
+SCREENS = optionscreen.py startupscreen.py matchsetupscreen.py buttons.py screen.py numberchangescreen.py buttontest.py
+DEPLOYTESTFILES = buttonTest.py rn4020test.py pipetester.py
+HARDWARE = hardware.py rn4020.py HDMIdriver.py touchDriver.py
+OTHER = main.py clock.py utils.py globalVariables.py
+DIRS = Media Font
+DEPLOYFILES = $(SCREENS) $(DEPLOYTESTFILES) $(HARDWARE) $(OTHER) $(DIRS)
+
 
 deploy-all:
 	sshpass -p $(PASSWORD) rsync -vr * $(USER)@$(TARGET):$(HOME)
