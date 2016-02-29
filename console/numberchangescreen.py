@@ -10,12 +10,16 @@
 #
 
 import pygame
-from utils import textOutline, numberDraw
+from utils import textOutline, numberDraw, removeKey
 from screen import Screen
 from buttons import Button
 import globalVariables
+import datetime
 
 class NumberChangeScreen(Screen):
+
+    heldGranularity = datetime.timedelta(0,0,100000)    # 10 incs per second
+
 
     def __init__(self,name,globalName,mode,title,color):
         Screen.__init__(self,name)
@@ -25,16 +29,21 @@ class NumberChangeScreen(Screen):
         self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.cancel,
                                      **Button.standardButton("NW","Cancel",self.screen))
 
-        self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.up,
-                                     **Button.standardButton("NE","<",self.screen))
+        self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.up, upCallback=self.release,
+                                     holdCallback = self.holdCountUp, rotation = 180,
+                                     **removeKey(Button.standardButton("NE","V",self.screen),'rotation'))
 
-        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.down,
-                                     **Button.standardButton("SE",">",self.screen))
+        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.down, upCallback=self.release,
+                                     holdCallback = self.holdCountDown,
+                                     **Button.standardButton("SE","V",self.screen))
 
         self.globalName = globalName
         self.mode = mode
         self.color = color
         self.title = title
+        self.heldCountUp = False
+        self.heldCountDown = False
+        self.heldLastTime = datetime.datetime.now()
 
     def drawNumber(self):
         self.screen.fill([0,0,0])             # just black, no graphic background image
@@ -45,6 +54,18 @@ class NumberChangeScreen(Screen):
                            boxWidth=4)
         self.screen.blit(image,((self.width - image.get_width())/2,(self.height-image.get_height())/2))
 
+
+    def holdCountUp(self):
+        self.heldCountUp = True
+        self.heldLastTime = datetime.datetime.now()
+
+    def holdCountDown(self):
+        self.heldCountDown = True
+        self.heldLastTime = datetime.datetime.now()
+
+    def release(self):
+        self.heldCountUp = False
+        self.heldCountDown = False
 
     def up(self):
         if self.mode == 0:
@@ -69,4 +90,12 @@ class NumberChangeScreen(Screen):
         self.number = getattr(globalVariables,self.globalName)
 
     def _process(self):
+        if self.heldCountUp or self.heldCountDown:
+            now = datetime.datetime.now()
+            if now - self.heldLastTime > NumberChangeScreen.heldGranularity:
+                self.heldLastTime = now
+                if self.heldCountUp:
+                    self.up()
+                if self.heldCountDown:
+                    self.down()
         self.drawNumber()
