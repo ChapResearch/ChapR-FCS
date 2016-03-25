@@ -17,6 +17,7 @@ from screen import Screen
 from buttons import Button
 import globalVariables
 from globalVariables import RED,GREEN,BLUE,YELLOW
+from hardware import HARDWARE
 
 class MatchSetupScreen(Screen):
 
@@ -37,13 +38,13 @@ class MatchSetupScreen(Screen):
                                                                                             self.buttonPadding)
         
         self.matchButton = self.buttons((self.buttonWidth,self.buttonHeight),self.matchPos,
-                                        graphic=self.matchImage, callback=self.editMatchNumber)
-        self.TimeButton = self.buttons((self.buttonWidth,self.buttonHeight),self.autoPos,
-                                       graphic=self.autoImage, callback=self.editTimeNumber)
+                                        graphic=self.matchImage, callback=self.editMatchNumber,gpio=HARDWARE.button.NW)
+        self.autoButton = self.buttons((self.buttonWidth,self.buttonHeight),self.autoPos,
+                                       graphic=self.autoImage, callback=self.editAutoNumber,gpio=HARDWARE.button.SW)
         self.teleopButton = self.buttons((self.buttonWidth,self.buttonHeight),self.teleopPos,
-                                         graphic=self.teleopImage, callback=self.editTeleopNumber)
+                                         graphic=self.teleopImage, callback=self.editTeleopNumber,gpio=HARDWARE.button.NE)
         self.endGameButton = self.buttons((self.buttonWidth,self.buttonHeight),self.endGamePos,
-                                          graphic=self.endGameImage, callback=self.editEndGameNumber)
+                                          graphic=self.endGameImage, callback=self.editEndGameNumber,gpio=HARDWARE.button.SE)
 
         self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.done,
                                      **Button.standardButton("S","Done",self.screen))

@@ -9,7 +9,7 @@ import pygame
 from buttons import Button
 from hardware import HARDWARE
 
-class Screen():
+class Screen(object):
 
     # the screenList is maintained by the class, so when a screen needs to
     # be switched, it can happen easily.
@@ -26,6 +26,36 @@ class Screen():
         self.height = self.screen.get_height()
         Screen.screenList.append(self)
         self.buttons = Button.clone(name)    # these are the buttons for THIS screen
+        self.title = None
+
+    #
+    # _setLogo() - puts the "standard" logo at the top of the screen - only used when
+    #              there is room for it.
+    #
+    def _setLogo(self):
+        theImage = pygame.image.load("Media/ChapFCS-title-small.gif")
+        y = 10
+        x = (self.width-theImage.get_width())/2
+        self.screen.blit(theImage,(x,y))
+
+
+    #
+    # _setTitle() - sets the given title in the "normal" position.  Note, too that
+    #               self.title gets set to the value.
+    #
+    def _setTitle(self,title,font="arial",bold=True,italic=False,size=40,color=(255,255,255),lineColor=(255,255,255),drawLines=True,lineThickness=2):
+        self.title = title
+        fontpath = pygame.font.match_font(font,bold,italic)
+        workingFont = pygame.font.Font(fontpath,size)
+        width,height = workingFont.size(title)
+        positionX = (self.width - width)/2
+        positionY = 60 + (80-height)/2
+        titleImage = workingFont.render(title,True,color)
+        self.screen.blit(titleImage,(positionX,positionY))
+        if drawLines:
+            pygame.draw.line(self.screen,lineColor,(positionX,positionY-3),(positionX+width,positionY-3),lineThickness)
+            pygame.draw.line(self.screen,lineColor,(positionX,positionY+height+3),(positionX+width,positionY+height+3),lineThickness)
+        
 
     #
     # findscreen() - CLASS METHOD - this routine will return the screen that
@@ -51,7 +81,8 @@ class Screen():
         pygame.display.update()
 
     #
-    # _process() - just in case the subclass doesn't do a _process()
+    # _process() - just in case the subclass doesn't do a _process().  this is called
+    #              through each screen loop as buttons are processed.
     #
     def _process(self):
         pass
@@ -82,14 +113,14 @@ class Screen():
                 elif nextScreen == "quit":        # request to quit
                     return nextScreen
                 else:                             # otherwise, decend to next screen
-                    nextScreen = Screen.findScreen(nextScreen)
-                    if not nextScreen:
+                    nextScreenObject = Screen.findScreen(nextScreen)
+                    if not nextScreenObject:
                         print("ERROR: screen " + nextScreen + " not found.")
                         return("quit")
-                    nextScreen = nextScreen.process()          # process this new screen and quit if asked
+                    nextScreen = nextScreenObject.process()          # process this new screen and quit if asked
                     if nextScreen == "quit":
                         return nextScreen
-
+                    self._enter()                                    # re-entering this screen
 
     def processEvents(self):
         while True:

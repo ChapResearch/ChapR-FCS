@@ -18,12 +18,12 @@ class OptionScreen(Screen):
 
     def __init__(self,name):
         Screen.__init__(self,name)
-        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.reboot,
-                                     **Button.standardButton("NW","Reboot",self.screen))
+        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.systemOptions,
+                                     **Button.standardButton("NW",["System","Options"],self.screen))
         self.ButtonSW = self.buttons(bgcolor = (0,0,255), callback=self.setup,
                                      **Button.standardButton("SW","Setup",self.screen))
         self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.matchSetup,
-                                     **Button.standardButton("NE",["Match","Setup"],self.screen))
+                                     **Button.standardButton("NE",["Match","Options"],self.screen))
         self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.quit,
                                      **Button.standardButton("SE","Quit",self.screen))
         # self.ButtonNE = "Other"

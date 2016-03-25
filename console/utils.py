@@ -110,12 +110,13 @@ def textHollow(font, message, fontcolor):
     img.set_colorkey(notcolor)
     return img
 
-def textOutline(font, message, fontcolor, outlinecolor):
+def textOutline(font, message, fontcolor, outlinecolor, outlined):
     base = font.render(message, 0, fontcolor)
     outline = textHollow(font, message, outlinecolor)
     img = pygame.Surface(outline.get_size(), 16)
     img.blit(base, (1, 1))
-    img.blit(outline, (0, 0))
+    if outlined:
+        img.blit(outline, (0, 0))
     img.set_colorkey(0)
     return img
 
@@ -131,7 +132,7 @@ def textOutline(font, message, fontcolor, outlinecolor):
 #     mode:  0 = 3 digit time
 #            1 = 3 digits
 #
-def numberDraw(number,mode,color,height,width=0,title=None,titleColor=(255,255,255),boxWidth=2,boxColor=(255,255,255)):
+def numberDraw(number,mode,color,height,width=0,title=None,titleColor=(255,255,255),boxWidth=2,boxColor=(255,255,255),outlined=True):
 
     outlineColor = (255,255,255)
     pad = height / 15
@@ -158,7 +159,7 @@ def numberDraw(number,mode,color,height,width=0,title=None,titleColor=(255,255,2
     else:
         text = "%03d" % int(number)
 
-    textSurface = textOutline(font,text,color,outlineColor)
+    textSurface = textOutline(font,text,color,outlineColor,outlined)
     surface.fill((9,9,9))
     surface.set_colorkey((9,9,9))
     surface.set_alpha(255)
@@ -183,4 +184,11 @@ def numberDraw(number,mode,color,height,width=0,title=None,titleColor=(255,255,2
 def removeKey(dict,key):
     del dict[key]
     return dict
+
+#
+# coordOffset() - offset the first coordinate by the second, and return
+#                 the result.
+#
+def coordOffset(first,second):
+    return( (first[0]+second[0],first[1]+second[1]) )
 

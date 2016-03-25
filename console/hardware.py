@@ -13,7 +13,7 @@ import pygame
 if not(os.getenv("DISPLAY")):
     import RPi.GPIO as GPIO
 
-class HARDWARE:
+class HARDWARE(object):
 
     BUTTONDOWN = pygame.USEREVENT
     BUTTONUP = pygame.USEREVENT + 1
@@ -114,3 +114,8 @@ class HARDWARE:
     SE = buttonTracker(button.SE)
     S = buttonTracker(button.S)
 
+    @classmethod
+    def cleanup(cls):
+        print "hardware cleanup"
+        if not os.getenv("DISPLAY"):
+            GPIO.cleanup()

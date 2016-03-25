@@ -20,7 +20,6 @@ class ButtonTestScreen(Screen):
         self.str = "Press the 1st button."
         self.target = 1
         self.str2 = ""
-        self.BBT = "Button Test"
         # self.ButtonNE = "Other"
         # self.ButtonSE = "Thing"
         # self.ButtonAction = "Action"
@@ -86,8 +85,10 @@ class ButtonTestScreen(Screen):
         B1 = myfont.render(self.str, 1, (255,255,0))
         B2 = myfont.render(self.str2, 1, (255,255,0))
         myfont2 = pygame.font.SysFont("monospace", 35)
-        B3 = myfont2.render(self.BBT,1,(255,0,0))
-        swidth3 = myfont2.size(self.BBT)[0]
-        self.screen.blit(B3,((x - swidth3)/2,100))
+        #self.BBT = "Button Test"
+        #B3 = myfont2.render(self.BBT,1,(255,0,0))
+        #swidth3 = myfont2.size(self.BBT)[0]
+        #self.screen.blit(B3,((x - swidth3)/2,100))
+        self._setTitle("Button Test")
         self.screen.blit(B1,((x - swidth)/2,(y - sheight)/2))
         self.screen.blit(B2,((x - swidth2)/2,(y - sheight)/2+sheight))

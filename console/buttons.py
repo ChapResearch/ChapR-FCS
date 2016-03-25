@@ -13,6 +13,7 @@
 #
 
 import pygame
+from utils import coordOffset
 from hardware import HARDWARE
 
 class Button():
@@ -122,6 +123,18 @@ class Button():
                 button.flashTarget = pygame.time.get_ticks() + button.flashing
                 button._draw(surface)
                 pygame.display.flip()
+
+
+    #
+    # tableButton() - a shorthand for creating a button based upon a cell in a table.
+    #
+    @classmethod
+    def tableButton(cls,table,cellName,location):
+        if table.getCellSize(cellName) is None:
+            return None
+        return({ "size": table.getCellSize(cellName),
+                 "position": coordOffset(location,table.getCellLocation(cellName)),
+                 "graphic": table.getCellImage(cellName) })
 
     #
     # standardButton() - given an identifier and a surface (for laying out the button)

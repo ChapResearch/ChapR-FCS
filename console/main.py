@@ -35,6 +35,7 @@ import multiprocessing as mp
 from signal import alarm, signal, SIGALRM
 import globalVariables
 from globalVariables import RED,GREEN,BLUE,YELLOW
+from hardware import HARDWARE
 
 
 # from rn4020 import RN4020
@@ -133,6 +134,10 @@ from matchsetupscreen import MatchSetupScreen
 from numberchangescreen import NumberChangeScreen
 from teamassign import TeamAssignScreen
 from buttontest import ButtonTestScreen
+from mainscreen import MainScreen
+from matchoptionsscreen import MatchOptionsScreen
+from systemoptionsscreen import SystemOptionsScreen
+from runmatchscreen import RunMatchScreen
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
@@ -151,10 +156,16 @@ NumberChangeScreen("autoTimeChangeScreen","autoTime",0,"Autonomous:",YELLOW)
 NumberChangeScreen("teleopTimeChangeScreen","teleopTime",0,"Teleop:",GREEN)
 NumberChangeScreen("endGameTimeChangeScreen","endGameTime",0,"End Game:",RED)
 NumberChangeScreen("matchNumberChangeScreen","matchNumber",1,"Match:",BLUE)
+MatchOptionsScreen("MatchOptions")
+SystemOptionsScreen("SystemOptions")
+RunMatchScreen("RunMatch",bigScreen)
 
 BootScreens(smallScreen,bigScreen).process()
 ButtonTestScreen("ButtonTestScreen").process()
-OptionScreen("OptionScreen").process()
+#OptionScreen("OptionScreen").process()
+
+while(True):
+        MainScreen("MainScreen").process()
 
 #
 # END ROUTINES - these should always be called upon end
@@ -162,4 +173,5 @@ OptionScreen("OptionScreen").process()
 bigScreen.end()
 #hdmiProcess.join()        # wait for the child to exit
 pygame.quit()
+HARDWARE.cleanup()
 exit()

@@ -7,8 +7,19 @@
 #   connected to the parent who is feeding this child
 #   sequences of commands.
 #
-#   COMMANDS:
+#   The following commands are used:
+#     INIT  - initialize
+#     END   - end
+#     SI    - show image:  filename, (x,y), fade
+#     CLS   - clear screen
+#     FILL  - fill screen
+#     CSET   - set the clock args: mins,secs
+#     CCOLOR - set the clock color: r,g,b
+#     CRUN   - start the clock counting down
+#     CSTOP  - stop the count
 #
+#
+# OLD OLD OLD BELOW THIS
 #     TEAM:[NW,NE,SW,SE]:<teamstring>
 #     BATTERY:[NW,NE,SW,SE]:<batterylevel>
 #     STATUS:[NW,NE,SW,SE]:<status>
@@ -39,8 +50,9 @@ from time import sleep
 import utils
 from multiprocessing import Queue
 from signal import alarm, signal, SIGALRM
-
+from globalVariables import RED,GREEN,BLUE,YELLOW,BLACK,WHITE
 from fractions import gcd
+from HDMIclock import HDMIClock
 
 
 class HDMI:
@@ -54,12 +66,16 @@ class HDMI:
             print("going init on HDMI...")
             self._initHDMI()
             print("done")
+            self.clock = HDMIClock(pygame.display.get_surface(),BLACK)
+            print("done with HDMI clock as well")
 
             # just go into listen/dispatch loop
 
             #print("enter listen loop")
             while 1:
                 self.clientListen()
+                self.clock.update()
+                pygame.display.update()
 
     #
     # _initHDMI() - initializes the HDMI display from the framebuffer
@@ -82,7 +98,7 @@ class HDMI:
 
         try:
             pygame.display.init()
-            #pygame.init()
+            pygame.init()
 
         except pygame.error:
             print("failed on opening frame buffer")
@@ -153,6 +169,39 @@ class HDMI:
         else:
             utils.showImage(image,position,fade)
 
+    #
+    # clockSet(mins,secs) - routines to control the clock
+    # clockColor(r,g,b)
+    # clockRun()
+    # clockStop()
+    #
+
+    def clockSet(self,mins,secs=None):
+        if self.role == "server":
+            self._command("CSET",mins,secs)
+        else:
+            if secs is None:
+                print("clockSet() called with secs as None")
+            self.clock.setTime(mins,secs)
+
+    def clockColor(self,color):
+        if self.role == "server":
+            self._command("CCOLOR",color)
+        else:
+            self.clock.setColor(color)
+
+    def clockRun(self):
+        if self.role == "server":
+            self._command("CRUN")
+        else:
+            self.clock.run()
+
+    def clockStop(self):
+        if self.role == "server":
+            self._command("CSTOP")
+        else:
+            self.clock.stop()
+
     def init(self):
         if self.role == "server":
             self._command("INIT")
@@ -178,11 +227,12 @@ class HDMI:
     #                  by tab-separated arguments.
     #
     def clientListen(self):
-        args = self.comm.get()
-        cmd = args[0]
-        args = args[1:]
-        self._dispatch(cmd,args)
-        return(cmd)
+        if not self.comm.empty():
+            args = self.comm.get()
+            cmd = args[0]
+            args = args[1:]
+            self._dispatch(cmd,args)
+            return(cmd)
 
     commandTable = (
         ( "INIT", init ),
@@ -190,5 +240,9 @@ class HDMI:
         ( "SI" , showImage ),
         ( "CLS", cls),
         ( "FILL", fill),
+        ( "CSET", clockSet),
+        ( "CCOLOR", clockColor),
+        ( "CRUN", clockRun),
+        ( "CSTOP", clockStop),
     )
 
