@@ -21,6 +21,8 @@ class Button():
     # here is the list of buttons that are in this class (or cloned class)
     buttonList = []
 
+    flashSpeed = 250
+
     def __init__(self,
                  size,                    # a tuple of (width,height) for the button - prior to any rotation
                  position,                # a button location (x,y) - upper left corner AFTER rotation
@@ -36,7 +38,8 @@ class Button():
                  callback=None,           # callback when the button is pressed (synonym for downCallback)
                  downCallback=None,       # callback when the button is moves down
                  upCallback=None,         # callback when the button is moves up
-                 holdCallback=None):      # callback when the button is held down
+                 holdCallback=None,       # callback when the button is held down
+                 rock=None):              # if given, the rock will be passed to any callback called
 
         self.bgcolor = bgcolor
         if not isinstance(labels,list):   # target label needs to always be list of labels
@@ -57,12 +60,13 @@ class Button():
         self.graphic = graphic
         self.flashing = flashing
         self.flashState = True
-        self.flashTarget = pygame.time.get_ticks() + self.flashing;
+        self.flashTarget = pygame.time.get_ticks() + Button.flashSpeed
         self.gpio = gpio
         self.callback = callback
         self.upCallback = upCallback
         self.downCallback = downCallback
         self.holdCallback = holdCallback
+        self.rock = rock
         self.__class__.buttonList.append(self)
 
     #
@@ -89,26 +93,26 @@ class Button():
                 if button.gpio == event.button:
                     if event.type == HARDWARE.BUTTONDOWN:
                         if hasattr(button,'callback') and button.callback:
-                            return button.callback()
+                            return button._callit(button.callback)
                         if hasattr(button,'downCallback') and button.downCallback:
-                            return button.downCallback()
+                            return button._callit(button.downCallback)
                     elif event.type == HARDWARE.BUTTONUP:
                         if hasattr(button,'upCallback') and button.upCallback:
-                            return button.upCallback()
+                            return button._callit(button.upCallback)
                     elif event.type == HARDWARE.BUTTONHOLD:
                         if hasattr(button,'holdCallback') and button.holdCallback:
-                            return button.holdCallback()
+                            return button._callit(button.holdCallback)
 
 
             elif button.inside(event.pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if hasattr(button,'callback') and button.callback:
-                        return button.callback()
+                        return button._callit(button.callback)
                     if hasattr(button,'downCallback') and button.downCallback:
-                        return button.downCallback()
+                        return button._callit(button.downCallback)
                 if event.type == pygame.MOUSEBUTTONUP:
                     if hasattr(button,'upCallback') and button.upCallback:
-                        return button.upCallback()
+                        return button._callit(button.upCallback)
 
     @classmethod
     def draw(cls,surface):
@@ -120,7 +124,7 @@ class Button():
         for button in cls.buttonList:
             if button.flashing and pygame.time.get_ticks() > button.flashTarget:
                 button.flashState = not(button.flashState)
-                button.flashTarget = pygame.time.get_ticks() + button.flashing
+                button.flashTarget = pygame.time.get_ticks() + cls.flashSpeed
                 button._draw(surface)
                 pygame.display.flip()
 
@@ -186,6 +190,16 @@ class Button():
                     "rotation":0,
                     "labels":name,
                     "gpio":HARDWARE.button.S})
+
+    #
+    # _callit() - a routine to make the code prettier - this calls the given callback
+    #             with the rock if given, otherwise with no arguments.
+    #
+    def _callit(self,theCall):
+        if self.rock:
+            return theCall(self.rock)
+        else:
+            return theCall()
 
     #
     # _drawLabel() - a routine to simplify the procedure of drawing labels in buttons
