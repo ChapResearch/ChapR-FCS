@@ -196,7 +196,7 @@ class Button():
     #             with the rock if given, otherwise with no arguments.
     #
     def _callit(self,theCall):
-        if self.rock:
+        if self.rock is not None:
             return theCall(self.rock)
         else:
             return theCall()
