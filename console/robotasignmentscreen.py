@@ -20,6 +20,8 @@ class RobotAssignmentScreen(Screen):
         
         self.cb1 = (240,220,0)
         self.cb2 = (110,40,180)
+        
+        self.roboSel = None                   # if this is a robt number then that robot is selected 
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
 
@@ -43,7 +45,22 @@ class RobotAssignmentScreen(Screen):
     def tableButton(self,rock):
         print("Table Button Called")
         print(rock)
-        
+        if self.roboSel is not None:
+            if self.roboSel == rock:
+                self.dataTable.changeData(rock,flashing = False)
+                print("Turning off flashing for rock")
+                self.roboSel = None
+            else:
+                self.dataTable.changeData(rock,flashing = True)
+                self.dataTable.changeData(self.roboSel,flashing=False)
+                print("turning on flashing for rock")
+                self.roboSel = rock
+        else:
+            self.dataTable.changeData(rock,flashing = True)
+            print("Turning on flashing for rock")
+            self.roboSel = rock
+
+
     def delete(self):
         print("Yeet delete")
         trashList.append()
@@ -84,14 +101,16 @@ class RobotAssignmentScreen(Screen):
     def _process(self):
 #       self.incominglist = BLE.OnDeckList()
         incomingList = (6710,5628,80161,12345,7975,2468,"8666","9048")
+        returnvalue = False
         if len(incomingList) > len(self.lastList):
+            returnvalue = True
             button = 0
             for robot in incomingList:
                 if robot not in self.trashList:
-                    self.dataTable.changeData(button,robot)
+                    self.dataTable.changeData(button,data = robot)
                     button += 1
 
         # STuff Happens here idk what it is
 
         self.lastList = incomingList
-        return True
+        return returnvalue
