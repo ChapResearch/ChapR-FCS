@@ -129,7 +129,7 @@ class Table(object):
             for c, col in enumerate(row):
                 data,chars = col
                 if "name" in chars and chars["name"] == name:
-                    chars["flashstate"] = True
+                    chars["flashState"] = True
                     chars["flashing"] = flashing
                     self._compute()
 
