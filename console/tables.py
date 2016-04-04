@@ -63,6 +63,7 @@ class Table(object):
         self.mydefaults = self._getCharacteristics(args,Table.defaults)
         self.__class__.tableList.append(self)
         self.position = (0,0)
+        self.needsUpdating = True  # if true, the screen needs to be updated
 
     #
     # addSpacer() - just a convenience routine to add a column with a certain amount of
@@ -229,6 +230,7 @@ class Table(object):
     #              buttons to work.  The drawn buttons are added to the screen button list.
     #
     def _compute(self):
+        self.needsUpdating = True
         self.computed = True           # just planning ahead
 
         #
@@ -454,6 +456,9 @@ class Table(object):
     def update(cls,surface):
         madeAChange = False
         for table in cls.tableList:
+            if table.needsUpdating:
+                madeAChange = True
+                table.needsUpdating = False
             for r, row in enumerate(table.tableData):
                 for c, col in enumerate(row):
                     data,chars = col
@@ -461,6 +466,7 @@ class Table(object):
                         chars["flashState"] = not(chars["flashState"])
                         chars["flashTarget"] = pygame.time.get_ticks() + cls.flashSpeed
                         madeAChange = True
+        
         return madeAChange
 
     #
