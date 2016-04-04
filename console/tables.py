@@ -114,12 +114,24 @@ class Table(object):
             for c, col in enumerate(row):
                 data,chars = col
                 if "name" in chars and chars["name"] == name:
+                    changed = False
                     if "data" in args:
                         col[0] = args["data"]
-                    self.computed = False               # mark it necessary to recompute the table
-                for key,value in args:
-                    chars[key] = value
-                    self.computed = False               # mark it necessary to recompute the table
+                        changed = True
+                    for key,value in args.iteritems():
+                        chars[key] = value
+                        changed = True
+                    if changed:
+                        self._compute()
+
+    def setFlash(self,name,flashing):
+        for r, row in enumerate(self.tableData):
+            for c, col in enumerate(row):
+                data,chars = col
+                if "name" in chars and chars["name"] == name:
+                    chars["flashstate"] = True
+                    chars["flashing"] = flashing
+                    self._compute()
 
     #
     # getCellLocation() - given a name, find the target cell and return its location
@@ -299,8 +311,6 @@ class Table(object):
     #           It takes the tabledata structure and makes it happen.
     #
     def _draw(self,surface):
-
-        print("drawing table")
         self.compute()
 
         #
