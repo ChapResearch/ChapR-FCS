@@ -140,6 +140,9 @@ from mainscreen import MainScreen
 from matchoptionsscreen import MatchOptionsScreen
 from systemoptionsscreen import SystemOptionsScreen
 from runmatchscreen import RunMatchScreen
+from About import AboutScreen
+from systemtests import SystemTestsScreen
+from robotasignmentscreen import RobotAssignmentScreen
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
@@ -161,6 +164,9 @@ NumberChangeScreen("matchNumberChangeScreen","matchNumber",1,"Match:",BLUE)
 MatchOptionsScreen("MatchOptions")
 SystemOptionsScreen("SystemOptions")
 RunMatchScreen("RunMatch",bigScreen)
+AboutScreen("AboutScreen")
+SystemTestsScreen("SystemTest")
+RobotAssignmentScreen("RobotAssignmentScreen").process()
 
 #BootScreens(smallScreen,bigScreen).process()
 #ButtonTestScreen("ButtonTestScreen").process()
