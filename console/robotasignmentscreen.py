@@ -22,41 +22,47 @@ class RobotAssignmentScreen(Screen):
         self.cb2 = (110,40,180)
         
         self.roboSel = None                   # if this is a robt number then that robot is selected 
+        self.trashRobots = []
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
-
-        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,
+        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "NW",
                                      **Button.standardButton("NW","",self.screen))
-        self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,
+        self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "NE",
                                      **Button.standardButton("NE","",self.screen))
-        self.ButtonSW= self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,
+        self.ButtonSW = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "SW",
                                      **Button.standardButton("SW","",self.screen))
-        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,
+        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "SE",
                                      **Button.standardButton("SE","",self.screen))
-        self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.done,
+        self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.done,rock = "S",
                                      **Button.standardButton("S","Done",self.screen))
-        self.ButtonDel = self.buttons(bgcolor = (255,0,0), callback = self.delete,
+        self.ButtonDel = self.buttons(bgcolor = (255,0,0), callback = self.delete,rock = "DelButton",
                                       size=(30,30), position=(150,300), rotation=0,labels=["",""])
         self.trashList=[]
 
     def teamAssign(self):
         print("team assign called")
-        
+        if self.roboSel is not None:
+            self.dataTable.changeData(self.roboSel,data = incomingList[self.roboSel])
+            print("Changing the name of team assign Button")
+            self.trashRobots.append(self.roboSel)
+        else:
+            pass
+
     def tableButton(self,rock):
         print("Table Button Called")
         print(rock)
         if self.roboSel is not None:
             if self.roboSel == rock:
-                self.dataTable.changeData(rock,flashing = False)
+                self.dataTable.setFlash(rock,False)
                 print("Turning off flashing for rock")
                 self.roboSel = None
             else:
-                self.dataTable.changeData(rock,flashing = True)
-                self.dataTable.changeData(self.roboSel,flashing=False)
+                self.dataTable.setFlash(rock,True)
+                self.dataTable.setFlash(self.roboSel,False)
                 print("turning on flashing for rock")
                 self.roboSel = rock
         else:
-            self.dataTable.changeData(rock,flashing = True)
+            self.dataTable.setFlash(rock,True)
             print("Turning on flashing for rock")
             self.roboSel = rock
 
@@ -100,7 +106,7 @@ class RobotAssignmentScreen(Screen):
         
     def _process(self):
 #       self.incominglist = BLE.OnDeckList()
-        incomingList = (6710,5628,80161,12345,7975,2468,"8666","9048")
+        incomingList = [6710,5628,80161,12345,7975,2468,"8666","9048"]
         returnvalue = False
         if len(incomingList) > len(self.lastList):
             returnvalue = True
