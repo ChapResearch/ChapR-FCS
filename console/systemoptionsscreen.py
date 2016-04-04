@@ -87,7 +87,7 @@ class SystemOptionsScreen(Screen):
         self._setLogo()
         self._setTitle("System Options",italic=True,color=(0,0,255))
         self.tableDraw()
-        self.screen.blit(self.dataTable.image(),self.tablePosition)
+#        self.screen.blit(self.dataTable.image(),self.tablePosition)
 
     def _process(self):
         pass

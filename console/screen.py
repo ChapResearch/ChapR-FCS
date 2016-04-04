@@ -7,6 +7,7 @@
 
 import pygame
 from buttons import Button
+from tables import Table
 from hardware import HARDWARE
 
 class Screen(object):
@@ -26,6 +27,7 @@ class Screen(object):
         self.height = self.screen.get_height()
         Screen.screenList.append(self)
         self.buttons = Button.clone(name)    # these are the buttons for THIS screen
+        self.tables = Table.clone(name)      # these are the tables for THIS screen
         self.title = None
 
     #
@@ -72,11 +74,19 @@ class Screen(object):
 
     #
     # update() - updates the current screen to the pygame display.  Generally this
-    #            is not overriden by child classes.
+    #            is not overriden by child classes.  NOTE that screen redrawing
+    #            only happens if necessary.
     #
     def update(self):
-        self.buttons.update(self.screen)             # needed for flashing buttons
+        return self.buttons.update(self.screen) or self.tables.update(self.screen)
+                                                                      # needed for flashing buttons or table cells
+
+    #
+    # draw() - draws the screen - really consists mostly of buttons and tables
+    #
+    def draw(self):
         self.buttons.draw(self.screen)
+        self.tables.draw(self.screen)
         pygame.display.get_surface().blit(self.screen,(0,0))
         pygame.display.update()
 
@@ -96,15 +106,23 @@ class Screen(object):
         pass
 
     #
+    # enter() - this is the screen enter routine - called whenever a screen is displayed
+    #           or re-displayed.  It will call the subclass _enter() as well
+    #
+    def enter(self):
+        self._enter()
+        self.draw()
+
+    #
     # process() - process a screen of stuff.  This is really the eventloop() for a
     #             screen.  Each individual screen can have their own _process() to 
-    #             do any specific processing for that screen.
+    #             do any specific processing for that screen.  
     #
     def process(self):
-        self._enter()                             # the start-up code for entering a screen
+        self.enter()                              # the start-up code for entering a screen
         while True:
-            self._process()                       # call the process for the subclass screen
-            self.update()                         # then do the update of the buttons, screen, etc.
+            if self._process() or self.update():  # if the subclass needs it, or we need it, redraw
+                self.draw()
 
             nextScreen = self.processEvents()     # process my events
             if nextScreen:
@@ -120,7 +138,7 @@ class Screen(object):
                     nextScreen = nextScreenObject.process()          # process this new screen and quit if asked
                     if nextScreen == "quit":
                         return nextScreen
-                    self._enter()                                    # re-entering this screen
+                    self.enter()                                     # re-entering this screen
 
     def processEvents(self):
         while True:
@@ -135,6 +153,9 @@ class Screen(object):
             if event.key == pygame.K_ESCAPE:
                 exit(0)
         elif event.type == pygame.MOUSEBUTTONDOWN or event.type == HARDWARE.BUTTONUP or event.type == HARDWARE.BUTTONDOWN or event.type == HARDWARE.BUTTONHOLD:
+            nextScreen = self.tables.processEvent(event)
+            if nextScreen:
+                return nextScreen
             nextScreen = self.buttons.processEvent(event)       # this will call my callbacks
             if nextScreen:
                 return nextScreen

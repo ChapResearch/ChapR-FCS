@@ -15,18 +15,24 @@ import pygame
 import numbers
 
 # TEMPORARY
-pygame.init()
+#pygame.init()
 # TEMPORARY
 
 class Table(object):
+
+    # here is the list of tables that are in this class (or cloned class)
+    tableList = []
+
+    flashSpeed = 350
 
     defaults = {}
     defaults["align"] = "left"                  # alignment can be "left", "right", "center", "number"
     defaults["valign"] = "middle"               # alignment can be "top", "bottom", "middle"
     defaults["bold"] = False                    # true or false for bold (only effective for sysfont)
     defaults["italic"] = False                  # true or false for italics (only effective for sysfont)
-    defaults["blink"] = False                   # True to blink the data
+    defaults["flashing"] = False                # True to blink the data
     defaults["callback"] = None                 # if callback is given, the data is turned into a button
+    defaults["rock"] = None                     # the rock to be passed to the button/callback
     defaults["name"] = None                     # the name is used to update the data in a table
     defaults["borders"] = (None,None,None,None) # given as a tuple (N,E,S,W) of colors for the given borders
     defaults["sysfont"] = None                  # font for the data - sysfont will take presedence over just "font"
@@ -56,6 +62,8 @@ class Table(object):
         self.width = None          # used to store user-specified dimensions of table
         self.height = None
         self.mydefaults = self._getCharacteristics(args,Table.defaults)
+        self.__class__.tableList.append(self)
+        self.position = (0,0)
 
     #
     # addSpacer() - just a convenience routine to add a column with a certain amount of
@@ -76,6 +84,10 @@ class Table(object):
     #             data is added.  Note that if this is the first data item of a row,
     #             the row data structures are created.  See the "defaults" in the class
     #             (above) to see what arguments are accepted.  Others are quietly ignored.
+    #
+    #    IMPORTANT - self.mydefaults are set when the object is instantiated - from the the
+    #                class defaults.  This means that you can "change" the normal defaults by
+    #                supplying arguments to the __init__().
     #
     def addData(self,data,**args):
         self.dirty = True
@@ -197,7 +209,13 @@ class Table(object):
 
     #
     # _compute() - given the data in the current table, compute all of the meta-data about the
-    #              data in the table.
+    #              data in the table.  NOTE about buttons - when a cell has a callback() in it,
+    #              then it is taken as a button. The entire button machinery is used (including
+    #              drawing and flashing) by translating the table attributes to button attributes
+    #              before the button is drawn.  NOTE, too, that the cell height and width are
+    #              calculated normally as if a button wasn't there, then the button is drawn
+    #              within that space.  FINAL NOTE, a Screen object must be set in the table for
+    #              buttons to work.  The drawn buttons are added to the screen button list.
     #
     def _compute(self):
         self.computed = True           # just planning ahead
@@ -261,28 +279,14 @@ class Table(object):
             y+= rowHeight
 
         #
-        # now render the individual cell images
+        # check for and prepare flashing cells
         #
         for r, row in enumerate(self.tableData):
             for c, col in enumerate(row):
                 data,chars = col
-
-                cellImage = pygame.Surface((chars["cellWidth"],chars["cellHeight"]),pygame.SRCALPHA,self.tableImage)
-                if chars["bgcolor"] is not None:
-                    cellImage.fill(chars["bgcolor"])
-
-                if type(data) is pygame.Surface:              # this is an image
-                    dataImage = data
-                elif data is not None:                        # otherwise string or number
-                    data = str(data)
-                    font = pygame.font.Font(pygame.font.match_font(chars["font"]),chars["fontsize"])
-                    dataImage = font.render(data,True,chars["color"])
-
-                if data is not None:
-                    cellImage.blit(dataImage,(chars["inCellX"],chars["inCellY"]))
-
-                chars["image"] = cellImage
-
+                chars["flashState"] = True
+                if chars["flashing"]:
+                    chars["flashTarget"] = pygame.time.get_ticks() + self.__class__.flashSpeed
 
     #
     # compute() - a user-level interface to the _compute() function.
@@ -292,15 +296,40 @@ class Table(object):
             self._compute()
 
     #
-    # _draw() - draws the current table, and stores it in the self.tableImage.  This is the work-horse
-    #           routine of this module.  It takes the tabledata structure and makes it happen.
+    # _draw() - draws the current table on the given surface.
+    #           It takes the tabledata structure and makes it happen.
     #           Note that this routine marks all items in the table dirty and then calls the
     #           _redraw() routine.
     #
-    def _draw(self):
+    def _draw(self,surface):
         self.dirty = False         # just planning ahead
 
         self.compute()
+
+        #
+        # now render the individual cell images
+        #
+        for r, row in enumerate(self.tableData):
+            for c, col in enumerate(row):
+                data,chars = col
+
+                # otherwise, it is not a button and the image must be calculated
+
+                cellImage = pygame.Surface((chars["cellWidth"],chars["cellHeight"]),pygame.SRCALPHA,self.tableImage)
+                if chars["bgcolor"] is not None:
+                    cellImage.fill(chars["bgcolor"])
+
+                if chars["flashState"] and type(data) is pygame.Surface:              # this is an image
+                    dataImage = data
+                    cellImage.blit(dataImage,(chars["inCellX"],chars["inCellY"]))
+
+                elif chars["flashState"] and data is not None:                        # otherwise string or number
+                    data = str(data)
+                    font = pygame.font.Font(pygame.font.match_font(chars["font"]),chars["fontsize"])
+                    dataImage = font.render(data,True,chars["color"])
+                    cellImage.blit(dataImage,(chars["inCellX"],chars["inCellY"]))
+
+                chars["image"] = cellImage
 
         # create the image surface that we will render individual cells to
         # (obviously, this replaces any previous image)
@@ -311,6 +340,8 @@ class Table(object):
             for c, col in enumerate(row):
                 data,chars = col
                 self.tableImage.blit(chars["image"],(chars["x"],chars["y"]))
+
+        surface.blit(self.tableImage,self.position)
                     
     #
     # _align() - given the horizontal/vertical dimensions, return the X/Y for alignment
@@ -401,13 +432,6 @@ class Table(object):
         self.newRow = True          # note that ending a row doesn't make a table dirty
 
     #
-    # update() - updates the table.  This is used to update blinking and check for events
-    #            for the buttons, calling callbacks as necessary.
-    #
-    def update(self):
-        pass
-
-    #
     # image() - returns the image for a table.  If it is dirty, it will be drawn before
     #           being passed back.
     #
@@ -415,3 +439,78 @@ class Table(object):
         if self.dirty:
             self._draw()
         return self.tableImage
+
+    @classmethod
+    def draw(cls,surface):
+        for table in cls.tableList:
+            table._draw(surface)
+
+    #
+    # clone() - ok, this is somewhat obscure (but the same as in Button)
+    #           By calling Table.clone("name") this routine will create a NEW class
+    #           called "nameTables" that inherits from Button, but has a different
+    #           table list.  This makes it possible to easily have different sets of
+    #           tables for different screens.
+    #
+    @classmethod
+    def clone(cls,name):
+        return(type(name + "Tables",(Table,object),{'tableList':[]}))
+
+    @classmethod
+    def update(cls,surface):
+        madeAChange = False
+        for table in cls.tableList:
+            for r, row in enumerate(table.tableData):
+                for c, col in enumerate(row):
+                    data,chars = col
+                    if chars["flashing"] and pygame.time.get_ticks() > chars["flashTarget"]:
+                        chars["flashState"] = not(chars["flashState"])
+                        chars["flashTarget"] = pygame.time.get_ticks() + cls.flashSpeed
+                        madeAChange = True
+        return madeAChange
+
+    #
+    # processEvent() - (just like Button.processEvent) Map click events to the appropriate
+    #                  callbacks. NOTE that this routine has been streamlined by ensuring
+    #                  that only mouse down events cause any action at all.  NOTE too that
+    #                  it is assumed that only one cell has the click "inside".
+    #
+    @classmethod
+    def processEvent(cls,event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for table in cls.tableList:
+                for r, row in enumerate(table.tableData):
+                    for c, col in enumerate(row):
+                        data,chars = col
+                        if table.inside(event.pos,chars):
+                            return table._callit(chars)
+        return False
+
+    #
+    # _callit() - a routine to make the code prettier - this calls the given callback
+    #             with the rock if given, otherwise with no arguments.
+    #
+    def _callit(self,chars):
+        if chars["callback"] is not None:
+            if chars["rock"] is not None:
+                return chars["callback"](chars["rock"])
+            else:
+                return chars["callback"]()
+
+    #
+    # inside() - returns True if the given position (x,y) is within the bounds
+    #            of the table cell given.  Used for figuring out clicks.  This works
+    #            just like Button.inside() works, just checking for clicks inside
+    #            one of the cells for the table.
+    #
+    def inside(self,pos,chars):
+        x,y = pos;
+
+        myx = chars["x"] + self.position[0]
+        myy = chars["y"] + self.position[1]
+        width = chars["cellWidth"]
+        height = chars["cellHeight"]
+        return(x >= myx and 
+               x <= myx + width and
+               y >= myy and
+               y <= myy + height)

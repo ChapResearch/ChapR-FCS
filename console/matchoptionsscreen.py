@@ -44,9 +44,9 @@ class MatchOptionsScreen(Screen):
         return "MatchSetupScreen"
 
     def tableDraw(self):
-        self.dataTable = Table(fontsize=20,font="arial",align="right")
+        self.dataTable = self.tables(fontsize=20,font="arial",align="right",callback=self.setTimes,bgcolor=(0,0,0))
 
-        self.dataTable.addData("Next Match:  ",name="matchlabel")
+        self.dataTable.addData("Next Match:  ",name="matchlabel",flashing=True,bgcolor=(50,50,50))
         self.dataTable.addData(self.matchImage,name="match")
         self.dataTable.addSpacer(10)
         self.dataTable.addData("Teleop:  ",     name="teleoplabel")
@@ -63,23 +63,7 @@ class MatchOptionsScreen(Screen):
         self.dataTable.addData("Remote Control:  ",align="right", bold=False)
         self.dataTable.addData("On",bold=True,align="left")
 
-        self.Buttontimes1 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"autolabel",self.tablePosition))
-        self.Buttontimes2 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"auto",self.tablePosition))
-        self.Buttontimes3 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"teleoplabel",self.tablePosition))
-        self.Buttontimes4 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"teleop",self.tablePosition))
-        self.Buttontimes5 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"endgamelabel",self.tablePosition))
-        self.Buttontimes6 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"endgame",self.tablePosition))
-        self.Buttontimes7 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"matchlabel",self.tablePosition))
-        self.Buttontimes8 = self.buttons(callback=self.setTimes,
-                                            **Button.tableButton(self.dataTable,"match",self.tablePosition))
-
+        self.dataTable.position = self.tablePosition
 
     def numberDraw(self):
         self.matchImage = numberDraw(globalVariables.matchNumber,1,BLUE,20,boxWidth=0,outlined=False)
@@ -92,8 +76,7 @@ class MatchOptionsScreen(Screen):
         self._setTitle("Match Options",italic=True,color=(255,0,0))
         self.numberDraw()
         self.tableDraw()
-        self.screen.blit(self.dataTable.image(),self.tablePosition)
 
     def _process(self):
-        pass
+        return False               # false indicates no change to data
 

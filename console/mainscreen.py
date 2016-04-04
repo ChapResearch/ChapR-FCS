@@ -24,7 +24,7 @@ class MainScreen(Screen):
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
 
-        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.systemOptions,
+        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.systemOptions, flashing=True,
                                      **Button.standardButton("NW",["System","Options"],self.screen))
         self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.matchOptions,
                                      **Button.standardButton("NE",["Match","Options"],self.screen))
@@ -33,10 +33,12 @@ class MainScreen(Screen):
         self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.nextMatch,
                                      **Button.standardButton("S",["Next","Match"],self.screen))
 
-        self.dataTable = Table(fontsize=20,font="monospace")
+        self.ButtonS.flashing = True
+
+        self.dataTable = self.tables(fontsize=20,font="monospace")
 
         self.dataTable.addData("Field Name: ",align="right")
-        self.dataTable.addData("Galileo", bold=True, name="fieldName",bgcolor=(50,50,50))
+        self.dataTable.addData("Galileo", bold=True, name="fieldName",bgcolor=(50,50,50),callback=self.setFieldName,flashing=True)
         self.dataTable.endRow()
         self.dataTable.addData("Waiting Robots: ", align="right")
         self.dataTable.addData("4",name="robots",bold=True)
@@ -45,13 +47,9 @@ class MainScreen(Screen):
         self.dataTable.addData("10",name="match",callback=self.setMatchNumber,bold=True)
         self.dataTable.endRow()
 
-        self.ButtonFieldName = self.buttons(callback=self.setFieldName,
-                                            **Button.tableButton(self.dataTable,"fieldName",self.tablePosition))
-
         # put out the title
         self.screen.blit(self.titleImage,self.titlePosition)
-        self.screen.blit(self.dataTable.image(),self.tablePosition)
-#        self.dataTable.updateData("robots",10)
+        self.dataTable.position = self.tablePosition
 
     def setFieldName(self):
         text = self.dataTable.getCellData("fieldName")

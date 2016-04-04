@@ -23,15 +23,16 @@ class Button():
 
     flashSpeed = 250
 
+                                          # NOTE - a "default" button is just a region that is clickable
     def __init__(self,
                  size,                    # a tuple of (width,height) for the button - prior to any rotation
                  position,                # a button location (x,y) - upper left corner AFTER rotation
-                 labels="",               # label for the button - multi-lines will attempt to center
+                 labels=None,             # label for the button - multi-lines will attempt to center
                  font=None,               # the font to use - defaults to something nice
                  rotation=0,              # 0,90,180,270 rotation of the button
-                 bgcolor=(0,0,0),         # the background color of the button
+                 bgcolor=None,            # the background color of the button
                  lcolor=(255,255,255),    # font and outline color for the button
-                 outline=0,               # if true, generate an outline for the button
+                 outline=0,               # thickness of outline, zero means no outline
                  graphic=None,            # graphic to place on the button (NOT IMPLEMENTED YET)
                  flashing=0,              # if true, the content of the button will flash
                  gpio=None,               # the GPIO connected to the associated physical button
@@ -42,10 +43,10 @@ class Button():
                  rock=None):              # if given, the rock will be passed to any callback called
 
         self.bgcolor = bgcolor
-        if not isinstance(labels,list):   # target label needs to always be list of labels
-            self.labels = [ labels ]
-        else:
+        if labels is None or isinstance(labels,list):
             self.labels = labels
+        else:
+            self.labels = [ labels ]   # target label needs to always be list of labels (or None)
 
         if not(font):
             font = pygame.font.SysFont('arial', size[1]/3, bold=True)        
@@ -60,7 +61,7 @@ class Button():
         self.graphic = graphic
         self.flashing = flashing
         self.flashState = True
-        self.flashTarget = pygame.time.get_ticks() + Button.flashSpeed
+        self.flashTarget = pygame.time.get_ticks() + self.__class__.flashSpeed
         self.gpio = gpio
         self.callback = callback
         self.upCallback = upCallback
@@ -121,12 +122,13 @@ class Button():
 
     @classmethod
     def update(cls,surface):
+        madeAChange = False
         for button in cls.buttonList:
             if button.flashing and pygame.time.get_ticks() > button.flashTarget:
                 button.flashState = not(button.flashState)
                 button.flashTarget = pygame.time.get_ticks() + cls.flashSpeed
-                button._draw(surface)
-                pygame.display.flip()
+                madeAChange = True
+        return madeAChange
 
 
     #
@@ -206,8 +208,9 @@ class Button():
     #                This assumes that the whole surface is used to draw (ie - ignoring outline)
     #
     def _drawLabel(self,surface):
-        surface.fill(self.bgcolor)
-        if self.flashState:
+        if self.bgcolor is not None:
+            surface.fill(self.bgcolor)
+        if self.labels is not None and self.flashState:
             width,realHeight = surface.get_size()
             height = 0.7 * realHeight                         # leave some top and bottom
             heightDivision = height / len(self.labels)
@@ -228,30 +231,29 @@ class Button():
     #
     def _draw(self,surface):
 
-        # procedure:
-        #  1) fill the button surface to create the outline (buttonSurface)
-        #  2) get a surface for the inside accounting for the outline (labelSurface)
-        #  3) draw text on the inside surface
-        #  4) blit the inside surface onto the outsize surface
-        #  5) rotate if necessary
-        #  6) blit the outside surface onto the target surface!
+        # drawing only happens if there is something to draw, this means that one or more of the
+        # following need to be set:
+        
+        if self.outline != 0 or self.labels is not None or self.bgcolor is not None or self.graphic:
 
-        self.surface.fill(self.lcolor)
+            if self.outline != 0:
+                self.surface.fill(self.lcolor)
 
-        width, height = self.size
-        labelSurface = pygame.Surface((width - 2*self.outline,height - 2*self.outline))
+            width, height = self.size
+            labelSurface = pygame.Surface((width - 2*self.outline,height - 2*self.outline))
 
-        self._drawLabel(labelSurface)
-        self.surface.blit(labelSurface,(self.outline,self.outline))
+            self._drawLabel(labelSurface)
 
-        if self.graphic:
-            self.surface.blit(self.graphic,(0,0))
+            self.surface.blit(labelSurface,(self.outline,self.outline))
 
-        buttonSurface = pygame.transform.rotate(self.surface,self.rotation)
+            if self.graphic:
+                self.surface.blit(self.graphic,(0,0))
 
-        surface.blit(buttonSurface,self.position)
+            buttonSurface = pygame.transform.rotate(self.surface,self.rotation)
 
-    def click(self):
+            surface.blit(buttonSurface,self.position)
+
+    def printClicked(self):
         print(" ".join(self.labels) + " clicked")
 
     #
@@ -261,10 +263,16 @@ class Button():
     #            clicks can be done
     #
     def inside(self,pos):
-        buttonSurface = pygame.transform.rotate(self.surface,self.rotation)
+
         x,y = pos;
         myx,myy = self.position
-        width,height = buttonSurface.get_size();
+
+        # since rotation is only on 0,90,180,270 it is easy to get the right width/height
+        if self.rotation % 180 == 0:
+            width,height = self.size
+        else:
+            height,width = self.size
+
         return(x >= myx and 
                x <= myx + width and
                y >= myy and

@@ -111,6 +111,8 @@ hdmiProcess = hdmiProcess.start()
 bigScreen = HDMI("server",hdmiComm)    # sets up the communication to the sub-process
 smallScreen = touchScreen("/dev/fb1")  # initialize the small screen interface
 
+pygame.init()
+
 # set-up hardware, and run through the boot-up test sequence.  Each
 # time we boot, the system tests the buttons and bluetooth (as much as
 # possible anyway)
@@ -160,8 +162,8 @@ MatchOptionsScreen("MatchOptions")
 SystemOptionsScreen("SystemOptions")
 RunMatchScreen("RunMatch",bigScreen)
 
-BootScreens(smallScreen,bigScreen).process()
-ButtonTestScreen("ButtonTestScreen").process()
+#BootScreens(smallScreen,bigScreen).process()
+#ButtonTestScreen("ButtonTestScreen").process()
 #OptionScreen("OptionScreen").process()
 
 while(True):
