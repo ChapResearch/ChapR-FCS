@@ -107,17 +107,19 @@ class Table(object):
 
     #
     # changeData() - change a named piece of data in the previously supplied data.
-    #                If resetChars is True, then the characteristics are reset,
-    #                otherwise they remain the same (the default).
+    #                If characteristics are given, they will replace the previous.
     #
-    def changeData(self,name,data,resetChars=False,**args):
+    def changeData(self,name,**args):
         for r, row in enumerate(self.tableData):
             for c, col in enumerate(row):
-                if "name" in col[1] and col[1]["name"] == name:
-                    self.tableData[r][c][0] = data
-                    self.computed = False
-                    if resetChars:
-                        self.tableData[r][c][1] = self._getCharacteristics(args,self.mydefaults)
+                data,chars = col
+                if "name" in chars and chars["name"] == name:
+                    if "data" in args:
+                        col[0] = args["data"]
+                    self.computed = False               # mark it necessary to recompute the table
+                for key,value in args:
+                    chars[key] = value
+                    self.computed = False               # mark it necessary to recompute the table
 
     #
     # getCellLocation() - given a name, find the target cell and return its location
