@@ -68,7 +68,7 @@ class SystemOptionsScreen(Screen):
         pass
 
     def tableDraw(self):
-        self.dataTable = Table(fontsize=20,font="monospace")
+        self.dataTable = self.tables(fontsize=20,font="monospace")
 
         self.dataTable.addData("Field Name: ",align="right")
         self.dataTable.addData("Galileo", bold=True, name="fieldName",bgcolor=(50,50,50))
@@ -80,14 +80,12 @@ class SystemOptionsScreen(Screen):
         self.dataTable.addData("10",name="match",bold=True)
         self.dataTable.endRow()
 
-        self.ButtonFieldName = self.buttons(callback=self.setFieldName,
-                                            **Button.tableButton(self.dataTable,"fieldName",self.tablePosition))
+        self.dataTable.position = self.tablePosition
 
     def _enter(self):
         self._setLogo()
         self._setTitle("System Options",italic=True,color=(0,0,255))
         self.tableDraw()
-#        self.screen.blit(self.dataTable.image(),self.tablePosition)
 
     def _process(self):
         pass

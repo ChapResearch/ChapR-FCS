@@ -47,7 +47,7 @@ class MatchOptionsScreen(Screen):
         self.dataTable = self.tables(fontsize=20,font="arial",align="right",callback=self.setTimes,bgcolor=(0,0,0))
 
         self.dataTable.addData("Next Match:  ",name="matchlabel",flashing=True,bgcolor=(50,50,50))
-        self.dataTable.addData(self.matchImage,name="match")
+        self.dataTable.addData(self.matchImage,name=0)
         self.dataTable.addSpacer(10)
         self.dataTable.addData("Teleop:  ",     name="teleoplabel")
         self.dataTable.addData(self.teleopImage,name="teleop")
@@ -76,7 +76,13 @@ class MatchOptionsScreen(Screen):
         self._setTitle("Match Options",italic=True,color=(255,0,0))
         self.numberDraw()
         self.tableDraw()
+        self.testchange = False
 
     def _process(self):
-        return False               # false indicates no change to data
+        if self.testchange:
+            return False
+        else:
+            self.dataTable.changeData(0,102)
+            self.testchange = True
+            return True                           # returning true causes the screen to redraw stuff
 

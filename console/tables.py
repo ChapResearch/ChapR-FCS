@@ -54,7 +54,6 @@ class Table(object):
     def __init__(self,**args):
         self.tableImage = None
         self.computed = False      # true if data has been computed recently
-        self.dirty = True          # being "dirty" means that the table needs to be re-painted
         self.newRow = True         # when True, the next data starts on a new row
         self.tableData = list()    # just indicating that this is where the data is stored
         self.currentRow = -1       # first row will be index 0
@@ -90,7 +89,6 @@ class Table(object):
     #                supplying arguments to the __init__().
     #
     def addData(self,data,**args):
-        self.dirty = True
         self.computed = False
         chars = self._getCharacteristics(args,self.mydefaults)
 
@@ -113,11 +111,11 @@ class Table(object):
     #                otherwise they remain the same (the default).
     #
     def changeData(self,name,data,resetChars=False,**args):
-        self.dirty = True
         for r, row in enumerate(self.tableData):
             for c, col in enumerate(row):
                 if "name" in col[1] and col[1]["name"] == name:
                     self.tableData[r][c][0] = data
+                    self.computed = False
                     if resetChars:
                         self.tableData[r][c][1] = self._getCharacteristics(args,self.mydefaults)
 
@@ -205,7 +203,6 @@ class Table(object):
     def size(self,width=None,height=None):
         self.width = width
         self.height = height
-        self.dirty = True
 
     #
     # _compute() - given the data in the current table, compute all of the meta-data about the
@@ -298,12 +295,10 @@ class Table(object):
     #
     # _draw() - draws the current table on the given surface.
     #           It takes the tabledata structure and makes it happen.
-    #           Note that this routine marks all items in the table dirty and then calls the
-    #           _redraw() routine.
     #
     def _draw(self,surface):
-        self.dirty = False         # just planning ahead
 
+        print("drawing table")
         self.compute()
 
         #
@@ -354,10 +349,6 @@ class Table(object):
             return diff
         else:
             return 0
-
-    #
-    # _redraw() - will do only a redraw of the items in the table data that are marked dirty.
-    #
 
     #
     # _rows() - return the number of rows in a table, which could be zero
@@ -430,15 +421,6 @@ class Table(object):
     #
     def endRow(self):
         self.newRow = True          # note that ending a row doesn't make a table dirty
-
-    #
-    # image() - returns the image for a table.  If it is dirty, it will be drawn before
-    #           being passed back.
-    #
-    def image(self):
-        if self.dirty:
-            self._draw()
-        return self.tableImage
 
     @classmethod
     def draw(cls,surface):

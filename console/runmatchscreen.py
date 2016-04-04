@@ -59,6 +59,7 @@ class RunMatchScreen(Screen):
             self.bigScreen.clockStop()
             self.bigScreen.clockSet(self.clock.time) # make sure in sync
             self.bigStopped = True
+        return True                          # tells screen that a redraw is necessary
 
     #
     # _state0() - implements the state zero
