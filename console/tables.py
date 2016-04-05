@@ -118,10 +118,15 @@ class Table(object):
                     changed = False
                     if "data" in args:
                         col[0] = args["data"]
+                        # note that this ASSUMES that you want calculated width/height
+                        # if you want to specify it (like if you did originally for example)
+                        # then you need to do it AGAIN during a data change
+                        chars["cellWidth"] = chars["cellHeight"] = chars["height"] = chars["width"] = None
                         changed = True
                     for key,value in args.iteritems():
-                        chars[key] = value
-                        changed = True
+                        if key != "data":
+                            chars[key] = value
+                            changed = True
                     if changed:
                         self._compute()
 
