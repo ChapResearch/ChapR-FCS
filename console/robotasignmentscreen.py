@@ -17,7 +17,9 @@ class RobotAssignmentScreen(Screen):
         Screen.__init__(self,name)
 
         self.tablePosition = (130,10)
-        
+        self.trashcanpic = pygame.image.load("Media/Trashcan.png").convert()
+        self.trashcanpic = pygame.transform.scale(self.trashcanpic, (50,50))
+
         self.cb1 = (240,220,0)
         self.cb2 = (110,40,180)
         
@@ -38,8 +40,8 @@ class RobotAssignmentScreen(Screen):
                                      **Button.standardButton("SE","",self.screen))
         self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.done,rock = "S",
                                      **Button.standardButton("S","Done",self.screen))
-        self.ButtonDel = self.buttons(bgcolor = (255,0,0), callback = self.trashButton,rock = "DelButton",
-                                      size=(30,30), position=(150,300), rotation=0,labels=["",""])
+        self.ButtonDel = self.buttons(graphic = self.trashcanpic, callback = self.trashButton,rock = "DelButton",
+                                      size=(50,50), position=(130,275), rotation=0,labels=["",""])
 
     def teamAssign(self,rock):
         print("team assign called")
@@ -89,6 +91,7 @@ class RobotAssignmentScreen(Screen):
                 self.Button[self.AssignButtonPressed].flashing = False
                 self.Button[self.AssignButtonPressed].labels = " "
                 self.assignedTeams[self.AssignButtonPressed] = None
+                self.AssignButtonPressed = None
                 self.repaintTable()
             else:
                 pass
