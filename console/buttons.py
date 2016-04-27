@@ -29,6 +29,7 @@ class Button():
                  position,                # a button location (x,y) - upper left corner AFTER rotation
                  labels=None,             # label for the button - multi-lines will attempt to center
                  font=None,               # the font to use - defaults to something nice
+                 fontsize=None,           # the font size to use - defaults to something nice
                  rotation=0,              # 0,90,180,270 rotation of the button
                  bgcolor=None,            # the background color of the button
                  lcolor=(255,255,255),    # font and outline color for the button
@@ -43,13 +44,15 @@ class Button():
                  rock=None):              # if given, the rock will be passed to any callback called
 
         self.bgcolor = bgcolor
-        if labels is None or isinstance(labels,list):
-            self.labels = labels
+        self.setLabels(labels)
+
+        if fontsize is not None:
+            self.fontsize = fontsize
         else:
-            self.labels = [ labels ]   # target label needs to always be list of labels (or None)
+            self.fontsize = size[1]/3
 
         if not(font):
-            font = pygame.font.SysFont('arial', size[1]/3, bold=True)        
+            font = pygame.font.SysFont('arial', self.fontsize, bold=True)        
 
         self.font = font
         self.lcolor = lcolor
@@ -68,7 +71,19 @@ class Button():
         self.downCallback = downCallback
         self.holdCallback = holdCallback
         self.rock = rock
+        self.needsUpdating = True                     # set to true if an update is necessary
         self.__class__.buttonList.append(self)
+
+    #
+    # setLabels() - simple method to set the labels for a button.  It was turned into a method
+    #               so that they can be easily updated.
+    #
+    def setLabels(labels):
+        self.needsUpdating = True
+        if labels is None or isinstance(labels,list):
+            self.labels = labels
+        else:
+            self.labels = [ labels ]   # target label needs to always be list of labels (or None)
 
     #
     # clone() - ok, this is somewhat obscure
@@ -122,7 +137,7 @@ class Button():
 
     @classmethod
     def update(cls,surface):
-        madeAChange = False
+        madeAChange = self.needsUpdating
         for button in cls.buttonList:
             if button.flashing and pygame.time.get_ticks() > button.flashTarget:
                 button.flashState = not(button.flashState)
