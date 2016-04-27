@@ -78,7 +78,7 @@ class Button():
     # setLabels() - simple method to set the labels for a button.  It was turned into a method
     #               so that they can be easily updated.
     #
-    def setLabels(labels):
+    def setLabels(self,labels):
         self.needsUpdating = True
         if labels is None or isinstance(labels,list):
             self.labels = labels
@@ -137,8 +137,10 @@ class Button():
 
     @classmethod
     def update(cls,surface):
-        madeAChange = self.needsUpdating
+        madeAChange = False
         for button in cls.buttonList:
+            if button.needsUpdating:
+                madeAChange = True
             if button.flashing and pygame.time.get_ticks() > button.flashTarget:
                 button.flashState = not(button.flashState)
                 button.flashTarget = pygame.time.get_ticks() + cls.flashSpeed
