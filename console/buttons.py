@@ -89,8 +89,8 @@ class Button():
     # setFlash(self,on) - turns on flashing if on is true, otherwise flash is turned off
     #
     def setFlash(self,on):
-        set.flashing = on
-        set.flashState = True            # always turn the button back on when changing flashing
+        self.flashing = on
+        self.flashState = True            # always turn the button back on when changing flashing
         self.needsUpdating = True
 
     #
