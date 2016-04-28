@@ -78,8 +78,10 @@ class Screen(object):
     #            only happens if necessary.
     #
     def update(self):
-        return self.buttons.update(self.screen) or self.tables.update(self.screen)
-                                                                      # needed for flashing buttons or table cells
+        b = self.buttons.update(self.screen)     # needed for flashing buttons or table cells
+        t = self.tables.update(self.screen)
+        return b or t
+                     
 
     #
     # draw() - draws the screen - really consists mostly of buttons and tables
