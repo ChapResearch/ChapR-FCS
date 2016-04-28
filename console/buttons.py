@@ -86,6 +86,14 @@ class Button():
             self.labels = [ labels ]   # target label needs to always be list of labels (or None)
 
     #
+    # setFlash(self,on) - turns on flashing if on is true, otherwise flash is turned off
+    #
+    def setFlash(self,on):
+        set.flashing = on
+        set.flashState = True            # always turn the button back on when changing flashing
+        self.needsUpdating = True
+
+    #
     # clone() - ok, this is somewhat obscure
     #           By calling Button.clone("name") this routine will create a NEW class
     #           called "nameButtons" that inherits from Button, but has a different
