@@ -149,6 +149,7 @@ class Button():
         for button in cls.buttonList:
             if button.needsUpdating:
                 madeAChange = True
+                button.needsUpdating = False
             if button.flashing and pygame.time.get_ticks() > button.flashTarget:
                 button.flashState = not(button.flashState)
                 button.flashTarget = pygame.time.get_ticks() + cls.flashSpeed
