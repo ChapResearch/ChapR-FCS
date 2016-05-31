@@ -23,6 +23,9 @@ class ButtonTestScreen(Screen):
         # self.ButtonNE = "Other"
         # self.ButtonSE = "Thing"
         # self.ButtonAction = "Action"
+        
+    def _enter(self):
+        self.redraw()
 
     def button1(self):
         print("Button 1 is working")
@@ -35,6 +38,7 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
+        self.redraw() 
 
     def button2(self):
         print("Button 2 is working")
@@ -47,6 +51,7 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
+        self.redraw() 
 
     def button3(self):
         print("Button 3 is working")
@@ -59,6 +64,7 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
+        self.redraw() 
 
     def button4(self):
         if self.target==4:
@@ -70,11 +76,12 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
+        self.redraw() 
 
     def quit(self):
         return "back"
 
-    def _process(self):
+    def redraw(self):
         self.screen.fill([0,0,0])             # just black, no graphic background image
         x = self.screen.get_width()
         y = self.screen.get_height()
