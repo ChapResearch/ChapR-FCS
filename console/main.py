@@ -37,8 +37,7 @@ import globalVariables
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from hardware import HARDWARE
 from Team import Match
-
-# from rn4020 import RN4020
+from rn4020 import RN4020
 
 #
 #  ____   _                    _         _    _               
@@ -113,6 +112,21 @@ smallScreen = touchScreen("/dev/fb1")  # initialize the small screen interface
 
 pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
 pygame.init()
+
+
+#  ____   _               _                 _    _     
+# | __ ) | | _   _   ___ | |_  ___    ___  | |_ | |__  
+# |  _ \ | || | | | / _ \| __|/ _ \  / _ \ | __|| '_ \ 
+# | |_) || || |_| ||  __/| |_| (_) || (_) || |_ | | | |
+# |____/ |_| \__,_| \___| \__|\___/  \___/  \__||_| |_|
+#                                                      
+# Set up the bluetooth control.  The RN4020 is the hardward at the lowest
+# level.  However, we use a special BLE object to maintain everything from
+# bluetooth control, to the threads that monitor the protocol as the match
+# is progressing.
+# 
+
+#bluetooth = BLEcontrol()
 
 # set-up hardware, and run through the boot-up test sequence.  Each
 # time we boot, the system tests the buttons and bluetooth (as much as
