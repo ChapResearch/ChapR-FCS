@@ -24,7 +24,7 @@ class MainScreen(Screen):
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
 
-        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.systemOptions, flashing=True,
+        self.ButtonNW = self.buttons(bgcolor = (0,0,255), callback=self.systemOptions,
                                      **Button.standardButton("NW",["System","Options"],self.screen))
         self.ButtonNE = self.buttons(bgcolor = (0,0,255), callback=self.matchOptions,
                                      **Button.standardButton("NE",["Match","Options"],self.screen))
@@ -33,12 +33,11 @@ class MainScreen(Screen):
         self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.nextMatch,
                                      **Button.standardButton("S",["Next","Match"],self.screen))
 
-        self.ButtonS.flashing = True
 
         self.dataTable = self.tables(fontsize=20,font="monospace")
 
         self.dataTable.addData("Field Name: ",align="right")
-        self.dataTable.addData("Galileo", bold=True, name="fieldName",bgcolor=(50,50,50),callback=self.setFieldName,flashing=True)
+        self.dataTable.addData("Galileo", bold=True, name="fieldName",bgcolor=(50,50,50),callback=self.setFieldName)
         self.dataTable.endRow()
         self.dataTable.addData("Waiting Robots: ", align="right")
         self.dataTable.addData("4",name="robots",bold=True)
