@@ -36,7 +36,7 @@ from signal import alarm, signal, SIGALRM
 import globalVariables
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from hardware import HARDWARE
-
+from Team import Match
 
 # from rn4020 import RN4020
 
@@ -55,10 +55,10 @@ from hardware import HARDWARE
 
 #
 #  ____                
-# | __ )  _   _   __ _ 
-# |  _ \ | | | | / _` |
-# | |_) || |_| || (_| |
-# |____/  \__,_| \__, |
+# | __ )  _   _   __ _              ________  ___  ____
+# |  _ \ | | | | / _` |             /        \  \ \/ /
+# | |_) || |_| || (_| |            |          |_/   /
+# |____/  \__,_| \__, |             \______________/
 #                |___/ 
 # __        __            _                                                _ 
 # \ \      / /___   _ __ | | __        __ _  _ __  ___   _   _  _ __    __| |
@@ -111,6 +111,7 @@ hdmiProcess = hdmiProcess.start()
 bigScreen = HDMI("server",hdmiComm)    # sets up the communication to the sub-process
 smallScreen = touchScreen("/dev/fb1")  # initialize the small screen interface
 
+pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
 pygame.init()
 
 # set-up hardware, and run through the boot-up test sequence.  Each
@@ -143,6 +144,8 @@ from runmatchscreen import RunMatchScreen
 from About import AboutScreen
 from systemtests import SystemTestsScreen
 from robotasignmentscreen import RobotAssignmentScreen
+from matchsetup import PrepareMatchScreen
+from startmatch import StartMatchScreen
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
@@ -156,6 +159,9 @@ from robotasignmentscreen import RobotAssignmentScreen
 #     OptionScreen() - "option"
 #     MatchSetupScreen() - "
 
+# All of the match info is stored in match object
+MatchObject = Match()
+
 MatchSetupScreen("MatchSetupScreen")
 NumberChangeScreen("autoTimeChangeScreen","autoTime",0,"Autonomous:",YELLOW)
 NumberChangeScreen("teleopTimeChangeScreen","teleopTime",0,"Teleop:",GREEN)
@@ -164,13 +170,14 @@ NumberChangeScreen("matchNumberChangeScreen","matchNumber",1,"Match:",BLUE)
 MatchOptionsScreen("MatchOptions")
 SystemOptionsScreen("SystemOptions")
 RunMatchScreen("RunMatch",bigScreen)
-AboutScreen("AboutScreen")
+AboutScreen("AboutScreen")#.process()
 SystemTestsScreen("SystemTest")
-RobotAssignmentScreen("RobotAssignmentScreen").process()
-
+RobotAssignmentScreen("RobotAssignmentScreen",MatchObject).process()
+PrepareMatchScreen("PrepareMatch",MatchObject).process()
 #BootScreens(smallScreen,bigScreen).process()
 #ButtonTestScreen("ButtonTestScreen").process()
 #OptionScreen("OptionScreen").process()
+StartMatchScreen("StartMatch",MatchObject,bigScreen).process()
 
 while(True):
         MainScreen("MainScreen").process()
