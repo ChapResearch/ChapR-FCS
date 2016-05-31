@@ -40,5 +40,7 @@ class HDMIClock(Clock):
         Clock.setTime(self,mins,secs)
         self._draw()
 
+    def setColor(self,color):
+        Clock.setColor(self,color)
 
         
