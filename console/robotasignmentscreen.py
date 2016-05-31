@@ -10,126 +10,190 @@ from tables import Table
 from utils import textOutline, numberDraw
 import globalVariables
 from globalVariables import RED,GREEN,BLUE,YELLOW
+from Team import Match
 
 class RobotAssignmentScreen(Screen):
 
-    def __init__(self,name):
+    def __init__(self,name,match):
         Screen.__init__(self,name)
 
+        self.match = match        
+        
         self.tablePosition = (130,10)
         self.trashcanpic = pygame.image.load("Media/Trashcan.png").convert()
         self.trashcanpic = pygame.transform.scale(self.trashcanpic, (50,50))
 
-        self.cb1 = (240,220,0)
-        self.cb2 = (110,40,180)
-        
-        self.roboSel = None                   # if this is a robt number then that robot is selected 
+        self.cb1 = (150,150,150)
+        self.cb2 = (50,50,50)
+        self.sideBlue = (150,150,255)
+        self.sideRed = (255,150,150)
+
+        self.roboSel = None                   #  the index into the Table of robots
         self.trashList = []
         self.AssignButtonPressed = None        #This is set to one of NW NE SW SE or NOne
         self.assignedTeams = { "NW":None, "NE":None, "SW":None, "SE":None }
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
         self.Button = dict()
-        self.Button["NW"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "NW",
+        self.Button["NW"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "NW",fontsize = 25,
                                      **Button.standardButton("NW","",self.screen))
-        self.Button["NE"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "NE",
+        self.Button["NE"] = self.buttons(bgcolor = (255,0,0), callback=self.teamAssign,rock = "NE",fontsize = 25,
                                      **Button.standardButton("NE","",self.screen))
-        self.Button["SW"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "SW",
+        self.Button["SW"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "SW",fontsize = 25,
                                      **Button.standardButton("SW","",self.screen))
-        self.Button["SE"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "SE",
+        self.Button["SE"] = self.buttons(bgcolor = (255,0,0), callback=self.teamAssign,rock = "SE",fontsize = 25,
                                      **Button.standardButton("SE","",self.screen))
-        self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.done,rock = "S",
+        self.ButtonS = self.buttons(bgcolor = (255,255,255), callback=self.done, lcolor = (0,0,0),
                                      **Button.standardButton("S","Done",self.screen))
         self.ButtonDel = self.buttons(graphic = self.trashcanpic, callback = self.trashButton,rock = "DelButton",
                                       size=(50,50), position=(130,275), rotation=0,labels=["",""])
+        self.createSides()
 
+
+    #
+    # _updateTableDIsplayList() - Update the display list acording to incoming list and trash list.
+    #
+    def _updateTableDisplayList(self):
+        self.displayList =  list(set(self.incomingList)-set(self.trashList))
+        self.displayList.sort()
+
+    #
+    # _unassignButton() - Remove team from assigned button
+    #                     the button is identified by rock
+    #
+    def _unassignButton(self, rock):
+        self.trashList.remove(self.assignedTeams[rock])
+        self.Button[rock].setLabels(None)
+        
+
+    #
+    # _SwapAssignedWithTable() - Swaps assigned team with selcted robot on table.
+    #                            the argument rock refers to the assigned team that is swaped.
+    #
+    def _swapAssignedWithTable(self,rock):
+        # First remove the team thats on the button
+        self.trashList.remove(self.assignedTeams[rock])
+        # Next assign the current selcted table robot to Button
+        self._assignTeamToButton(rock)
+
+    #
+    # _assignTeamToButton() - Assign the previously clicked team to the button identified by rock
+    #
+    #
+    def _assignTeamToButton(self,rock):
+        # move the flashing table robot to the button
+        self.trashList.append(self.displayList[self.roboSel])
+        self.assignedTeams[rock] = self.displayList[self.roboSel]
+        self.Button[rock].setLabels(str(self.displayList[self.roboSel]))
+        # Clean up and repaint table
+        self.dataTable.setFlash(self.roboSel,False)
+        self.roboSel = None
+        self.repaintTable()
+
+    #
+    #_swap2Buttons() - Swaps two assignedTeam buttons
+    #                  the rock refers to the last button clicked
+    #                  this routine assumes that the 2 buttons are different
+    #                  (you need to ensure this before calling thi routine)
+    #
+    def _swap2Buttons(self,rock):
+        self.Button[self.AssignButtonPressed].setFlash(False)
+        checklabel = str(self.assignedTeams[self.AssignButtonPressed])
+        if self.assignedTeams[self.AssignButtonPressed] is None:
+            checklabel = None
+        self.Button[rock].setLabels(checklabel)
+        newlabel = str(self.assignedTeams[rock])
+        if self.assignedTeams[rock] is None:
+            newlabel = None
+        self.Button[self.AssignButtonPressed].setLabels(newlabel)
+        temp = self.assignedTeams[rock]
+        self.assignedTeams[rock] = self.assignedTeams[self.AssignButtonPressed]
+        self.assignedTeams[self.AssignButtonPressed] = temp
+
+    #nn
+    # teamAssign() - Called whenever a corner buton is clicked
+    #  n              the rock identifies the buton that was presnsed.
+    #
     def teamAssign(self,rock):
-        print("team assign called")
-#        self.Button[rock].labels = ["Hello",]
-#        self.Button[rock].flashing = True
+        
+        # First check if a table button has been clicked previously
         if self.roboSel is not None:
-            print("This aint working")
-            print("Changing the name of team assign Button")
-            modifiedList = []
-            for robot in self.incomingList:
-                print(robot)
-                if robot not in self.trashList:
-                    print(robot)
-                    modifiedList.append(robot)
-                else:
-                    robot += 1
-            self.trashList.append(modifiedList[self.roboSel])
-            self.Button[rock].labels = [str(modifiedList[self.roboSel]),]
-            self.assignedTeams[rock] = modifiedList[self.roboSel]
-            print(self.incomingList[self.roboSel])                                      
-            self.dataTable.setFlash(self.roboSel,False)
-            self.roboSel = None
-            self.repaintTable()
+            if self.assignedTeams[rock] is not None:       # Check if there is a team on the button
+                self._swapAssignedWithTable(rock)
+            else:                                          # There was no team on the button
+                self._assignTeamToButton(rock)
+
+        # No Table button had been clicked, but  another assignTeam button had been clicked
         elif self.AssignButtonPressed is not None:
             if rock != self.AssignButtonPressed:
-                self.Button[self.AssignButtonPressed].flashing = False
-                self.Button[rock].labels = [str(self.assignedTeams[self.AssignButtonPressed])]
-                self.Button[self.AssignButtonPressed].labels = [str(self.assignedTeams[rock])]
-                temp = self.assignedTeams[rock]
-                self.assignedTeams[rock] = self.assignedTeams[self.AssignButtonPressed]
-                self.assignedTeams[self.AssignButtonPressed] = temp
+                self._swap2Buttons(rock)
             self.AssignButtonPressed = None
-            self.Button[rock].flashing = False
+            self.Button[rock].setFlash(False)
         else:
             self.AssignButtonPressed = rock
-            self.Button[rock].flashing = True
+            self.Button[rock].setFlash(True)
 
     def trashButton(self,rock):
+        self._updateTableDisplayList()
+        # Trashes the robot from the table that was reviously clicked
         if self.roboSel is not None:
-            self.trashList.append(self.incomingList[self.roboSel])
+            self.trashList.append(self.displayList[self.roboSel])
             self.dataTable.setFlash(self.roboSel,False)
             self.roboSel = None
             self.repaintTable()
+        #Trashes the the previously selected assigned team
         elif self.AssignButtonPressed is not None:
             if self.assignedTeams[self.AssignButtonPressed] is not None:
                 self.trashList.append(self.assignedTeams[self.AssignButtonPressed])
-                self.Button[self.AssignButtonPressed].flashing = False
-                self.Button[self.AssignButtonPressed].labels = " "
+                self.Button[self.AssignButtonPressed].setFlash(False)
+                self.Button[self.AssignButtonPressed].setLabels(None)
                 self.assignedTeams[self.AssignButtonPressed] = None
                 self.AssignButtonPressed = None
                 self.repaintTable()
-            else:
-                pass
+        else:
+            del self.trashList[:]
+            for team in self.assignedTeams:
+                if self.assignedTeams[team] is not None:
+                    self.trashList.append(self.assignedTeams[team])
+            self._updateTableDisplayList()
+            self.repaintTable()
+            pass
 
     def tableButton(self,rock):
-        print("Table Button Called")
-        print(rock)
+
+        # If a robot from the table was previously selected
         if self.roboSel is not None:
+            # If the clicked robot is the same as the one clicked previously then turn flashing off and clear roboSel
             if self.roboSel == rock:
                 self.dataTable.setFlash(rock,False)
-                print("Turning off flashing for rock")
                 self.roboSel = None
+            # if the clicked robot is different than previously selected
             else:
                 self.dataTable.setFlash(rock,True)
                 self.dataTable.setFlash(self.roboSel,False)
-                print("turning on flashing for rock")
                 self.roboSel = rock
+        # If an assigned team button has been selected previously
         elif self.AssignButtonPressed is not None:
-            print[self.trashList]
             for teams in self.trashList:
-                print(self.trashList)
                 if teams == self.assignedTeams[self.AssignButtonPressed]:
                    self.trashList.remove(teams)
-            self.Button[self.AssignButtonPressed].labels = " "
-            self.Button[self.AssignButtonPressed].flashing = False
+            self.Button[self.AssignButtonPressed].setLabels(None)
+            self.Button[self.AssignButtonPressed].setFlash(False)
+            self.assignedTeams[self.AssignButtonPressed] = None
             self.AssignButtonPressed = None
             self.repaintTable()
         else:
             self.dataTable.setFlash(rock,True)
-            print("Turning on flashing for rock")
             self.roboSel = rock
 
-
     def delete(self):
-        print("Yeet delete")
         trashList.append()
 
     def done(self):
+        self.match.add(Match.B1,self.assignedTeams["NW"])
+        self.match.add(Match.R1,self.assignedTeams["NE"])
+        self.match.add(Match.B2,self.assignedTeams["SW"])
+        self.match.add(Match.R2,self.assignedTeams["SE"])
         return "back"
 
     def tableCreate(self):
@@ -153,39 +217,52 @@ class RobotAssignmentScreen(Screen):
         self.dataTable.endRow()
         self.dataTable.position = self.tablePosition
 
-
+    def createSides(self):
+        widthRed = self.width-self.width/2
+        pygame.draw.rect(self.screen,self.sideBlue,(0,0,self.width/2,self.height),0)
+        pygame.draw.rect(self.screen,self.sideRed,(widthRed,0,self.width/2,self.height),0)
 
     def _enter(self):
+#        self.incomingList = BLE.OnDeckList()
+        self.trashList = list()
+        self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
+        self._updateTableDisplayList()
+        if self.match.getTeam(Match.R1) is not None:
+            self.assignedTeams["NW"] = self.match.getTeam(Match.R1).getNumber()
+            self.trashList.append(self.match.getTeam(Match.R1).getNumber())
+        if self.match.getTeam(Match.R2) is not None:
+            self.assignedTeams["NE"] = self.match.getTeam(Match.R2).getNumber()
+            self.trashList.append(self.match.getTeam(Match.R2).getNumber())
+        if self.match.getTeam(Match.B1) is not None:
+            self.assignedTeams["SW"] = self.match.getTeam(Match.B1).getNumber()
+            self.trashList.append(self.match.getTeam(Match.B1).getNumber())
+        if self.match.getTeam(Match.B2) is not None:
+            self.assignedTeams["SE"] = self.match.getTeam(Match.B2).getNumber()
+            self.trashList.append(self.match.getTeam(Match.B2).getNumber())
         self.tableCreate()
         self.lastList = list()
+        
+        self.repaintTable()
  
     def repaintTable(self):
-        print("YOOOOO")
-        print(self.trashList)
+        self._updateTableDisplayList()
         button = 0
         self.incomingList.sort(cmp=None, key=None, reverse=False)
         for button in range(0,10):
-            print("yeet")
             self.dataTable.changeData(button,data = "")
             button = 0
-        for robot in self.incomingList:
-            print(robot)
-            if robot not in self.trashList:
-                print(robot)
-                self.dataTable.changeData(button,data = robot)
-                button += 1
+        for robot in self.displayList:
+            self.dataTable.changeData(button,data = robot)
+            button += 1
 
 
     def _process(self):
 #       self.incominglist = BLE.OnDeckList()
-        self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
-        self.incomingList.sort(cmp=None, key=None, reverse=False)
         returnvalue = False
-        if len(self.incomingList) > len(self.lastList):
-            self.repaintTable()
-            returnvalue = True
-                    
+
         # STuff Happens here idk what it is
 
+        self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
+        self._updateTableDisplayList()        
         self.lastList = self.incomingList
         return returnvalue
