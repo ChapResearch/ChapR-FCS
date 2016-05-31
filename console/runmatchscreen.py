@@ -26,8 +26,8 @@ from globalVariables import RED,GREEN,BLUE,YELLOW,BLACK,WHITE
 from HDMIclock import HDMIClock
 
 class RunMatchScreen(Screen):
-
-    # this screen is run as a state machine
+        
+ #screen is run as a state machine
     #   State   Description
     #  ------  --------------------------
     #    0     Waiting to start the match
