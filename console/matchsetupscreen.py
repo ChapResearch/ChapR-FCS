@@ -87,6 +87,9 @@ class MatchSetupScreen(Screen):
         endGamePos = (self.width - imageWidth - edgePadding,edgePadding*2+imageHeight)
         return((matchPos,autoPos,teleopPos,endGamePos))
 
-    def _process(self):
+    def _enter(self):
         self.matchButton.graphic, self.autoButton.graphic, self.teleopButton.graphic, self.endGameButton.graphic = self.numberImages(self.buttonHeight)
+        
+    def _process(self):
+        pass
 
