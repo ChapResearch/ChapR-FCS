@@ -23,8 +23,8 @@
 
 from hardware import HARDWARE
 import serial
-import RPi.GPIO as GPIO
 import datetime
+import os
 
 class RN4020:
     """Implements intereface to RN4020"""
@@ -64,38 +64,53 @@ class RN4020:
     #              it.
     #
     def __init__(self):
-        # note that this thing doesn't keep the serial port parameters
-        # in instance variables because they're already in the serial
-        # class as ser.baudrate, ser.port, ser.timeout, etc.
-        self.ser = serial.Serial(HARDWARE.rn4020.tty,HARDWARE.rn4020.baud,timeout=1)
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-        #GPIO.setup(HARDWARE.rn4020.mldp,GPIO.OUT)        # CMD/MLDP drive low
-        #GPIO.setup(HARDWARE.rn4020.wake,GPIO.OUT)         # WAKE_SW drive high
-        GPIO.setup(HARDWARE.rn4020.connected,GPIO.IN)         # goes high when connected
-        #GPIO.output(HARDWARE.rn4020.mldp,GPIO.LOW)
-        #GPIO.output(HARDWARE.rn4020.wake,GPIO.HIGH)
+
+        # the rn4020 module is only viable on the actual console platform, so simulation
+        # is a problem.  However, the module shouldn't break everything else during
+        # simulation, so this code makes it work right duing simulation.
+
+        self.simulation = True
+        if not os.getenv("DISPLAY"):
+            self.simluation = False
+            import RPi.GPIO as GPIO
+
+            # note that this thing doesn't keep the serial port parameters
+            # in instance variables because they're already in the serial
+            # class as ser.baudrate, ser.port, ser.timeout, etc.
+            self.ser = serial.Serial(HARDWARE.rn4020.tty,HARDWARE.rn4020.baud,timeout=1)
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setwarnings(False)
+            #GPIO.setup(HARDWARE.rn4020.mldp,GPIO.OUT)        # CMD/MLDP drive low
+            #GPIO.setup(HARDWARE.rn4020.wake,GPIO.OUT)         # WAKE_SW drive high
+            GPIO.setup(HARDWARE.rn4020.connected,GPIO.IN)         # goes high when connected
+            #GPIO.output(HARDWARE.rn4020.mldp,GPIO.LOW)
+            #GPIO.output(HARDWARE.rn4020.wake,GPIO.HIGH)
 
     def sync(self):
         # (re)syncronizes with the rn4020
         pass
 
     def flush(self):
-        t = self.ser.timeout
-        self.ser.timeout = .1
-        self.ser.readlines()
-        self.ser.timeout = t
+        if not self.simulation:
+            t = self.ser.timeout
+            self.ser.timeout = .1
+            self.ser.readlines()
+            self.ser.timeout = t
 
     def dump(self):
-        t = self.ser.timeout
-        self.ser.timeout = .1
-        print(self.ser.readlines())
-        self.ser.timeout = t
+        if not self.simulation:
+            t = self.ser.timeout
+            self.ser.timeout = .1
+            print(self.ser.readlines())
+            self.ser.timeout = t
 
     def reboot(self):
-        self.flush()
-        self._cmd("R,1")
-        return(self._waitline("Reboot",1) and self._waitline("CMD",2))
+        if not self.simluation:
+            self.flush()
+            self._cmd("R,1")
+            return(self._waitline("Reboot",1) and self._waitline("CMD",2))
+        else:
+            return(True)
 
     #
     # _cmd() - execute the given command, and consume the return message
@@ -103,11 +118,15 @@ class RN4020:
     #          some commands have return, some don't.
     #
     def _cmd(self,name):
-        self.ser.write(name + "\n")
+        if not self.simluation:
+            self.ser.write(name + "\n")
 
     def _cmdV(self,name):
-        self._cmd(name)
-        return(self._waitline("AOK",10,"ERR"))
+        if not self.simluation:
+            self._cmd(name)
+            return(self._waitline("AOK",10,"ERR"))
+        else:
+            return(True)
 
     #
     # _setDeviceChar() - sets the device characteristics that will be
@@ -196,9 +215,12 @@ class RN4020:
         return(self._cmdV("SR,00100000"))
 
     def setup(self):
-        return(self._setFactory() and
-               self._setDeviceChar("Chap FCS","Chap Research","Chap FCS") and
-               self._setServices() and
-               self._setFeatures() and
-               self._setPrivateServices() and
-               self.reboot())
+        if not self.simluation:
+            return(self._setFactory() and
+                   self._setDeviceChar("Chap FCS","Chap Research","Chap FCS") and
+                   self._setServices() and
+                   self._setFeatures() and
+                   self._setPrivateServices() and
+                   self.reboot())
+        else:
+            return(True)
