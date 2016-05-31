@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Chap FCS</string>
+    <string name="fcsFieldSelector">Field</string>
+    <string name="fieldText">Field</string>
+    <string name="scanButton">Scan</string>
+    <string name="autoText">Autonomous</string>
+    <string name="chapFCSLogo">none</string>
+    <string name="teleopText">Tele-Op</string>
+    <string name="confirmButton">Confirm</string>
+    <string name="backButton">Back</string>
+    <string name="errorMessage">Access: Denied</string>
+    <string name="unknown_device">none found</string>
+
+    <string-array name="OpModes">
+        <item>-None-</item>
+    </string-array>
+</resources>
