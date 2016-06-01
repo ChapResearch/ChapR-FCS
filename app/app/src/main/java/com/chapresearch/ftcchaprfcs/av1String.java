@@ -43,22 +43,22 @@ public class av1String {
         for (int i = 0, b = 0; i < achars; i+=4, b+=3){
             //int selector = (i % 4 == 0) ? 4: i % 4;
             storage[i] = (byte)((bytes[b] >> 2) & 0x3f);
-            //System.out.printf("0x%02x\n", storage[i]);
+            System.out.printf("0x%02x\n", storage[i]);
             if (i+1 < achars && b + 1 < slots) {
-                if (storage[i] == av1ReverseEncoding[0])
-                    break;
                 storage[i + 1] = (byte) (((bytes[b] << 4) & 0x30) | ((bytes[b + 1] >> 4) & 0x0f));
-                //System.out.printf("0x%02x\n", storage[i+1]);
+                if (storage[i+1] == av1ReverseEncoding[0])
+					break;
+                System.out.printf("0x%02x\n", storage[i+1]);
                 if (i+2 < achars && b + 2 < slots) {
-                    if (storage[i] == av1ReverseEncoding[0])
-                        break;
                     storage[i + 2] = (byte) (((bytes[b + 1] << 2) & 0x3c) | ((bytes[b + 2] >> 6) & 0x03));
-                    //System.out.printf("0x%02x\n", storage[i+2]);
+                    if (storage[i+2] == av1ReverseEncoding[0])
+						break;
+                    System.out.printf("0x%02x\n", storage[i+2]);
                     if (i+3 < achars) {
-                        if (storage[i] == av1ReverseEncoding[0])
-                            break;
                         storage[i + 3] = (byte) (bytes[b + 2] & 0x3f);
-                        //System.out.printf("0x%02x\n", storage[i+3]);
+                        if (storage[i+3] == av1ReverseEncoding[0])
+							break;
+                        System.out.printf("0x%02x\n", storage[i+3]);
                     }
                 }
             }
@@ -68,9 +68,11 @@ public class av1String {
     
     public av1String(String theMessage){
     	count = theMessage.length();
+    	//System.out.println(count);
         while (count % 4 != 0){
             count++;
         }
+        System.out.println(count);
     	while(theMessage.length() != count){
     		theMessage += " ";
     	}
@@ -94,11 +96,11 @@ public class av1String {
     		if (i+2 < count) {
     			arr[k + 1] = (byte)(((storage[i + 1] << 4) & 0xf0) | ((storage[i + 2] >> 2 & 0x0f)));
     			//System.out.printf("0x%02x\n", arr[k+1]);
-                if (i+3 < count) {
-                	arr[k + 2] = (byte)(((storage[i + 2] << 6) & 0xc0) | ((storage[i + 3] & 0x3f)));
-                	//System.out.printf("0x%02x\n", arr[k+2]);
-                }
-            }
+                	if (i+3 < count) {
+                		arr[k + 2] = (byte)(((storage[i + 2] << 6) & 0xc0) | ((storage[i + 3] & 0x3f)));
+                		//System.out.printf("0x%02x\n", arr[k+2]);
+                	}
+            	}
     	}
     	return arr;
     }
