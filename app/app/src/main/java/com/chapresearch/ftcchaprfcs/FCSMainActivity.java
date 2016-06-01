@@ -81,7 +81,6 @@ public class FCSMainActivity extends ActionBarActivity {
                 fieldText.setVisibility(View.INVISIBLE);
                 autoText.setVisibility(View.INVISIBLE);
                 teleopText.setVisibility(View.INVISIBLE);
-                messageText.setVisibility(View.VISIBLE);
                 backButton.setVisibility(View.VISIBLE);
             }
         });
@@ -130,10 +129,18 @@ public class FCSMainActivity extends ActionBarActivity {
                                 if (record.is_inNextMatch){
                                     messageText.setTextColor(Color.GREEN);
                                     messageText.setText("Access: Granted");
+                                    messageText.setVisibility(View.VISIBLE);
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    messageText.setVisibility(View.INVISIBLE);
                                 }
                                 else {
                                     messageText.setTextColor(Color.RED);
                                     messageText.setText("Access: Denied");
+                                    messageText.setVisibility(View.VISIBLE);
                                 }
                                 break;
                             case MATCH:
