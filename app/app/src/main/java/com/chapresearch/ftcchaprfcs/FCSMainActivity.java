@@ -102,8 +102,8 @@ public class FCSMainActivity extends ActionBarActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //scanLeDevice(true);
-                mBluetoothAdapter.startLeScan(bLeScanCallback);
+                scanLeDevice(true);
+                //mBluetoothAdapter.startLeScan(bLeScanCallback);
             }
         });
     }
