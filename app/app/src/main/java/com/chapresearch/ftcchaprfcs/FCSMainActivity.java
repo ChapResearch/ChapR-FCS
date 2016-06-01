@@ -140,7 +140,7 @@ public class FCSMainActivity extends ActionBarActivity {
                                 break;
                         }
                     }
-                    while (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
+                    if (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
                         mBluetoothAdapter.startLeScan(bLeScanCallback);
                     }
                 }
