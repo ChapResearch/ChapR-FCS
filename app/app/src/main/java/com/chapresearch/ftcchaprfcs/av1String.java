@@ -45,12 +45,18 @@ public class av1String {
             storage[i] = (byte)((bytes[b] >> 2) & 0x3f);
             //System.out.printf("0x%02x\n", storage[i]);
             if (i+1 < achars && b + 1 < slots) {
+                if (storage[i] == av1ReverseEncoding[0])
+                    break;
                 storage[i + 1] = (byte) (((bytes[b] << 4) & 0x30) | ((bytes[b + 1] >> 4) & 0x0f));
                 //System.out.printf("0x%02x\n", storage[i+1]);
                 if (i+2 < achars && b + 2 < slots) {
+                    if (storage[i] == av1ReverseEncoding[0])
+                        break;
                     storage[i + 2] = (byte) (((bytes[b + 1] << 2) & 0x3c) | ((bytes[b + 2] >> 6) & 0x03));
                     //System.out.printf("0x%02x\n", storage[i+2]);
                     if (i+3 < achars) {
+                        if (storage[i] == av1ReverseEncoding[0])
+                            break;
                         storage[i + 3] = (byte) (bytes[b + 2] & 0x3f);
                         //System.out.printf("0x%02x\n", storage[i+3]);
                     }
@@ -76,7 +82,7 @@ public class av1String {
 
     public byte[] packed(){
     	int pos = (count * 3) / 4;
-    	if (pos % 4 != 0){
+    	while (pos % 4 != 0){
     		pos++;
     	}
     	System.out.println(pos);
