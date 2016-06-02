@@ -67,6 +67,10 @@ public class FCSMainActivity extends ActionBarActivity {
         spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
         fieldOptions.setAdapter(spinnerAdapter);
 
+        if (spinnerAdapter.isEmpty()){
+            spinnerAdapter.add("-None-");
+        }
+
         if (mBluetoothAdapter == null) {
             Toast.makeText(this,"bluetooth hardware not found :(", Toast.LENGTH_SHORT).show();
             finish();
@@ -120,10 +124,12 @@ public class FCSMainActivity extends ActionBarActivity {
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
 
                     FCSBLEScanner record = new FCSBLEScanner(device, rssi, scanRecord, mBluetoothAdapter.getName());
+
                     if (record.is_ChapFCS){
                         Log.d("Address", device.getAddress());
                         Log.d("RSSI",Integer.toString(rssi));
                         Log.d("SR",record.bytesToHex(scanRecord));
+                        Log.d("Name", record.name);
                         switch (record.mode){
                             case ON_DECK:
                                 //if (record.is_connectable){
@@ -155,9 +161,9 @@ public class FCSMainActivity extends ActionBarActivity {
                     if (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
                         mBluetoothAdapter.startLeScan(bLeScanCallback);
                     }
-                    else {
-                        scanLeDevice(false);
-                    }
+                    //else {
+                    //    scanLeDevice(false);
+                    //}
 
                 }
 
