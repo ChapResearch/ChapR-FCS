@@ -14,7 +14,7 @@ public class av1String {
     
     // this is an ascii translation table to av1 that starts at 0x20
     static byte[] av1ReverseEncoding = {
-    		(byte)0x00,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,
+    		(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,
     		(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,
     		(byte)0x3E,(byte)0x35,(byte)0x36,(byte)0x37,(byte)0x38,(byte)0x39,(byte)0x3A,(byte)0x3B,
     		(byte)0x3C,(byte)0x3D,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,(byte)0x3F,
@@ -46,12 +46,18 @@ public class av1String {
             //System.out.printf("0x%02x\n", storage[i]);
             if (i+1 < achars && b + 1 < slots) {
                 storage[i + 1] = (byte) (((bytes[b] << 4) & 0x30) | ((bytes[b + 1] >> 4) & 0x0f));
+                if (storage[i+1] == av1ReverseEncoding[0])
+					break;
                 //System.out.printf("0x%02x\n", storage[i+1]);
                 if (i+2 < achars && b + 2 < slots) {
                     storage[i + 2] = (byte) (((bytes[b + 1] << 2) & 0x3c) | ((bytes[b + 2] >> 6) & 0x03));
+                    if (storage[i+2] == av1ReverseEncoding[0])
+						break;
                     //System.out.printf("0x%02x\n", storage[i+2]);
                     if (i+3 < achars) {
                         storage[i + 3] = (byte) (bytes[b + 2] & 0x3f);
+                        if (storage[i+3] == av1ReverseEncoding[0])
+							break;
                         //System.out.printf("0x%02x\n", storage[i+3]);
                     }
                 }
@@ -62,9 +68,11 @@ public class av1String {
     
     public av1String(String theMessage){
     	count = theMessage.length();
+    	//System.out.println(count);
         while (count % 4 != 0){
             count++;
         }
+        //System.out.println(count);
     	while(theMessage.length() != count){
     		theMessage += " ";
     	}
@@ -76,10 +84,10 @@ public class av1String {
 
     public byte[] packed(){
     	int pos = (count * 3) / 4;
-    	if (pos % 4 != 0){
+    	while (pos % 4 != 0){
     		pos++;
     	}
-    	System.out.println(pos);
+    	//System.out.println(pos);
     	byte[] arr = new byte[pos];
     	
     	for (int i = 0, k = 0; k < pos - 3; i+=4, k+=3){
@@ -88,11 +96,11 @@ public class av1String {
     		if (i+2 < count) {
     			arr[k + 1] = (byte)(((storage[i + 1] << 4) & 0xf0) | ((storage[i + 2] >> 2 & 0x0f)));
     			//System.out.printf("0x%02x\n", arr[k+1]);
-                if (i+3 < count) {
-                	arr[k + 2] = (byte)(((storage[i + 2] << 6) & 0xc0) | ((storage[i + 3] & 0x3f)));
-                	//System.out.printf("0x%02x\n", arr[k+2]);
-                }
-            }
+                	if (i+3 < count) {
+                		arr[k + 2] = (byte)(((storage[i + 2] << 6) & 0xc0) | ((storage[i + 3] & 0x3f)));
+                		//System.out.printf("0x%02x\n", arr[k+2]);
+                	}
+            	}
     	}
     	return arr;
     }

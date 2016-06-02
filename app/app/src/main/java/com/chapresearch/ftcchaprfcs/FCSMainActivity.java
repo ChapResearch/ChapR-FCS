@@ -81,7 +81,6 @@ public class FCSMainActivity extends ActionBarActivity {
                 fieldText.setVisibility(View.INVISIBLE);
                 autoText.setVisibility(View.INVISIBLE);
                 teleopText.setVisibility(View.INVISIBLE);
-                messageText.setVisibility(View.VISIBLE);
                 backButton.setVisibility(View.VISIBLE);
             }
         });
@@ -102,8 +101,8 @@ public class FCSMainActivity extends ActionBarActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //scanLeDevice(true);
-                mBluetoothAdapter.startLeScan(bLeScanCallback);
+                scanLeDevice(true);
+                //mBluetoothAdapter.startLeScan(bLeScanCallback);
             }
         });
     }
@@ -130,17 +129,25 @@ public class FCSMainActivity extends ActionBarActivity {
                                 if (record.is_inNextMatch){
                                     messageText.setTextColor(Color.GREEN);
                                     messageText.setText("Access: Granted");
+                                    messageText.setVisibility(View.VISIBLE);
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    messageText.setVisibility(View.INVISIBLE);
                                 }
                                 else {
                                     messageText.setTextColor(Color.RED);
                                     messageText.setText("Access: Denied");
+                                    messageText.setVisibility(View.VISIBLE);
                                 }
                                 break;
                             case MATCH:
                                 break;
                         }
                     }
-                    while (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
+                    if (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
                         mBluetoothAdapter.startLeScan(bLeScanCallback);
                     }
                 }
