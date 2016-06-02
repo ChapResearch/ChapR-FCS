@@ -67,7 +67,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:text="@string/autoText"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:enabled="false"
+        android:inputType="none" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -79,7 +81,8 @@
         android:inputType="none"
         android:layout_alignTop="@+id/autoPicker"
         android:layout_alignLeft="@+id/fieldText"
-        android:layout_alignStart="@+id/fieldText" />
+        android:layout_alignStart="@+id/fieldText"
+        android:enabled="false" />
 
     <Spinner
         android:layout_width="match_parent"
