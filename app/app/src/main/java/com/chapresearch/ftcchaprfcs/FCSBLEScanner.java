@@ -1,7 +1,6 @@
 package com.chapresearch.ftcchaprfcs;
 
 import android.bluetooth.BluetoothDevice;
-import java.util.BitSet;
 
 /**
  * Created by IyengarArnhav on 4/20/2016.
@@ -26,9 +25,7 @@ public class FCSBLEScanner {
         STOP
     }
 
-    public BitSet          bitSet;          // BitSet object allows a byte array to broken down into bits
     public av1String       getName;         // The object to decode the 6 bit ascii
-    public byte[]          bits;            // this is where the all of the bits in the scanRecord will be stored
     public String          myName;          // name of robot controller (team number)
     public boolean         is_ChapFCS;      // true if it is a good ChapFCS packet
     public BluetoothDevice device;
@@ -48,8 +45,6 @@ public class FCSBLEScanner {
         this.device = device;
         this.rssi = rssi;
         this.myName = myTeamNumber;
-        this.bitSet = BitSet.valueOf(scanRecord);
-        this.bits = bitSet.toByteArray();
         this.matchNumber = 0;
         this.position = 0;
         this.is_inNextMatch = false;
