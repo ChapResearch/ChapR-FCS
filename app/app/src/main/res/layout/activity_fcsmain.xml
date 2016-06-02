@@ -67,8 +67,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:text="@string/autoText"
-        android:textColor="#ffffff"
-        android:inputType="none" />
+        android:textColor="#ffffff" />
 
     <EditText
         android:layout_width="wrap_content"

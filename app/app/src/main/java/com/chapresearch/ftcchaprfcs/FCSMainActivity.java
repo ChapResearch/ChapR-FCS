@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,6 +39,8 @@ public class FCSMainActivity extends ActionBarActivity {
     private Handler bHandler;
     private static final long SCAN_PERIOD = 10000;
 
+    private ArrayAdapter<String> spinnerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,9 @@ public class FCSMainActivity extends ActionBarActivity {
 
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+
+        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
+        fieldOptions.setAdapter(spinnerAdapter);
 
         if (mBluetoothAdapter == null) {
             Toast.makeText(this,"bluetooth hardware not found :(", Toast.LENGTH_SHORT).show();
@@ -122,8 +128,7 @@ public class FCSMainActivity extends ActionBarActivity {
                             case ON_DECK:
                                 //if (record.is_connectable){
                                 //}
-                                messageText.setText(record.name);
-                                messageText.setVisibility(View.VISIBLE);
+                                spinnerAdapter.add(record.name);
                                 break;
                             case READY:
                                 if (record.is_inNextMatch){
