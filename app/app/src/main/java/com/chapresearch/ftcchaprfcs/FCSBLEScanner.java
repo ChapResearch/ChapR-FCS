@@ -105,16 +105,16 @@ public class FCSBLEScanner {
     public boolean readyMode(byte[] bytes){
         int R1 = 0, R2 = 0, B1 = 0, B2 = 0;
         String r1, r2, b1, b2;
-        for (int i = 21; i < 23; i++){
+        for (int i = 18; i < 20; i++){
             R1 += (int)bytes[i];
         }
-        for (int i = 23; i < 25; i++){
+        for (int i = 20; i < 22; i++){
             R2 += (int)bytes[i];
         }
-        for (int i = 25; i < 27; i++){
+        for (int i = 22; i < 24; i++){
             B1 += (int)bytes[i];
         }
-        for (int i = 27; i < 29; i++){
+        for (int i = 24; i < 26; i++){
             B2 += (int)bytes[i];
         }
 
