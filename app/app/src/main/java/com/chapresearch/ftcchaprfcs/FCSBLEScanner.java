@@ -1,6 +1,7 @@
 package com.chapresearch.ftcchaprfcs;
 
 import android.bluetooth.BluetoothDevice;
+import android.util.Log;
 
 /**
  * Created by IyengarArnhav on 4/20/2016.
@@ -63,7 +64,10 @@ public class FCSBLEScanner {
 
         // check for the magic value in the scan record to ensure it is a ChapFCS packet
 
-        this.is_ChapFCS = (char)scanRecord[index] == 0xC4 && (char)scanRecord[index+1] == 0xA9;
+        this.is_ChapFCS = (scanRecord[index] == (byte)0xC4) && (scanRecord[index+1] == (byte)0xA9);
+        //Log.d("1", String.format("0x%02x\n", scanRecord[index]));
+        //Log.d("2", String.format("0x%02x\n", scanRecord[index+1]));
+        //Log.d("Is it", Boolean.toString(is_ChapFCS));
 
         // get the name from the broadcast
 
