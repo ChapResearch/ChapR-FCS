@@ -120,9 +120,10 @@ public class FCSMainActivity extends ActionBarActivity {
                         Log.d("SR",record.bytesToHex(scanRecord));
                         switch (record.mode){
                             case ON_DECK:
-                                if (record.is_connectable){
-
-                                }
+                                //if (record.is_connectable){
+                                //}
+                                messageText.setText(record.name);
+                                messageText.setVisibility(View.VISIBLE);
                                 break;
                             case READY:
                                 if (record.is_inNextMatch){
