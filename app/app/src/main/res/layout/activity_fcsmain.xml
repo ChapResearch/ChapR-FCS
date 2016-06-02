@@ -139,6 +139,7 @@
         android:layout_below="@+id/chapFCSLogo"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="60dp"
-        android:layout_toEndOf="@+id/teleopText" />
+        android:layout_toEndOf="@+id/teleopText"
+        android:layout_marginTop="15dp" />
 
 </RelativeLayout>
