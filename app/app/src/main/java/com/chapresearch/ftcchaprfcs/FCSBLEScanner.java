@@ -63,7 +63,7 @@ public class FCSBLEScanner {
 
         // check for the magic value in the scan record to ensure it is a ChapFCS packet
 
-        this.is_ChapFCS = (char)scanRecord[index] == 'C' && (char)scanRecord[index+1] == 'F';
+        this.is_ChapFCS = (char)scanRecord[index] == 0xC4 && (char)scanRecord[index+1] == 0xA9;
 
         // get the name from the broadcast
 
