@@ -128,7 +128,7 @@ public class FCSMainActivity extends ActionBarActivity {
                     if (record.is_ChapFCS){
                         Log.d("Address", device.getAddress());
                         Log.d("RSSI",Integer.toString(rssi));
-                        Log.d("SR",record.bytesToHex(scanRecord));
+                        //Log.d("SR",record.bytesToHex(scanRecord));
                         Log.d("Name", record.name);
                         switch (record.mode){
                             case ON_DECK:
@@ -161,10 +161,6 @@ public class FCSMainActivity extends ActionBarActivity {
                     if (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
                         mBluetoothAdapter.startLeScan(bLeScanCallback);
                     }
-                    //else {
-                    //    scanLeDevice(false);
-                    //}
-
                 }
 
             };
