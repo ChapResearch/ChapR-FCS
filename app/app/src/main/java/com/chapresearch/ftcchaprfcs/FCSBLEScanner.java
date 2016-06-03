@@ -79,11 +79,11 @@ public class FCSBLEScanner {
     }
 
     public RunMode getMode (byte[] bytes){
-        if (bytes[7] == 0)
+        if ((int)bytes[7] == 0)
             return RunMode.ON_DECK;
-        else if (bytes[7] == 1)
+        else if ((int)bytes[7] == 1)
             return RunMode.READY;
-        else if (bytes[7] == 2)
+        else if ((int)bytes[7] == 2)
             return RunMode.MATCH;
         return RunMode.NONE;
     }
