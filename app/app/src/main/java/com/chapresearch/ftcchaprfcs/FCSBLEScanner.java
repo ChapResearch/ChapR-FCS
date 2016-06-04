@@ -34,7 +34,7 @@ public class FCSBLEScanner {
     public boolean         is_connectable;  // true if the incoming broadcast is connectable
     public RunMode         mode;            // the current protocol mode that the broadcast sets
     public String          name;            // the name of the field that the broadcast sets
-    public int             matchNumber;     // the current match number that the console sent
+    public long            matchNumber;     // the current match number that the console sent
     public AllianceColor   color;           // the alliance color
     public int             position;        // position in the alliance ( 1 or 2 )
     public boolean         is_inNextMatch;  // true if broadcast contains robot number for next match
@@ -98,10 +98,11 @@ public class FCSBLEScanner {
         return getName.toString();
     }
 
-    public int getMatch(byte[] bytes){
-        int match = 0;
+    public long getMatch(byte[] bytes){
+        long match = 0;
         for (int i = 17; i < 18; i++){
-            match = (int) bytes[i];
+            Log.d("Match", Long.toString((long)bytes[i]));
+            match = (long)bytes[i];
         }
         return match;
     }

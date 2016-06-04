@@ -90,7 +90,9 @@ public class FCSMainActivity extends AppCompatActivity {
                 fieldText.setVisibility(View.INVISIBLE);
                 autoText.setVisibility(View.INVISIBLE);
                 teleopText.setVisibility(View.INVISIBLE);
+                fieldOptions.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.VISIBLE);
+                mBluetoothAdapter.startLeScan(bLeScanCallback);
             }
         });
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -102,14 +104,17 @@ public class FCSMainActivity extends AppCompatActivity {
                 fieldText.setVisibility(View.VISIBLE);
                 autoText.setVisibility(View.VISIBLE);
                 teleopText.setVisibility(View.VISIBLE);
+                fieldOptions.setVisibility(View.VISIBLE);
                 messageText.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.INVISIBLE);
+                mBluetoothAdapter.stopLeScan(bLeScanCallback);
             }
         });
 
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mBluetoothAdapter.stopLeScan(bLeScanCallback);
                 scanLeDevice(true);
                 //mBluetoothAdapter.startLeScan(bLeScanCallback);
             }
@@ -131,7 +136,9 @@ public class FCSMainActivity extends AppCompatActivity {
                                 Log.d("RSSI",Integer.toString(rssi));
                                 //Log.d("SR",record.bytesToHex(scanRecord));
                                 Log.d("Name", record.name);
+                                //Log.d("Match", Integer.toString(record.matchNumber));
                                 Log.d("My Name", mBluetoothAdapter.getName());
+
                                 for (int i = 1; i < spinnerAdapter.getCount(); i++){
                                     if (spinnerAdapter.getItem(i-1).equals(record.name)){
                                         spinnerAdapter.add(record.name);
@@ -139,6 +146,9 @@ public class FCSMainActivity extends AppCompatActivity {
                                 }
                                 break;
                             case READY:
+                                Log.d("Name", record.name);
+                                //Log.d("Match", Integer.toString(record.matchNumber));
+
                                 if (record.is_inNextMatch){
                                     messageText.setTextColor(Color.GREEN);
                                     messageText.setText("Access: Granted");
@@ -149,6 +159,15 @@ public class FCSMainActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                     messageText.setVisibility(View.INVISIBLE);
+
+                                    switch (record.color){
+                                        case RED:
+                                            break;
+                                        case BLUE:
+                                            break;
+                                        case NONE:
+                                            break;
+                                    }
                                 }
                                 else {
                                     messageText.setTextColor(Color.RED);
@@ -175,9 +194,6 @@ public class FCSMainActivity extends AppCompatActivity {
                                 }
                                 break;
                         }
-                    }
-                    if (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
-                        mBluetoothAdapter.startLeScan(bLeScanCallback);
                     }
                 }
 
