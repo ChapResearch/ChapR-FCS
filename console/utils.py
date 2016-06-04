@@ -132,6 +132,13 @@ def textOutline(font, message, fontcolor, outlinecolor, outlined):
 #     mode:  0 = 3 digit time
 #            1 = 3 digits
 #
+# BIG NOTE ** Tue May 31 16:55:08 2016 **
+#   I'm starting modifications to put the "1" (one) more in the middle of the
+#   cell.  It just looks better that way!  those it is annoyingly complicated.
+#   Since we don't know which (if any) of the numbers will be a one, we draw
+#   of of them separately...but only after figuring out the right size of
+#   everything.
+#
 def numberDraw(number,mode,color,height,width=0,title=None,titleColor=(255,255,255),boxWidth=2,boxColor=(255,255,255),outlined=True):
 
     outlineColor = (255,255,255)

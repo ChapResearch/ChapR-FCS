@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.chapresearch.ftcchaprfcs.FCSMainActivity"
+    android:background="#030202"
+    android:id="@+id/screenLayout"
+    android:theme="@style/Theme.AppCompat.NoActionBar">
+    <ImageView
+        android:id="@+id/chapFCSLogo"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/chapfcs"
+        android:contentDescription="@string/chapFCSLogo" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fieldText"
+        android:enabled="false"
+        android:text="@string/fieldText"
+        android:background="#020202"
+        android:inputType="none"
+        android:textSize="30sp"
+        android:textColor="#ffffff"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="55dp"
+        android:layout_marginLeft="7dp" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scanButton"
+        android:id="@+id/scanButton"
+        android:layout_marginRight="5dp"
+        android:layout_alignTop="@+id/fieldText"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:textColor="#ffffff" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/autoPicker"
+        android:background="#030202"
+        android:spinnerMode="dropdown"
+        android:entries="@array/OpModes"
+        android:layout_below="@+id/autoText"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/autoText"
+        android:layout_marginTop="32dp"
+        android:layout_below="@+id/scanButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/autoText"
+        android:textColor="#ffffff"
+        android:enabled="false"
+        android:inputType="none" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/teleopText"
+        android:layout_marginTop="100dp"
+        android:text="@string/teleopText"
+        android:textColor="#ffffff"
+        android:inputType="none"
+        android:layout_alignTop="@+id/autoPicker"
+        android:layout_alignLeft="@+id/fieldText"
+        android:layout_alignStart="@+id/fieldText"
+        android:enabled="false" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/teleOpPicker"
+        android:background="#030202"
+        android:spinnerMode="dropdown"
+        android:entries="@array/OpModes"
+        android:layout_below="@+id/teleopText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/confirmButton"
+        android:id="@+id/confirmButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/teleopText"
+        android:layout_alignStart="@+id/teleopText"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/backButton"
+        android:id="@+id/backButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="#ffffff"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/errorMessage"
+        android:id="@+id/errorMessage"
+        android:layout_above="@+id/teleOpPicker"
+        android:layout_alignRight="@+id/autoPicker"
+        android:layout_alignEnd="@+id/autoPicker"
+        android:visibility="invisible"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+        android:textAlignment="center" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fieldOptions"
+        android:background="#030202"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/chapFCSLogo"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="60dp"
+        android:layout_toEndOf="@+id/teleopText"
+        android:layout_marginTop="15dp" />
+
+</RelativeLayout>

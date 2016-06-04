@@ -20,7 +20,6 @@ class NumberChangeScreen(Screen):
 
     heldGranularity = datetime.timedelta(0,0,100000)    # 10 incs per second
 
-
     def __init__(self,name,globalName,mode,title,color):
         Screen.__init__(self,name)
 
@@ -44,6 +43,7 @@ class NumberChangeScreen(Screen):
         self.heldCountUp = False
         self.heldCountDown = False
         self.heldLastTime = datetime.datetime.now()
+        self.needsUpdate = True
 
     def drawNumber(self):
         self.screen.fill([0,0,0])             # just black, no graphic background image
@@ -53,6 +53,7 @@ class NumberChangeScreen(Screen):
                            title=self.title,
                            boxWidth=4)
         self.screen.blit(image,((self.width - image.get_width())/2,(self.height-image.get_height())/2))
+        self.needsUpdate = True
 
 
     def holdCountUp(self):
@@ -71,9 +72,11 @@ class NumberChangeScreen(Screen):
         if self.mode == 0:
             if self.number < (9*60+59):
                 self.number += 1
+                self.drawNumber()
         else:
             if self.number < 999:
                 self.number += 1
+                self.drawNumber()
 
     def cancel(self):
         return("back")
@@ -81,6 +84,7 @@ class NumberChangeScreen(Screen):
     def down(self):
         if self.number > 0:
             self.number -= 1
+            self.drawNumber()
                 
     def done(self):
         setattr(globalVariables,self.globalName,self.number)
@@ -88,6 +92,7 @@ class NumberChangeScreen(Screen):
 
     def _enter(self):
         self.number = getattr(globalVariables,self.globalName)
+        self.drawNumber()
 
     def _process(self):
         if self.heldCountUp or self.heldCountDown:
@@ -98,4 +103,7 @@ class NumberChangeScreen(Screen):
                     self.up()
                 if self.heldCountDown:
                     self.down()
-        self.drawNumber()
+                self.drawNumber()
+        returnNeedsUpdate = self.needsUpdate
+        self.needsUpdate = False
+        return returnNeedsUpdate

@@ -82,7 +82,7 @@ class MatchOptionsScreen(Screen):
         if self.testchange:
             return False
         else:
-            self.dataTable.changeData(0,102)
+            self.dataTable.changeData(0,data=102)
             self.testchange = True
             return True                           # returning true causes the screen to redraw stuff
 
