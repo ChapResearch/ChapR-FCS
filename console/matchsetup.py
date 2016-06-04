@@ -20,7 +20,7 @@ class PrepareMatchScreen(Screen):
         self.match = match
 
         self.tablePosition = (20,130)
-        self.teamTablePosition = (185,177) 
+        self.teamTablePosition = (170,177) 
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
 
@@ -48,7 +48,7 @@ class PrepareMatchScreen(Screen):
         return "back"
 
     def startMatch(self):
-        pass
+        return "StartMatch"
 
     def setTimes(self):
         return "MatchSetupScreen"
@@ -58,7 +58,7 @@ class PrepareMatchScreen(Screen):
 
     def tableDraw(self):
         self.dataTable = self.tables(fontsize=20,font="arial",align="right",callback=self.setTimes,bgcolor=(0,0,0))
-        self.teamTable = self.tables(fontsize=20,font="arial",align="right",bgcolor=(50,50,50))
+        self.teamTable = self.tables(fontsize=20,font="arial",align="right",cellWidth=45,cellHeight=20,bgcolor=(50,50,50))
 
         # Create the dataTable
         self.dataTable.addData("Next Match:  ",name="matchlabel",flashing=False)
@@ -80,13 +80,14 @@ class PrepareMatchScreen(Screen):
         self.dataTable.endRow()
 
         # Create the teamsTable
-        self.teamTable.addData(self.match.getTeam(Match.R1).getNumber(), name = "Team1", bgcolor=(50,50,50))
+
+        self.teamTable.addData(self.match.getTeam(Match.B1).getNumber(), name = "Team1", bgcolor=(50,50,50))
         self.teamTable.addSpacer(5)
-        self.teamTable.addData(self.match.getTeam(Match.R2).getNumber(), name = "Team2", bgcolor=(50,50,50))
+        self.teamTable.addData(self.match.getTeam(Match.R1).getNumber(), name = "Team2", bgcolor=(50,50,50))
         self.teamTable.endRow()
-        self.teamTable.addData(self.match.getTeam(Match.B1).getNumber(), name = "Team3", bgcolor=(50,50,50))
+        self.teamTable.addData(self.match.getTeam(Match.B2).getNumber(), name = "Team3", bgcolor=(50,50,50))
         self.teamTable.addSpacer(5)
-        self.teamTable.addData(self.match.getTeam(Match.B2).getNumber(), name = "Team4", bgcolor=(50,50,50))
+        self.teamTable.addData(self.match.getTeam(Match.R2).getNumber(), name = "Team4", bgcolor=(50,50,50))
         self.teamTable.endRow()
 
         self.dataTable.addData("Remote Control:  ",align="right", bold=False)
