@@ -48,7 +48,7 @@ public class FCSBLEScanner {
         this.myName = myTeamNumber;
         this.matchNumber = 0;
         this.position = 0;
-        this.is_inNextMatch = false;
+        this.is_inNextMatch = readyMode(scanRecord);
         this.is_invited = false;
         this.mode = getMode(scanRecord);
         this.color = AllianceColor.NONE;
