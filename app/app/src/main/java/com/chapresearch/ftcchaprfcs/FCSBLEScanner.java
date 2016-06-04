@@ -73,7 +73,7 @@ public class FCSBLEScanner {
 
         this.name = getName(scanRecord);
 
-        // get the match number fro the broadcast
+        // get the match number for the broadcast
 
         this.matchNumber = getMatch(scanRecord);
     }
