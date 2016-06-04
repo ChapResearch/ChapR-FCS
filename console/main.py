@@ -55,8 +55,8 @@ from rn4020 import RN4020
 #
 #  ____                
 # | __ )  _   _   __ _              ________  ___  ____
-# |  _ \ | | | | / _` |             /        \  \ \/ /
-# | |_) || |_| || (_| |            |          |_/   /
+# |  _ \ | | | | / _` |             /O       \  \ \/ /
+# | |_) || |_| || (_| |            | ___/     |_/   /
 # |____/  \__,_| \__, |             \______________/
 #                |___/ 
 # __        __            _                                                _ 
@@ -186,12 +186,12 @@ SystemOptionsScreen("SystemOptions")
 RunMatchScreen("RunMatch",bigScreen)
 AboutScreen("AboutScreen")#.process()
 SystemTestsScreen("SystemTest")
-RobotAssignmentScreen("RobotAssignmentScreen",MatchObject).process()
-PrepareMatchScreen("PrepareMatch",MatchObject).process()
-#BootScreens(smallScreen,bigScreen).process()
-#ButtonTestScreen("ButtonTestScreen").process()
-#OptionScreen("OptionScreen").process()
-StartMatchScreen("StartMatch",MatchObject,bigScreen).process()
+RobotAssignmentScreen("RobotAssignmentScreen",MatchObject)#.process()
+PrepareMatchScreen("PrepareMatch",MatchObject)#.process()
+BootScreens(smallScreen,bigScreen)#.process()
+ButtonTestScreen("ButtonTestScreen")#.process()
+OptionScreen("OptionScreen")#.process()
+StartMatchScreen("StartMatch",MatchObject,bigScreen)#.process()
 
 while(True):
         MainScreen("MainScreen").process()
