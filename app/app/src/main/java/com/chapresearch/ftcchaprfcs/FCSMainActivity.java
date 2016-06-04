@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -17,11 +18,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.chapresearch.ftcchaprfcs.av1String;
 
-import java.util.Arrays;
-
-public class FCSMainActivity extends ActionBarActivity {
+public class FCSMainActivity extends AppCompatActivity {
 
     private Button confirmButton;
     private Button scanButton;
@@ -80,6 +78,8 @@ public class FCSMainActivity extends ActionBarActivity {
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
+            finish();
+            return;
         }
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
@@ -126,15 +126,18 @@ public class FCSMainActivity extends ActionBarActivity {
                     FCSBLEScanner record = new FCSBLEScanner(device, rssi, scanRecord, mBluetoothAdapter.getName());
 
                     if (record.is_ChapFCS){
-                        Log.d("Address", device.getAddress());
-                        Log.d("RSSI",Integer.toString(rssi));
-                        //Log.d("SR",record.bytesToHex(scanRecord));
-                        Log.d("Name", record.name);
                         switch (record.mode){
                             case ON_DECK:
-                                //if (record.is_connectable){
-                                //}
-                                spinnerAdapter.add(record.name);
+                                Log.d("Address", device.getAddress());
+                                Log.d("RSSI",Integer.toString(rssi));
+                                //Log.d("SR",record.bytesToHex(scanRecord));
+                                Log.d("Name", record.name);
+                                Log.d("My Name", mBluetoothAdapter.getName());
+                                for (int i = 1; i < spinnerAdapter.getCount(); i++){
+                                    if (spinnerAdapter.getItem(i-1).equals(record.name)){
+                                        spinnerAdapter.add(record.name);
+                                    }
+                                }
                                 break;
                             case READY:
                                 if (record.is_inNextMatch){
@@ -155,6 +158,27 @@ public class FCSMainActivity extends ActionBarActivity {
                                 }
                                 break;
                             case MATCH:
+                                if (record.command == FCSBLEScanner.MatchCommand.AUTO_INIT){
+
+                                }
+                                else if (record.command == FCSBLEScanner.MatchCommand.AUTO_START){
+
+                                }
+                                else if (record.command == FCSBLEScanner.MatchCommand.TELEOP_INIT){
+
+                                }
+                                else if (record.command == FCSBLEScanner.MatchCommand.TELEOP_START){
+
+                                }
+                                else if (record.command == FCSBLEScanner.MatchCommand.ENDGAME_START){
+
+                                }
+                                else if (record.command == FCSBLEScanner.MatchCommand.STOP){
+
+                                }
+                                else {
+
+                                }
                                 break;
                         }
                     }
