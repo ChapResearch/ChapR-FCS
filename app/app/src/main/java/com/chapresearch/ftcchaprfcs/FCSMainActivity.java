@@ -157,26 +157,21 @@ public class FCSMainActivity extends AppCompatActivity {
                                 }
                                 break;
                             case MATCH:
-                                if (record.command == FCSBLEScanner.MatchCommand.AUTO_INIT){
-
-                                }
-                                else if (record.command == FCSBLEScanner.MatchCommand.AUTO_START){
-
-                                }
-                                else if (record.command == FCSBLEScanner.MatchCommand.TELEOP_INIT){
-
-                                }
-                                else if (record.command == FCSBLEScanner.MatchCommand.TELEOP_START){
-
-                                }
-                                else if (record.command == FCSBLEScanner.MatchCommand.ENDGAME_START){
-
-                                }
-                                else if (record.command == FCSBLEScanner.MatchCommand.STOP){
-
-                                }
-                                else {
-
+                                switch (record.command){
+                                    case AUTO_INIT:
+                                        break;
+                                    case AUTO_START:
+                                        break;
+                                    case TELEOP_INIT:
+                                        break;
+                                    case TELEOP_START:
+                                        break;
+                                    case ENDGAME_START:
+                                        break;
+                                    case STOP:
+                                        break;
+                                    case NONE:
+                                        break;
                                 }
                                 break;
                         }
