@@ -17,6 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.concurrent.TimeUnit;
+
 
 public class FCSMainActivity extends AppCompatActivity {
 
@@ -37,6 +39,9 @@ public class FCSMainActivity extends AppCompatActivity {
     private static final long SCAN_PERIOD = 10000;
 
     private ArrayAdapter<String> spinnerAdapter;
+
+    private int counter;
+    private int confirmCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +66,11 @@ public class FCSMainActivity extends AppCompatActivity {
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 
-        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
+        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
         fieldOptions.setAdapter(spinnerAdapter);
+
+        counter = 0;
+        confirmCounter = 0;
 
         if (spinnerAdapter.isEmpty()){
             spinnerAdapter.add("-None-");
@@ -93,6 +101,7 @@ public class FCSMainActivity extends AppCompatActivity {
                 fieldOptions.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.VISIBLE);
                 mBluetoothAdapter.startLeScan(bLeScanCallback);
+                confirmCounter++;
             }
         });
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +117,7 @@ public class FCSMainActivity extends AppCompatActivity {
                 messageText.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.INVISIBLE);
                 mBluetoothAdapter.stopLeScan(bLeScanCallback);
+                confirmCounter--;
             }
         });
 
@@ -129,6 +139,8 @@ public class FCSMainActivity extends AppCompatActivity {
 
                     FCSBLEScanner record = new FCSBLEScanner(device, rssi, scanRecord, mBluetoothAdapter.getName());
 
+                    counter = 0;
+
                     if (record.is_ChapFCS){
                         switch (record.mode){
                             case ON_DECK:
@@ -139,27 +151,25 @@ public class FCSMainActivity extends AppCompatActivity {
                                 //Log.d("Match", Integer.toString(record.matchNumber));
                                 Log.d("My Name", mBluetoothAdapter.getName());
 
-                                for (int i = 1; i < spinnerAdapter.getCount(); i++){
-                                    if (spinnerAdapter.getItem(i-1).equals(record.name)){
-                                        spinnerAdapter.add(record.name);
+                                for (int i = 1; i <= spinnerAdapter.getCount(); i++){
+                                    if (spinnerAdapter.getItem(i-1).equals(record.name + " " + Integer.toString(record.matchNumber) + "\n" + device.getAddress())){
+                                        counter++;
                                     }
+                                }
+                                if (counter == 0){
+                                    spinnerAdapter.add(record.name + " " + Integer.toString(record.matchNumber) + "\n" + device.getAddress());
                                 }
                                 break;
                             case READY:
                                 Log.d("Name", record.name);
-                                //Log.d("Match", Integer.toString(record.matchNumber));
-
+                                Log.d("Match", Integer.toString(record.matchNumber));
+                                Log.d("Is in", Boolean.toString(record.is_inNextMatch));
                                 if (record.is_inNextMatch){
                                     messageText.setTextColor(Color.GREEN);
                                     messageText.setText("Access: Granted");
-                                    messageText.setVisibility(View.VISIBLE);
-                                    try {
-                                        Thread.sleep(500);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                                    if (confirmCounter == 1){
+                                        messageText.setVisibility(View.VISIBLE);
                                     }
-                                    messageText.setVisibility(View.INVISIBLE);
-
                                     switch (record.color){
                                         case RED:
                                             break;
@@ -172,7 +182,9 @@ public class FCSMainActivity extends AppCompatActivity {
                                 else {
                                     messageText.setTextColor(Color.RED);
                                     messageText.setText("Access: Denied");
-                                    messageText.setVisibility(View.VISIBLE);
+                                    if (confirmCounter == 1){
+                                        messageText.setVisibility(View.VISIBLE);
+                                    }
                                 }
                                 break;
                             case MATCH:
