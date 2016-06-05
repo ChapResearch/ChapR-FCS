@@ -34,7 +34,7 @@ public class FCSBLEScanner {
     public boolean         is_connectable;  // true if the incoming broadcast is connectable
     public RunMode         mode;            // the current protocol mode that the broadcast sets
     public String          name;            // the name of the field that the broadcast sets
-    public long            matchNumber;     // the current match number that the console sent
+    public int             matchNumber;     // the current match number that the console sent
     public AllianceColor   color;           // the alliance color
     public int             position;        // position in the alliance ( 1 or 2 )
     public boolean         is_inNextMatch;  // true if broadcast contains robot number for next match
@@ -98,11 +98,11 @@ public class FCSBLEScanner {
         return getName.toString();
     }
 
-    public long getMatch(byte[] bytes){
-        long match = 0;
+    public int getMatch(byte[] bytes){
+        int match = 0;
         for (int i = 17; i < 18; i++){
-            Log.d("Match", Long.toString((long)bytes[i]));
-            match = (long)bytes[i];
+            //Log.d("Match", Integer.toString((int)bytes[i] & 0xFF));
+            match = ((int)bytes[i] & 0xFF);
         }
         return match;
     }
@@ -110,23 +110,36 @@ public class FCSBLEScanner {
     public boolean readyMode(byte[] bytes){
         int R1 = 0, R2 = 0, B1 = 0, B2 = 0;
         String r1, r2, b1, b2;
-        for (int i = 18; i < 20; i++){
-            R1 += (int)bytes[i];
+        for (int i = 18; i < 19; i++){
+            int first = (int)bytes[i] & 0xFF;
+            int second = (int)bytes[i+1] & 0xFF;
+            R1 = first * 256 + second;
         }
-        for (int i = 20; i < 22; i++){
-            R2 += (int)bytes[i];
+        for (int i = 20; i < 21; i++){
+            int first = (int)bytes[i] & 0xFF;
+            int second = (int)bytes[i+1] & 0xFF;
+            R2 = first * 256 + second;
         }
-        for (int i = 22; i < 24; i++){
-            B1 += (int)bytes[i];
+        for (int i = 22; i < 23; i++){
+            int first = (int)bytes[i] & 0xFF;
+            int second = (int)bytes[i+1] & 0xFF;
+            B1 = first * 256 + second;
         }
-        for (int i = 24; i < 26; i++){
-            B2 += (int)bytes[i];
+        for (int i = 24; i < 25; i++){
+            int first = (int)bytes[i] & 0xFF;
+            int second = (int)bytes[i+1] & 0xFF;
+            B2 = first * 256 + second;
         }
 
         r1 = R1 + "";
         r2 = R2 + "";
         b1 = B1 + "";
         b2 = B2 + "";
+
+        Log.d("R1", r1);
+        Log.d("R2", r2);
+        Log.d("B1", b1);
+        Log.d("B2", b2);
 
         if (myName.equals(r1) || myName.equals(r2)){
             color = AllianceColor.RED;
@@ -148,7 +161,7 @@ public class FCSBLEScanner {
             position = 0;
         }
 
-        if (myName.equals(r1)|| myName.equals(r2) || myName.equals(r1)|| myName.equals(r2))
+        if (myName.equals(r1)|| myName.equals(r2) || myName.equals(b1)|| myName.equals(b2))
             return true;
         return false;
     }
