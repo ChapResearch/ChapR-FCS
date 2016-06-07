@@ -17,7 +17,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.concurrent.TimeUnit;
 
 
 public class FCSMainActivity extends AppCompatActivity {
@@ -85,7 +84,6 @@ public class FCSMainActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
-            finish();
             return;
         }
 
@@ -146,18 +144,17 @@ public class FCSMainActivity extends AppCompatActivity {
                             case ON_DECK:
                                 Log.d("Address", device.getAddress());
                                 Log.d("RSSI",Integer.toString(rssi));
-                                //Log.d("SR",record.bytesToHex(scanRecord));
                                 Log.d("Name", record.name);
-                                //Log.d("Match", Integer.toString(record.matchNumber));
+                                Log.d("Match", Integer.toString(record.matchNumber));
                                 Log.d("My Name", mBluetoothAdapter.getName());
 
                                 for (int i = 1; i <= spinnerAdapter.getCount(); i++){
-                                    if (spinnerAdapter.getItem(i-1).equals(record.name + " " + Integer.toString(record.matchNumber) + "\n" + device.getAddress())){
+                                    if (spinnerAdapter.getItem(i-1).equals(record.name + "\n" + device.getAddress())){
                                         counter++;
                                     }
                                 }
                                 if (counter == 0){
-                                    spinnerAdapter.add(record.name + " " + Integer.toString(record.matchNumber) + "\n" + device.getAddress());
+                                    spinnerAdapter.add(record.name + "\n" + device.getAddress());
                                 }
                                 break;
                             case READY:
