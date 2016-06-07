@@ -185,21 +185,23 @@ public class FCSMainActivity extends AppCompatActivity {
                                 }
                                 break;
                             case MATCH:
-                                switch (record.command){
-                                    case AUTO_INIT:
-                                        break;
-                                    case AUTO_START:
-                                        break;
-                                    case TELEOP_INIT:
-                                        break;
-                                    case TELEOP_START:
-                                        break;
-                                    case ENDGAME_START:
-                                        break;
-                                    case STOP:
-                                        break;
-                                    case NONE:
-                                        break;
+                                if (record.is_inNextMatch){
+                                    switch (record.command){
+                                        case AUTO_INIT:
+                                            break;
+                                        case AUTO_START:
+                                            break;
+                                        case TELEOP_INIT:
+                                            break;
+                                        case TELEOP_START:
+                                            break;
+                                        case ENDGAME_START:
+                                            break;
+                                        case ABORT:
+                                            break;
+                                        case NONE:
+                                            break;
+                                    }
                                 }
                                 break;
                         }
