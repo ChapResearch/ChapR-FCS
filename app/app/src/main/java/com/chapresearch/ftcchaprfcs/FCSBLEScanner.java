@@ -1,7 +1,6 @@
 package com.chapresearch.ftcchaprfcs;
 
 import android.bluetooth.BluetoothDevice;
-import android.util.Log;
 
 /**
  * Created by IyengarArnhav on 4/20/2016.
@@ -46,11 +45,8 @@ public class FCSBLEScanner {
         this.device = device;
         this.rssi = rssi;
         this.myName = myTeamNumber;
-        this.matchNumber = 0;
         this.position = 0;
-        this.is_inNextMatch = readyMode(scanRecord);
         this.is_invited = false;
-        this.mode = getMode(scanRecord);
         this.color = AllianceColor.NONE;
         this.command = MatchCommand.NONE;
 
@@ -58,7 +54,7 @@ public class FCSBLEScanner {
 
         this.is_connectable = (int)scanRecord[2] != 4;
 
-        // set the inital index for scanning the record
+        // set the initial index for scanning the record
 
         int index = 5;
 
@@ -69,6 +65,10 @@ public class FCSBLEScanner {
         //Log.d("2", String.format("0x%02x\n", scanRecord[index+1]));
         //Log.d("Is it", Boolean.toString(is_ChapFCS));
 
+        // get the mode from the broadcast
+
+        this.mode = getMode(scanRecord);
+
         // get the name from the broadcast
 
         this.name = getName(scanRecord);
@@ -76,6 +76,14 @@ public class FCSBLEScanner {
         // get the match number for the broadcast
 
         this.matchNumber = getMatch(scanRecord);
+
+        // gets the alliance color, position on the field, and whether or not it is in the next match
+
+        this.is_inNextMatch = readyMode(scanRecord);
+
+        // gets the command
+
+        getCommand(scanRecord);
     }
 
     public RunMode getMode (byte[] bytes){
@@ -99,11 +107,7 @@ public class FCSBLEScanner {
     }
 
     public int getMatch(byte[] bytes){
-        int match = 0;
-        for (int i = 17; i < 18; i++){
-            //Log.d("Match", Integer.toString((int)bytes[i] & 0xFF));
-            match = ((int)bytes[i] & 0xFF);
-        }
+        int match = ((int)bytes[17] & 0xFF);
         return match;
     }
 
@@ -136,10 +140,10 @@ public class FCSBLEScanner {
         b1 = B1 + "";
         b2 = B2 + "";
 
-        Log.d("R1", r1);
-        Log.d("R2", r2);
-        Log.d("B1", b1);
-        Log.d("B2", b2);
+        //Log.d("R1", r1);
+        //Log.d("R2", r2);
+        //Log.d("B1", b1);
+        //Log.d("B2", b2);
 
         if (myName.equals(r1) || myName.equals(r2)){
             color = AllianceColor.RED;
@@ -164,6 +168,123 @@ public class FCSBLEScanner {
         if (myName.equals(r1)|| myName.equals(r2) || myName.equals(b1)|| myName.equals(b2))
             return true;
         return false;
+    }
+
+    public void getCommand(byte[] bytes){
+        switch (this.color){
+            case RED:
+                switch (this.position){
+                    case 1:
+                        int R1 = (int)bytes[26] & 0xF0;
+                        switch (R1){
+                            case 0:
+                                this.command = MatchCommand.NONE;
+                                break;
+                            case 1:
+                                this.command = MatchCommand.AUTO_INIT;
+                                break;
+                            case 2:
+                                this.command = MatchCommand.AUTO_START;
+                                break;
+                            case 3:
+                                this.command = MatchCommand.TELEOP_INIT;
+                                break;
+                            case 4:
+                                this.command = MatchCommand.TELEOP_START;
+                                break;
+                            case 5:
+                                this.command = MatchCommand.ENDGAME_START;
+                                break;
+                            case 6:
+                                this.command = MatchCommand.STOP;
+                                break;
+                        }
+                        break;
+                    case 2:
+                        int R2 = (int)bytes[26] & 0x0F;
+                        switch (R2){
+                            case 0:
+                                this.command = MatchCommand.NONE;
+                                break;
+                            case 1:
+                                this.command = MatchCommand.AUTO_INIT;
+                                break;
+                            case 2:
+                                this.command = MatchCommand.AUTO_START;
+                                break;
+                            case 3:
+                                this.command = MatchCommand.TELEOP_INIT;
+                                break;
+                            case 4:
+                                this.command = MatchCommand.TELEOP_START;
+                                break;
+                            case 5:
+                                this.command = MatchCommand.ENDGAME_START;
+                                break;
+                            case 6:
+                                this.command = MatchCommand.STOP;
+                                break;
+                        }
+                        break;
+                }
+                break;
+            case BLUE:
+                switch (this.position){
+                    case 1:
+                        int B1 = (int)bytes[26] & 0xF0;
+                        switch (B1){
+                            case 0:
+                                this.command = MatchCommand.NONE;
+                                break;
+                            case 1:
+                                this.command = MatchCommand.AUTO_INIT;
+                                break;
+                            case 2:
+                                this.command = MatchCommand.AUTO_START;
+                                break;
+                            case 3:
+                                this.command = MatchCommand.TELEOP_INIT;
+                                break;
+                            case 4:
+                                this.command = MatchCommand.TELEOP_START;
+                                break;
+                            case 5:
+                                this.command = MatchCommand.ENDGAME_START;
+                                break;
+                            case 6:
+                                this.command = MatchCommand.STOP;
+                                break;
+                        }
+                        break;
+                    case 2:
+                        int B2 = (int)bytes[26] & 0xF0;
+                        switch (B2){
+                            case 0:
+                                this.command = MatchCommand.NONE;
+                                break;
+                            case 1:
+                                this.command = MatchCommand.AUTO_INIT;
+                                break;
+                            case 2:
+                                this.command = MatchCommand.AUTO_START;
+                                break;
+                            case 3:
+                                this.command = MatchCommand.TELEOP_INIT;
+                                break;
+                            case 4:
+                                this.command = MatchCommand.TELEOP_START;
+                                break;
+                            case 5:
+                                this.command = MatchCommand.ENDGAME_START;
+                                break;
+                            case 6:
+                                this.command = MatchCommand.STOP;
+                                break;
+                        }
+                        break;
+                }
+                break;
+        }
     }
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
