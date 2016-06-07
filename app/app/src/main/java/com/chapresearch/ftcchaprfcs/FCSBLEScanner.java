@@ -22,7 +22,7 @@ public class FCSBLEScanner {
         TELEOP_INIT,
         TELEOP_START,
         ENDGAME_START,
-        STOP
+        ABORT
     }
 
     public av1String       getName;         // The object to decode the 6 bit ascii
@@ -49,6 +49,7 @@ public class FCSBLEScanner {
         this.is_invited = false;
         this.color = AllianceColor.NONE;
         this.command = MatchCommand.NONE;
+        this.mode = RunMode.NONE;
 
         // determine if this is a connectable broadcast or not
 
@@ -67,7 +68,7 @@ public class FCSBLEScanner {
 
         // get the mode from the broadcast
 
-        this.mode = getMode(scanRecord);
+        getMode(scanRecord);
 
         // get the name from the broadcast
 
@@ -86,14 +87,19 @@ public class FCSBLEScanner {
         getCommand(scanRecord);
     }
 
-    public RunMode getMode (byte[] bytes){
-        if ((int)bytes[7] == 0)
-            return RunMode.ON_DECK;
-        else if ((int)bytes[7] == 1)
-            return RunMode.READY;
-        else if ((int)bytes[7] == 2)
-            return RunMode.MATCH;
-        return RunMode.NONE;
+    public void getMode (byte[] bytes){
+        int mod = (int)bytes[7];
+        switch (mod){
+            case 0:
+                this.mode = RunMode.ON_DECK;
+                break;
+            case 1:
+                this.mode = RunMode.READY;
+                break;
+            case 2:
+                this.mode = RunMode.MATCH;
+                break;
+        }
     }
 
     public String getName(byte[] bytes){
@@ -196,7 +202,7 @@ public class FCSBLEScanner {
                                 this.command = MatchCommand.ENDGAME_START;
                                 break;
                             case 6:
-                                this.command = MatchCommand.STOP;
+                                this.command = MatchCommand.ABORT;
                                 break;
                         }
                         break;
@@ -222,7 +228,7 @@ public class FCSBLEScanner {
                                 this.command = MatchCommand.ENDGAME_START;
                                 break;
                             case 6:
-                                this.command = MatchCommand.STOP;
+                                this.command = MatchCommand.ABORT;
                                 break;
                         }
                         break;
@@ -252,7 +258,7 @@ public class FCSBLEScanner {
                                 this.command = MatchCommand.ENDGAME_START;
                                 break;
                             case 6:
-                                this.command = MatchCommand.STOP;
+                                this.command = MatchCommand.ABORT;
                                 break;
                         }
                         break;
@@ -278,7 +284,7 @@ public class FCSBLEScanner {
                                 this.command = MatchCommand.ENDGAME_START;
                                 break;
                             case 6:
-                                this.command = MatchCommand.STOP;
+                                this.command = MatchCommand.ABORT;
                                 break;
                         }
                         break;
