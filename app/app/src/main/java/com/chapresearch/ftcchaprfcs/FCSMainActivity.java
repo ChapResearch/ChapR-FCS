@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 public class FCSMainActivity extends AppCompatActivity {
 
+    private RelativeLayout screenLayout;
     private Button confirmButton;
     private Button scanButton;
     private Button backButton;
@@ -47,6 +49,7 @@ public class FCSMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fcsmain);
 
+        screenLayout = (RelativeLayout) findViewById(R.id.screenLayout);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         scanButton = (Button) findViewById(R.id.scanButton);
         backButton = (Button) findViewById(R.id.backButton);
@@ -142,11 +145,11 @@ public class FCSMainActivity extends AppCompatActivity {
                     if (record.is_ChapFCS){
                         switch (record.mode){
                             case ON_DECK:
-                                Log.d("Address", device.getAddress());
-                                Log.d("RSSI",Integer.toString(rssi));
-                                Log.d("Name", record.name);
-                                Log.d("Match", Integer.toString(record.matchNumber));
-                                Log.d("My Name", mBluetoothAdapter.getName());
+                                //Log.d("Address", device.getAddress());
+                                //Log.d("RSSI",Integer.toString(rssi));
+                                //Log.d("Name", record.name);
+                                //Log.d("Match", Integer.toString(record.matchNumber));
+                                //Log.d("My Name", mBluetoothAdapter.getName());
 
                                 for (int i = 1; i <= spinnerAdapter.getCount(); i++){
                                     if (spinnerAdapter.getItem(i-1).equals(record.name + "\n" + device.getAddress())){
@@ -158,30 +161,55 @@ public class FCSMainActivity extends AppCompatActivity {
                                 }
                                 break;
                             case READY:
-                                Log.d("Name", record.name);
-                                Log.d("Match", Integer.toString(record.matchNumber));
-                                Log.d("Is in", Boolean.toString(record.is_inNextMatch));
+                                //Log.d("Name", record.name);
+                                //Log.d("Match", Integer.toString(record.matchNumber));
+                                //Log.d("Is in", Boolean.toString(record.is_invited));
                                 if (record.is_inNextMatch){
-                                    messageText.setTextColor(Color.GREEN);
-                                    messageText.setText("Access: Granted");
-                                    if (confirmCounter == 1){
-                                        messageText.setVisibility(View.VISIBLE);
-                                    }
-                                    switch (record.color){
-                                        case RED:
-                                            break;
-                                        case BLUE:
-                                            break;
-                                        case NONE:
-                                            break;
-                                    }
+                                    Thread t = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                                runOnUiThread(new Runnable() {
+
+                                                    @Override
+                                                    public void run() {
+                                                        messageText.setTextColor(Color.GREEN);
+                                                        messageText.setText("Access: Granted");
+                                                        if (confirmCounter == 1) {
+                                                            messageText.setVisibility(View.VISIBLE);
+                                                        }
+                                                    }
+                                                }) ;
+                                            try {
+                                                Thread.sleep(500);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                    t.start();
                                 }
                                 else {
-                                    messageText.setTextColor(Color.RED);
-                                    messageText.setText("Access: Denied");
-                                    if (confirmCounter == 1){
-                                        messageText.setVisibility(View.VISIBLE);
-                                    }
+                                    Thread t = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    messageText.setTextColor(Color.RED);
+                                                    messageText.setText("Access: Denied");
+                                                    if (confirmCounter == 1)
+                                                    messageText.setVisibility(View.VISIBLE);
+                                                }
+                                            }) ;
+                                            try {
+                                                Thread.sleep(500);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                    t.start();
                                 }
                                 break;
                             case MATCH:
