@@ -1,6 +1,7 @@
 package com.chapresearch.ftcchaprfcs;
 
 import android.bluetooth.BluetoothDevice;
+import android.util.Log;
 
 /**
  * Created by IyengarArnhav on 4/20/2016.
@@ -46,7 +47,6 @@ public class FCSBLEScanner {
         this.rssi = rssi;
         this.myName = myTeamNumber;
         this.position = 0;
-        this.is_invited = false;
         this.color = AllianceColor.NONE;
         this.command = MatchCommand.NONE;
         this.mode = RunMode.NONE;
@@ -81,6 +81,10 @@ public class FCSBLEScanner {
         // gets the alliance color, position on the field, and whether or not it is in the next match
 
         this.is_inNextMatch = readyMode(scanRecord);
+
+        // is it invited to connect in the ready mode
+
+        this.is_invited = is_Invited(scanRecord);
 
         // gets the command
 
@@ -121,22 +125,22 @@ public class FCSBLEScanner {
         int R1 = 0, R2 = 0, B1 = 0, B2 = 0;
         String r1, r2, b1, b2;
         for (int i = 18; i < 19; i++){
-            int first = (int)bytes[i] & 0xFF;
+            int first = (int)bytes[i] & 0x7F;
             int second = (int)bytes[i+1] & 0xFF;
             R1 = first * 256 + second;
         }
         for (int i = 20; i < 21; i++){
-            int first = (int)bytes[i] & 0xFF;
+            int first = (int)bytes[i] & 0x7F;
             int second = (int)bytes[i+1] & 0xFF;
             R2 = first * 256 + second;
         }
         for (int i = 22; i < 23; i++){
-            int first = (int)bytes[i] & 0xFF;
+            int first = (int)bytes[i] & 0x7F;
             int second = (int)bytes[i+1] & 0xFF;
             B1 = first * 256 + second;
         }
         for (int i = 24; i < 25; i++){
-            int first = (int)bytes[i] & 0xFF;
+            int first = (int)bytes[i] & 0x7F;
             int second = (int)bytes[i+1] & 0xFF;
             B2 = first * 256 + second;
         }
@@ -173,6 +177,30 @@ public class FCSBLEScanner {
 
         if (myName.equals(r1)|| myName.equals(r2) || myName.equals(b1)|| myName.equals(b2))
             return true;
+        return false;
+    }
+
+    public boolean is_Invited (byte[] bytes){
+        if (this.color == AllianceColor.RED && this.position == 1){
+            if ((bytes[18] & (byte)0x80) == (byte)0x80){
+                return true;
+            }
+        }
+        if (this.color == AllianceColor.RED && this.position == 2){
+            if ((bytes[20] & (byte)0x80) == (byte)0x80){
+                return true;
+            }
+        }
+        if (this.color == AllianceColor.BLUE && this.position == 1){
+            if ((bytes[22] & (byte)0x80) == (byte)0x80){
+                return true;
+            }
+        }
+        if (this.color == AllianceColor.BLUE && this.position == 2){
+            if ((bytes[24] & (byte)0x80) == (byte)0x80){
+                return true;
+            }
+        }
         return false;
     }
 
