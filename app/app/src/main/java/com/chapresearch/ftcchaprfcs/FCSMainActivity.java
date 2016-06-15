@@ -152,12 +152,12 @@ public class FCSMainActivity extends AppCompatActivity {
                                 //Log.d("My Name", mBluetoothAdapter.getName());
 
                                 for (int i = 1; i <= spinnerAdapter.getCount(); i++){
-                                    if (spinnerAdapter.getItem(i-1).equals(record.name + "\n" + device.getAddress())){
+                                    if (spinnerAdapter.getItem(i-1).equals(record.name + " " + device.getAddress())){
                                         counter++;
                                     }
                                 }
                                 if (counter == 0){
-                                    spinnerAdapter.add(record.name + "\n" + device.getAddress());
+                                    spinnerAdapter.add(record.name + " " + device.getAddress());
                                 }
                                 break;
                             case READY:
@@ -187,6 +187,9 @@ public class FCSMainActivity extends AppCompatActivity {
                                         }
                                     });
                                     t.start();
+                                    if (record.is_invited){
+
+                                    }
                                 }
                                 else {
                                     Thread t = new Thread(new Runnable() {
@@ -237,7 +240,6 @@ public class FCSMainActivity extends AppCompatActivity {
                 }
 
             };
-
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
