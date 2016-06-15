@@ -291,7 +291,7 @@ public class FCSBLEScanner {
                         }
                         break;
                     case 2:
-                        int B2 = (int)bytes[26] & 0xF0;
+                        int B2 = (int)bytes[26] & 0x0F;
                         switch (B2){
                             case 0:
                                 this.command = MatchCommand.NONE;
