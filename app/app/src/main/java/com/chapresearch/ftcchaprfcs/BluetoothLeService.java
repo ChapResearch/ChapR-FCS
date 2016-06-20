@@ -78,7 +78,7 @@ public class BluetoothLeService extends Service{
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE);
+                readCharacteristic(characteristic);
             }
         }
 
