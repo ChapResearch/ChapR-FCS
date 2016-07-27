@@ -13,9 +13,9 @@ class SystemTestsScreen(Screen):
         self.ButtonNE = self.buttons(bgcolor = (255,0,0), callback=self.audiotest,
                                      **Button.standardButton("NE",["Audio","Test"],self.screen))
         self.ButtonSE = self.buttons(bgcolor = (255,0,0), callback=self.button4,
-                                     **Button.standardButton("SE",["Trump","4 Prez"],self.screen))
-        self.ButtonS = self.buttons(bgcolor = (255,0,0), callback=self.quit,
-                                     **Button.standardButton("S","Quit",self.screen))
+                                     **Button.standardButton("SE",["HDMI Screen","Test"],self.screen))
+        self.ButtonS = self.buttons(bgcolor = (255,255,255), callback=self.quit,lcolor = (0,0,0),
+                                     **Button.standardButton("S","Done",self.screen))
 
         # self.ButtonNE = "Other"
         # self.ButtonSE = "Thing"
@@ -31,7 +31,7 @@ class SystemTestsScreen(Screen):
         pass
 
     def audiotest(self):
-        self.redraw() 
+        return "AudioTest" 
 
     def button4(self):
         self.redraw() 
@@ -44,5 +44,5 @@ class SystemTestsScreen(Screen):
         x = self.screen.get_width()
         y = self.screen.get_height()
         myfont = pygame.font.SysFont("monospace", 25)
-        self._setTitle("System Tests")
+        self._setTitle("System Tests",position = "mid")
 
