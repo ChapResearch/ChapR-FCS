@@ -218,6 +218,11 @@ class Button():
                     "rotation":0,
                     "labels":name,
                     "gpio":HARDWARE.button.S})
+        elif ident == "N":
+            return({"size":(boxWidth,boxHeight),
+                    "position":(midPosition,topPosition),
+                    "rotation":0,
+                    "labels":name})
 
     #
     # _callit() - a routine to make the code prettier - this calls the given callback
