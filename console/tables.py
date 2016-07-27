@@ -106,6 +106,16 @@ class Table(object):
         self.currentCol += 1
         self.tableData[self.currentRow].append([data,chars])
 
+        # check for flash warning
+
+        if chars["flashing"]:
+            if chars["bgcolor"] is None:
+                if chars["name"] is not None:
+                    print("WARNING: table cell \"" + chars["name"] + "\" background color must be set for flashing to work")
+                else:
+                    print("WARNING: table cell background color must be set for flashing to work")
+
+
     #
     # changeData() - change a named piece of data in the previously supplied data.
     #                If characteristics are given, they will replace the previous.
@@ -116,6 +126,10 @@ class Table(object):
                 data,chars = col
                 if "name" in chars and chars["name"] == name:
                     changed = False
+                    if "flashing" in args:                # if turning on flashing, the warning if no bgcolor
+                        if args["flashing"]:
+                            if chars["bgcolor"] is None:
+                                print("WARNING: table cell \"" + name + "\" background color must be set for flashing to work")
                     if "data" in args:
                         col[0] = args["data"]
                         # note that this ASSUMES that you want calculated width/height
@@ -135,6 +149,9 @@ class Table(object):
             for c, col in enumerate(row):
                 data,chars = col
                 if "name" in chars and chars["name"] == name:
+                    if flashing:
+                        if chars["bgcolor"] is None:
+                            print("WARNING: table cell \"" + name + "\" background color must be set for flashing to work")
                     chars["flashState"] = True
                     chars["flashing"] = flashing
                     self._compute()
