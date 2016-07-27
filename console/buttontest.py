@@ -17,18 +17,16 @@ class ButtonTestScreen(Screen):
         self.ButtonS = self.buttons(bgcolor = (255,0,0), callback=self.quit,
                                      **Button.standardButton("S","Quit",self.screen))
 
-        self.str = "Press the 1st button."
-        self.target = 1
-        self.str2 = ""
         # self.ButtonNE = "Other"
         # self.ButtonSE = "Thing"
         # self.ButtonAction = "Action"
         
     def _enter(self):
-        self.redraw()
+        self.str = "Press the 1st button."
+        self.str2 = ""
+        self.target = 1
 
     def button1(self):
-        print("Button 1 is working")
         self.str2 = ""
         if self.target == 1:
             self.str = "Press the 2nd button."
@@ -38,10 +36,8 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
-        self.redraw() 
 
     def button2(self):
-        print("Button 2 is working")
         self.str2 = ""
         if self.target == 2:
             self.str = "Press the 3rd button."
@@ -51,10 +47,8 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
-        self.redraw() 
 
     def button3(self):
-        print("Button 3 is working")
         self.str2 = ""
         if self.target == 3:
             self.str = "Press the 4th button."
@@ -64,7 +58,6 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
-        self.redraw() 
 
     def button4(self):
         if self.target==4:
@@ -76,12 +69,11 @@ class ButtonTestScreen(Screen):
         else:
             self.str = "ERROR! Wrong button pressed."
             self.str2 = "Press Button " + str(self.target)
-        self.redraw() 
 
     def quit(self):
         return "back"
 
-    def redraw(self):
+    def _process(self):
         self.screen.fill([0,0,0])             # just black, no graphic background image
         x = self.screen.get_width()
         y = self.screen.get_height()
@@ -91,11 +83,7 @@ class ButtonTestScreen(Screen):
         swidth2 = myfont.size(self.str2)[0]
         B1 = myfont.render(self.str, 1, (255,255,0))
         B2 = myfont.render(self.str2, 1, (255,255,0))
-        myfont2 = pygame.font.SysFont("monospace", 35)
-        #self.BBT = "Button Test"
-        #B3 = myfont2.render(self.BBT,1,(255,0,0))
-        #swidth3 = myfont2.size(self.BBT)[0]
-        #self.screen.blit(B3,((x - swidth3)/2,100))
         self._setTitle("Button Test")
         self.screen.blit(B1,((x - swidth)/2,(y - sheight)/2))
         self.screen.blit(B2,((x - swidth2)/2,(y - sheight)/2+sheight))
+        return True
