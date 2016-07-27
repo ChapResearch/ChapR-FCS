@@ -13,13 +13,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+
 public class FCSMainActivity extends AppCompatActivity {
 
+    private RelativeLayout screenLayout;
     private Button confirmButton;
     private Button scanButton;
     private Button backButton;
@@ -38,11 +41,15 @@ public class FCSMainActivity extends AppCompatActivity {
 
     private ArrayAdapter<String> spinnerAdapter;
 
+    private int counter;
+    private int confirmCounter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fcsmain);
 
+        screenLayout = (RelativeLayout) findViewById(R.id.screenLayout);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         scanButton = (Button) findViewById(R.id.scanButton);
         backButton = (Button) findViewById(R.id.backButton);
@@ -61,8 +68,11 @@ public class FCSMainActivity extends AppCompatActivity {
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 
-        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
+        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
         fieldOptions.setAdapter(spinnerAdapter);
+
+        counter = 0;
+        confirmCounter = 0;
 
         if (spinnerAdapter.isEmpty()){
             spinnerAdapter.add("-None-");
@@ -77,7 +87,6 @@ public class FCSMainActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
-            finish();
             return;
         }
 
@@ -90,7 +99,10 @@ public class FCSMainActivity extends AppCompatActivity {
                 fieldText.setVisibility(View.INVISIBLE);
                 autoText.setVisibility(View.INVISIBLE);
                 teleopText.setVisibility(View.INVISIBLE);
+                fieldOptions.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.VISIBLE);
+                mBluetoothAdapter.startLeScan(bLeScanCallback);
+                confirmCounter++;
             }
         });
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -102,14 +114,18 @@ public class FCSMainActivity extends AppCompatActivity {
                 fieldText.setVisibility(View.VISIBLE);
                 autoText.setVisibility(View.VISIBLE);
                 teleopText.setVisibility(View.VISIBLE);
+                fieldOptions.setVisibility(View.VISIBLE);
                 messageText.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.INVISIBLE);
+                mBluetoothAdapter.stopLeScan(bLeScanCallback);
+                confirmCounter--;
             }
         });
 
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mBluetoothAdapter.stopLeScan(bLeScanCallback);
                 scanLeDevice(true);
                 //mBluetoothAdapter.startLeScan(bLeScanCallback);
             }
@@ -124,65 +140,106 @@ public class FCSMainActivity extends AppCompatActivity {
 
                     FCSBLEScanner record = new FCSBLEScanner(device, rssi, scanRecord, mBluetoothAdapter.getName());
 
+                    counter = 0;
+
                     if (record.is_ChapFCS){
                         switch (record.mode){
                             case ON_DECK:
-                                Log.d("Address", device.getAddress());
-                                Log.d("RSSI",Integer.toString(rssi));
-                                //Log.d("SR",record.bytesToHex(scanRecord));
-                                Log.d("Name", record.name);
-                                Log.d("My Name", mBluetoothAdapter.getName());
-                                for (int i = 1; i < spinnerAdapter.getCount(); i++){
-                                    if (spinnerAdapter.getItem(i-1).equals(record.name)){
-                                        spinnerAdapter.add(record.name);
+                                //Log.d("Address", device.getAddress());
+                                //Log.d("RSSI",Integer.toString(rssi));
+                                //Log.d("Name", record.name);
+                                //Log.d("Match", Integer.toString(record.matchNumber));
+                                //Log.d("My Name", mBluetoothAdapter.getName());
+
+                                for (int i = 1; i <= spinnerAdapter.getCount(); i++){
+                                    if (spinnerAdapter.getItem(i-1).equals(record.name + " " + device.getAddress())){
+                                        counter++;
                                     }
+                                }
+                                if (counter == 0){
+                                    spinnerAdapter.add(record.name + " " + device.getAddress());
                                 }
                                 break;
                             case READY:
+                                //Log.d("Name", record.name);
+                                //Log.d("Match", Integer.toString(record.matchNumber));
+                                //Log.d("Is in", Boolean.toString(record.is_invited));
                                 if (record.is_inNextMatch){
-                                    messageText.setTextColor(Color.GREEN);
-                                    messageText.setText("Access: Granted");
-                                    messageText.setVisibility(View.VISIBLE);
-                                    try {
-                                        Thread.sleep(500);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                                    Thread t = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                                runOnUiThread(new Runnable() {
+
+                                                    @Override
+                                                    public void run() {
+                                                        messageText.setTextColor(Color.GREEN);
+                                                        messageText.setText("Access: Granted");
+                                                        if (confirmCounter == 1) {
+                                                            messageText.setVisibility(View.VISIBLE);
+                                                        }
+                                                    }
+                                                }) ;
+                                            try {
+                                                Thread.sleep(500);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                    t.start();
+                                    if (record.is_invited){
+
                                     }
-                                    messageText.setVisibility(View.INVISIBLE);
                                 }
                                 else {
-                                    messageText.setTextColor(Color.RED);
-                                    messageText.setText("Access: Denied");
-                                    messageText.setVisibility(View.VISIBLE);
+                                    Thread t = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    messageText.setTextColor(Color.RED);
+                                                    messageText.setText("Access: Denied");
+                                                    if (confirmCounter == 1)
+                                                    messageText.setVisibility(View.VISIBLE);
+                                                }
+                                            }) ;
+                                            try {
+                                                Thread.sleep(500);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                    t.start();
                                 }
                                 break;
                             case MATCH:
-                                switch (record.command){
-                                    case AUTO_INIT:
-                                        break;
-                                    case AUTO_START:
-                                        break;
-                                    case TELEOP_INIT:
-                                        break;
-                                    case TELEOP_START:
-                                        break;
-                                    case ENDGAME_START:
-                                        break;
-                                    case STOP:
-                                        break;
-                                    case NONE:
-                                        break;
+                                if (record.is_inNextMatch){
+                                    switch (record.command){
+                                        case AUTO_INIT:
+                                            break;
+                                        case AUTO_START:
+                                            break;
+                                        case TELEOP_INIT:
+                                            break;
+                                        case TELEOP_START:
+                                            break;
+                                        case ENDGAME_START:
+                                            break;
+                                        case ABORT:
+                                            break;
+                                        case NONE:
+                                            break;
+                                    }
                                 }
                                 break;
                         }
                     }
-                    if (record.mode == FCSBLEScanner.RunMode.READY || record.mode == FCSBLEScanner.RunMode.MATCH){
-                        mBluetoothAdapter.startLeScan(bLeScanCallback);
-                    }
                 }
 
             };
-
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
