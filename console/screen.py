@@ -45,7 +45,7 @@ class Screen(object):
     # _setTitle() - sets the given title in the "normal" position.  Note, too that
     #               self.title gets set to the value.
     #
-    def _setTitle(self,title,font="arial",bold=True,italic=False,size=40,color=(255,255,255),lineColor=(255,255,255),drawLines=True,lineThickness=2):
+    def _setTitle(self,title,font="arial",bold=True,italic=False,size=40,color=(255,255,255),lineColor=(255,255,255),drawLines=True,lineThickness=2,position = "top"):
         self.title = title
         fontpath = pygame.font.match_font(font,bold,italic)
         workingFont = pygame.font.Font(fontpath,size)
@@ -53,11 +53,24 @@ class Screen(object):
         positionX = (self.width - width)/2
         positionY = 60 + (80-height)/2
         titleImage = workingFont.render(title,True,color)
-        self.screen.blit(titleImage,(positionX,positionY))
-        if drawLines:
-            pygame.draw.line(self.screen,lineColor,(positionX,positionY-3),(positionX+width,positionY-3),lineThickness)
-            pygame.draw.line(self.screen,lineColor,(positionX,positionY+height+3),(positionX+width,positionY+height+3),lineThickness)
-        
+        if position is "top":
+            self.screen.blit(titleImage,(positionX,positionY))
+            if drawLines:
+                pygame.draw.line(self.screen,lineColor,(positionX,positionY-3),(positionX+width,positionY-3),lineThickness)
+                pygame.draw.line(self.screen,lineColor,(positionX,positionY+height+3),(positionX+width,positionY+height+3),lineThickness)
+        elif position is "mid":
+            positionY = ((self.height)-(height))/2
+            self.screen.blit(titleImage,(positionX,positionY))
+            if drawLines:
+                pygame.draw.line(self.screen,lineColor,(positionX,positionY-3),(positionX+width,positionY-3),lineThickness)
+                pygame.draw.line(self.screen,lineColor,(positionX,positionY+height+3),(positionX+width,positionY+height+3),lineThickness)
+        elif position is "bot":
+            positionY = 60 + (80-height)*(2)
+            self.screen.blit(titleImage,(positionX,positionY))
+            if drawLines:
+                pygame.draw.line(self.screen,lineColor,(positionX,positionY-3),(positionX+width,positionY-3),lineThickness)
+                pygame.draw.line(self.screen,lineColor,(positionX,positionY+height+3),(positionX+width,positionY+height+3),lineThickness)
+
 
     #
     # findscreen() - CLASS METHOD - this routine will return the screen that
