@@ -36,13 +36,13 @@ class RobotAssignmentScreen(Screen):
         self.screen.fill([0,0,0])             # just black, no graphic background image
         self.Button = dict()
         self.Button["NW"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "NW",fontsize = 25,
-                                     **Button.standardButton("NW","",self.screen))
+                                     **Button.standardButton("NW",self.assignedTeams["NW"],self.screen))
         self.Button["NE"] = self.buttons(bgcolor = (255,0,0), callback=self.teamAssign,rock = "NE",fontsize = 25,
-                                     **Button.standardButton("NE","",self.screen))
+                                     **Button.standardButton("NE",self.assignedTeams["NE"],self.screen))
         self.Button["SW"] = self.buttons(bgcolor = (0,0,255), callback=self.teamAssign,rock = "SW",fontsize = 25,
-                                     **Button.standardButton("SW","",self.screen))
+                                     **Button.standardButton("SW",self.assignedTeams["SW"],self.screen))
         self.Button["SE"] = self.buttons(bgcolor = (255,0,0), callback=self.teamAssign,rock = "SE",fontsize = 25,
-                                     **Button.standardButton("SE","",self.screen))
+                                     **Button.standardButton("SE",self.assignedTeams["SE"],self.screen))
         self.ButtonS = self.buttons(bgcolor = (255,255,255), callback=self.done, lcolor = (0,0,0),
                                      **Button.standardButton("S","Done",self.screen))
         self.ButtonDel = self.buttons(graphic = self.trashcanpic, callback = self.trashButton,rock = "DelButton",
@@ -98,13 +98,15 @@ class RobotAssignmentScreen(Screen):
     #
     def _swap2Buttons(self,rock):
         self.Button[self.AssignButtonPressed].setFlash(False)
-        checklabel = str(self.assignedTeams[self.AssignButtonPressed])
         if self.assignedTeams[self.AssignButtonPressed] is None:
             checklabel = None
+        else:
+            checklabel = str(self.assignedTeams[self.AssignButtonPressed])
         self.Button[rock].setLabels(checklabel)
-        newlabel = str(self.assignedTeams[rock])
         if self.assignedTeams[rock] is None:
             newlabel = None
+        else:
+            newlabel = str(self.assignedTeams[rock])
         self.Button[self.AssignButtonPressed].setLabels(newlabel)
         temp = self.assignedTeams[rock]
         self.assignedTeams[rock] = self.assignedTeams[self.AssignButtonPressed]
@@ -227,18 +229,18 @@ class RobotAssignmentScreen(Screen):
         self.trashList = list()
         self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
         self._updateTableDisplayList()
-        if self.match.getTeam(Match.R1) is not None:
-            self.assignedTeams["NW"] = self.match.getTeam(Match.R1).getNumber()
-            self.trashList.append(self.match.getTeam(Match.R1).getNumber())
-        if self.match.getTeam(Match.R2) is not None:
-            self.assignedTeams["NE"] = self.match.getTeam(Match.R2).getNumber()
-            self.trashList.append(self.match.getTeam(Match.R2).getNumber())
         if self.match.getTeam(Match.B1) is not None:
-            self.assignedTeams["SW"] = self.match.getTeam(Match.B1).getNumber()
+            self.assignedTeams["NW"] = self.match.getTeam(Match.B1).getNumber()
             self.trashList.append(self.match.getTeam(Match.B1).getNumber())
+        if self.match.getTeam(Match.R1) is not None:
+            self.assignedTeams["NE"] = self.match.getTeam(Match.R1).getNumber()
+            self.trashList.append(self.match.getTeam(Match.R1).getNumber())
         if self.match.getTeam(Match.B2) is not None:
-            self.assignedTeams["SE"] = self.match.getTeam(Match.B2).getNumber()
+            self.assignedTeams["SW"] = self.match.getTeam(Match.B2).getNumber()
             self.trashList.append(self.match.getTeam(Match.B2).getNumber())
+        if self.match.getTeam(Match.R2) is not None:
+            self.assignedTeams["SE"] = self.match.getTeam(Match.R2).getNumber()
+            self.trashList.append(self.match.getTeam(Match.R2).getNumber())
         self.tableCreate()
         self.lastList = list()
         

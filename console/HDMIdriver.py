@@ -53,7 +53,8 @@ from signal import alarm, signal, SIGALRM
 from globalVariables import RED,GREEN,BLUE,YELLOW,BLACK,WHITE
 from fractions import gcd
 from HDMIclock import HDMIClock
-
+from batteryimage import BatteryImage
+from statsdisplay import StatsDisplay
 
 class HDMI:
 
@@ -66,8 +67,12 @@ class HDMI:
             print("going init on HDMI...")
             self._initHDMI()
             print("done")
+            StatsDisplay.init()
             self.clock = HDMIClock(pygame.display.get_surface(),BLACK)
             print("done with HDMI clock as well")
+
+            self.teamFontSize = 60
+            self.teamFont = pygame.font.SysFont('arial', self.teamFontSize, bold=True)        
 
             # just go into listen/dispatch loop
 
@@ -169,6 +174,13 @@ class HDMI:
         else:
             utils.showImage(image,position,fade)
 
+    def cteam(self,position,number,ping,rBat,pBat,stats=True):
+        if self.role == "server":
+            self._command("CTEAM",position,number,ping,rBat,pBat,stats)
+        else:
+            StatsDisplay.display(self.screen,self.screenSize,position,number,ping,rBat,pBat,stats)
+            
+
     #
     # clockSet(mins,secs) - routines to control the clock
     # clockColor(r,g,b)
@@ -244,5 +256,6 @@ class HDMI:
         ( "CCOLOR", clockColor),
         ( "CRUN", clockRun),
         ( "CSTOP", clockStop),
+        ( "CTEAM", cteam),
     )
 

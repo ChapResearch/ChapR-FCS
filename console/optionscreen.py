@@ -41,6 +41,9 @@ class OptionScreen(Screen):
     def matchSetup(self):
         print("going to match setup")
         return "matchSetup"
+        
+    def systemOptions(self):
+        return "SystemOptions"
 
     def quit(self):
         return "quit"

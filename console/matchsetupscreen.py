@@ -15,7 +15,7 @@ import pygame
 from utils import textOutline, numberDraw
 from screen import Screen
 from buttons import Button
-import globalVariables
+from settings import Settings
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from hardware import HARDWARE
 
@@ -71,10 +71,10 @@ class MatchSetupScreen(Screen):
     # numberImages() - draw the number images and return a list of them
     #
     def numberImages(self,imageHeight):
-        matchImage = numberDraw(globalVariables.matchNumber,1,BLUE,imageHeight, title="Match:")
-        autoImage = numberDraw(globalVariables.autoTime,0,YELLOW,imageHeight, title="Autonomous:")
-        teleopImage = numberDraw(globalVariables.teleopTime,0,GREEN,imageHeight, title="Teleop:")
-        endGameImage = numberDraw(globalVariables.endGameTime,0,RED,imageHeight, title="End Game:")
+        matchImage = numberDraw(Settings.matchNumber,1,BLUE,imageHeight, title="Match:")
+        autoImage = numberDraw(Settings.autoTime,0,YELLOW,imageHeight, title="Autonomous:")
+        teleopImage = numberDraw(Settings.teleopTime,0,GREEN,imageHeight, title="Teleop:")
+        endGameImage = numberDraw(Settings.endGameTime,0,RED,imageHeight, title="End Game:")
         return((matchImage,autoImage,teleopImage,endGameImage))
 
     #

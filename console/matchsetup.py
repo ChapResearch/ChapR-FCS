@@ -8,7 +8,7 @@ from screen import Screen
 from buttons import Button
 from tables import Table
 from utils import textOutline, numberDraw
-import globalVariables
+from settings import Settings
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from Team import Match
 
@@ -19,8 +19,13 @@ class PrepareMatchScreen(Screen):
 
         self.match = match
 
+        self.teamB1 = ""
+        self.teamR1 = ""
+        self.teamB2 = ""
+        self.teamR2 = ""
+
         self.tablePosition = (20,130)
-        self.teamTablePosition = (185,177) 
+        self.teamTablePosition = (170,200) 
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
 
@@ -30,8 +35,8 @@ class PrepareMatchScreen(Screen):
                                      **Button.standardButton("NE",["Remote","Control"],self.screen))
         self.ButtonSW = self.buttons(bgcolor = (0,0,255), callback=self.robotAssignment,
                                      **Button.standardButton("SW",["Robot","Assign"],self.screen))
-        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.remoteControl,
-                                     **Button.standardButton("SE",["",""],self.screen))
+        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.done,
+                                     **Button.standardButton("SE","Back",self.screen))
         self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.startMatch,
                                      **Button.standardButton("S",["Start","Match"],self.screen))
 
@@ -48,17 +53,18 @@ class PrepareMatchScreen(Screen):
         return "back"
 
     def startMatch(self):
-        pass
+        return "StartMatch"
 
     def setTimes(self):
         return "MatchSetupScreen"
 
     def robotAssignment(self):
+        print("done")
         return "RobotAssignmentScreen"
 
     def tableDraw(self):
         self.dataTable = self.tables(fontsize=20,font="arial",align="right",callback=self.setTimes,bgcolor=(0,0,0))
-        self.teamTable = self.tables(fontsize=20,font="arial",align="right",bgcolor=(50,50,50))
+        self.teamTable = self.tables(fontsize=20,font="arial",align="right",cellWidth=45,cellHeight=20)
 
         # Create the dataTable
         self.dataTable.addData("Next Match:  ",name="matchlabel",flashing=False)
@@ -74,44 +80,65 @@ class PrepareMatchScreen(Screen):
         self.dataTable.addData("Endgame:  ",      name="endgamelabel")
         self.dataTable.addData(self.endGameImage, name="endgame")
         self.dataTable.endRow()
-        self.dataTable.addData(" ", name="space1")
-        self.dataTable.endRow()
-        self.dataTable.addData(" ", name="space2")
+        self.dataTable.addData("Remote Control:  ",align="right", bold=False)
+        self.dataTable.addData("On",bold=True,align="left")
         self.dataTable.endRow()
 
         # Create the teamsTable
-        self.teamTable.addData(self.match.getTeam(Match.R1).getNumber(), name = "Team1", bgcolor=(50,50,50))
+
+        self.teamTable.addData(self.teamB1, name = "Team1")
         self.teamTable.addSpacer(5)
-        self.teamTable.addData(self.match.getTeam(Match.R2).getNumber(), name = "Team2", bgcolor=(50,50,50))
+        self.teamTable.addData(self.teamR1, name = "Team2")
         self.teamTable.endRow()
-        self.teamTable.addData(self.match.getTeam(Match.B1).getNumber(), name = "Team3", bgcolor=(50,50,50))
+        self.teamTable.addData(self.teamB2, name = "Team3")
         self.teamTable.addSpacer(5)
-        self.teamTable.addData(self.match.getTeam(Match.B2).getNumber(), name = "Team4", bgcolor=(50,50,50))
+        self.teamTable.addData(self.teamR2, name = "Team4")
         self.teamTable.endRow()
 
-        self.dataTable.addData("Remote Control:  ",align="right", bold=False)
-        self.dataTable.addData("On",bold=True,align="left")
 
         self.dataTable.position = self.tablePosition
         self.teamTable.position = self.teamTablePosition
 
     def numberDraw(self):
-        self.matchImage = numberDraw(globalVariables.matchNumber,1,BLUE,20,boxWidth=0,outlined=False)
-        self.autoImage = numberDraw(globalVariables.autoTime,0,YELLOW,20,boxWidth=0,outlined=False)
-        self.teleopImage = numberDraw(globalVariables.teleopTime,0,GREEN,20,boxWidth=0,outlined=False)
-        self.endGameImage = numberDraw(globalVariables.endGameTime,0,RED,20,boxWidth=0,outlined=False)
+        self.matchImage = numberDraw(Settings.matchNumber,1,BLUE,20,boxWidth=0,outlined=False)
+        self.autoImage = numberDraw(Settings.autoTime,0,YELLOW,20,boxWidth=0,outlined=False)
+        self.teleopImage = numberDraw(Settings.teleopTime,0,GREEN,20,boxWidth=0,outlined=False)
+        self.endGameImage = numberDraw(Settings.endGameTime,0,RED,20,boxWidth=0,outlined=False)
 
     def _enter(self):
         self._setLogo()
-        self._setTitle("Match Options",italic=True,color=(255,0,0))
+        self._setTitle("Next Match",italic=True,color=(255,0,0))
         self.numberDraw()
-        self.tableDraw()
         self.testchange = False
+        #Setup team variables for table
+        if self.match.getTeam(Match.B1) is not None:
+            self.teamB1 = self.match.getTeam(Match.B1).getNumber()
+        else:
+            self.teamB1 = ""
+        if self.match.getTeam(Match.R1) is not None:
+            self.teamR1 = self.match.getTeam(Match.R1).getNumber()
+        else:
+            self.teamR1 = ""
+        if self.match.getTeam(Match.B2) is not None:
+            self.teamB2 = self.match.getTeam(Match.B2).getNumber()
+        else:
+            self.teamB2 = ""
+        if self.match.getTeam(Match.R2) is not None:
+            self.teamR2 = self.match.getTeam(Match.R2).getNumber()
+        else:
+            self.teamR2 = ""
+        self.tableDraw()
 
     def _process(self):
         if self.testchange:
             return False
+
         else:
             self.dataTable.changeData(0)
             self.testchange = True
             return True                           # returning true causes the screen to redraw stuff
+
+
+
+
+
