@@ -37,7 +37,10 @@ class Match(object):
             self.positions[team] = None
     
     def getTeam(self, position):
-        return self.positions[position]
+        if self.positions[position] is not None:
+            return self.positions[position]
+        else:
+            return None
 
     def getPosition(self, teamN):
         for team in self.positions:
