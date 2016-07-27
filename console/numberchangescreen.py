@@ -15,6 +15,7 @@ from screen import Screen
 from buttons import Button
 import globalVariables
 import datetime
+from settings import Settings
 
 class NumberChangeScreen(Screen):
 
@@ -87,11 +88,13 @@ class NumberChangeScreen(Screen):
             self.drawNumber()
                 
     def done(self):
-        setattr(globalVariables,self.globalName,self.number)
+#        setattr(globalVariables,self.globalName,self.number)
+        setattr(Settings,self.globalName,self.number)
+        Settings.saveSettings()
         return("back")
 
     def _enter(self):
-        self.number = getattr(globalVariables,self.globalName)
+        self.number = getattr(Settings,self.globalName)
         self.drawNumber()
 
     def _process(self):
