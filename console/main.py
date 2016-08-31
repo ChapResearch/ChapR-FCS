@@ -160,6 +160,7 @@ from systemtests import SystemTestsScreen
 from robotasignmentscreen import RobotAssignmentScreen
 from matchsetup import PrepareMatchScreen
 from startmatch import StartMatchScreen
+from bluetoothtests import BluetoothTestsScreen
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
@@ -185,13 +186,15 @@ MatchOptionsScreen("MatchOptions")
 SystemOptionsScreen("SystemOptions")
 RunMatchScreen("RunMatch",bigScreen)
 AboutScreen("AboutScreen")#.process()
-SystemTestsScreen("SystemTest")
+SystemTestsScreen("SystemTests")
+BluetoothTestsScreen("BluetoothTests")
 RobotAssignmentScreen("RobotAssignmentScreen",MatchObject)#.process()
 PrepareMatchScreen("PrepareMatch",MatchObject)#.process()
 BootScreens(smallScreen,bigScreen)#.process()
 ButtonTestScreen("ButtonTestScreen")#.process()
 OptionScreen("OptionScreen")#.process()
 StartMatchScreen("StartMatch",MatchObject,bigScreen)#.process()
+from bluetoothtests import BluetoothTestsScreen
 
 while(True):
         MainScreen("MainScreen").process()
