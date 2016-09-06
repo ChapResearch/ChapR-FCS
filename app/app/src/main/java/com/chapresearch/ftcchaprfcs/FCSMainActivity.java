@@ -1,11 +1,15 @@
 package com.chapresearch.ftcchaprfcs;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -30,12 +34,16 @@ public class FCSMainActivity extends AppCompatActivity {
     public TextView autoText;
     public TextView teleopText;
     public TextView messageText;
+    public TextView matchText;
     private FCSBLE fcsble = new FCSBLE();
 
     public ArrayAdapter<String> spinnerAdapter;
 
     public int confirmCounter;
     private int counter;
+
+    IntentFilter ifilter;
+    Intent batteryStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,9 @@ public class FCSMainActivity extends AppCompatActivity {
         }
 
         //mBluetoothService.initialize();
+
+        ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryStatus = this.registerReceiver(null, ifilter);
 
         if (fcsble.mBluetoothAdapter == null) {
             Toast.makeText(this,"bluetooth hardware not found :(", Toast.LENGTH_SHORT).show();
@@ -144,6 +155,16 @@ public class FCSMainActivity extends AppCompatActivity {
                 }
 
                 @Override
+                public void consoleSelected() {
+                    messageText.setText("Attempting Connection...");
+                }
+
+                @Override
+                public void noConsoleSelected() {
+                    messageText.setText("Please go back and select a field to join");
+                }
+
+                @Override
                 public void consoleScanComplete() {
                     scanButton.setText("Scan");
                     scanButton.setClickable(true);
@@ -153,7 +174,24 @@ public class FCSMainActivity extends AppCompatActivity {
 
                 @Override
                 public void successfulQueue() {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
 
+                                @Override
+                                public void run() {
+                                    messageText.setText("Waiting...");
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
@@ -170,6 +208,7 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                         @Override
                                         public void run() {
+                                            screenLayout.setBackgroundColor(Color.RED);
                                             messageText.setText("R1");
                                             if (confirmCounter == 1) {
                                                 messageText.setVisibility(View.VISIBLE);
@@ -193,6 +232,7 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                         @Override
                                         public void run() {
+                                            screenLayout.setBackgroundColor(Color.RED);
                                             messageText.setText("R2");
                                             if (confirmCounter == 1) {
                                                 messageText.setVisibility(View.VISIBLE);
@@ -216,6 +256,7 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                         @Override
                                         public void run() {
+                                            screenLayout.setBackgroundColor(Color.BLUE);
                                             messageText.setText("B1");
                                             if (confirmCounter == 1) {
                                                 messageText.setVisibility(View.VISIBLE);
@@ -239,6 +280,7 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                         @Override
                                         public void run() {
+                                            screenLayout.setBackgroundColor(Color.BLUE);
                                             messageText.setText("B2");
                                             if (confirmCounter == 1) {
                                                 messageText.setVisibility(View.VISIBLE);
@@ -282,7 +324,12 @@ public class FCSMainActivity extends AppCompatActivity {
 
                 @Override
                 public int getBatteryStatus(int battery) {
-                    return 0;
+
+                    int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                    int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+                    float batteryPct = level / (float)scale;
+                    return (int)batteryPct;
                 }
 
                 @Override
@@ -335,130 +382,4 @@ public class FCSMainActivity extends AppCompatActivity {
 
                 }
             };
-
-    public BluetoothAdapter.LeScanCallback bLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
-
-                @Override
-                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-
-                    FCSBLEScanner record = new FCSBLEScanner(device, rssi, scanRecord, fcsble.getBluetoothName());
-
-                    counter = 0;
-
-                    if (record.is_ChapFCS){
-                        switch (record.mode){
-                            case ON_DECK:
-                                //Log.d("Address", device.getAddress());
-                                //Log.d("RSSI",Integer.toString(rssi));
-                                //Log.d("Name", record.name);
-                                //Log.d("Match", Integer.toString(record.matchNumber));
-                                //Log.d("My Name", mBluetoothAdapter.getName());
-
-                                for (int i = 1; i <= spinnerAdapter.getCount(); i++){
-                                    if (spinnerAdapter.getItem(i-1).equals(record.name + " " + device.getAddress())){
-                                        counter++;
-                                    }
-                                }
-                                if (counter == 0){
-                                    spinnerAdapter.add(record.name + " " + device.getAddress());
-                                }
-                                break;
-                            case READY:
-                                //Log.d("Name", record.name);
-                                //Log.d("Match", Integer.toString(record.matchNumber));
-                                //Log.d("Is in", Boolean.toString(record.is_invited));
-                                if (record.is_inNextMatch){
-                                    Thread t = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            runOnUiThread(new Runnable() {
-
-                                                @Override
-                                                public void run() {
-                                                    messageText.setTextColor(Color.GREEN);
-                                                    messageText.setText("Connection Successful");
-                                                    if (confirmCounter == 1) {
-                                                        messageText.setVisibility(View.VISIBLE);
-                                                    }
-                                                }
-                                            }) ;
-                                            try {
-                                                Thread.sleep(500);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                    t.start();
-                                    if (record.is_invited){
-
-                                    }
-                                }
-                                else {
-                                    Thread t = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            runOnUiThread(new Runnable() {
-
-                                                @Override
-                                                public void run() {
-                                                    messageText.setTextColor(Color.RED);
-                                                    messageText.setText("Connection Rejected");
-                                                    if (confirmCounter == 1)
-                                                        messageText.setVisibility(View.VISIBLE);
-                                                }
-                                            }) ;
-                                            try {
-                                                Thread.sleep(500);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                    t.start();
-                                }
-                                break;
-                            case MATCH:
-                                if (record.is_inNextMatch){
-                                    switch (record.command){
-                                        case AUTO_INIT:
-                                            break;
-                                        case AUTO_START:
-                                            break;
-                                        case TELEOP_INIT:
-                                            break;
-                                        case TELEOP_START:
-                                            break;
-                                        case ENDGAME_START:
-                                            break;
-                                        case ABORT:
-                                            break;
-                                        case NONE:
-                                            break;
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                }
-
-            };
-
-    /*private BluetoothAdapter.LeScanCallback FCSOnDeckJoin =
-            new BluetoothAdapter.LeScanCallback() {
-
-                @Override
-                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-
-                    FCSBLEScanner record = new FCSBLEScanner(device, rssi, scanRecord, fcsble.getName());
-
-                    if (record.is_connectable){
-                        if (confirmCounter == 1) {
-                            mBluetoothService.connect(device.getAddress());
-                        }
-                    }
-                }
-
-            };*/
 }
