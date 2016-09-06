@@ -55,9 +55,25 @@ class RN4020:
     #
     # The third arg is the size in bytes.
 
-    pchars = [ ["08c37cf5-e680-42de-88c8-0b7b83f5efa4", 0x02, 10],
-               ["ca54314d-dc4b-4d25-97c7-11eadabaf5a5", 0x01, 10]
+    #
+    # PROPERTY TYPE = 0010 0000 = indicate            (other values aren't supported
+    #                 0001 0000 = notify                   by the RN4020 yet)
+    #                 0000 1000 = write with ack
+    #                 0000 0100 = write without ack
+    #                 0000 0010 = read
+    #
+    # TODO: read is turned on for the attributes below, for testing.  They do NOT need
+    #       to be read for distribiton. (0x08 instead of 0x0a)
+    #
+    #                      UUID                        PROPERTY TYPE   MAX BYTES
+    #           -------------------------------------  -------------   ---------
+    pchars = [ ["0d48b2e8-3312-11e6-ac61-9e71128cae77",    0x0a,         2],   # robot number (for joining)
+               ["0d48b6da-3312-11e6-ac61-9e71128cae77",    0x0a,        10],   # R1 report (see above for report format)
+               ["0d48b900-3312-11e6-ac61-9e71128cae77",    0x0a,        10],   # R2 report
+               ["0d48ba22-3312-11e6-ac61-9e71128cae77",    0x0a,        10],   # B1 report
+               ["0d48bb08-3312-11e6-ac61-9e71128cae77",    0x0a,        10]    # B2 report
              ]
+
 
     #
     # __init__() - creates a serial object for the port and opens
@@ -71,7 +87,7 @@ class RN4020:
 
         self.simulation = True
         if not os.getenv("DISPLAY"):
-            self.simluation = False
+            self.simulation = False
             import RPi.GPIO as GPIO
 
             # note that this thing doesn't keep the serial port parameters
@@ -105,7 +121,7 @@ class RN4020:
             self.ser.timeout = t
 
     def reboot(self):
-        if not self.simluation:
+        if not self.simulation:
             self.flush()
             self._cmd("R,1")
             return(self._waitline("Reboot",1) and self._waitline("CMD",2))
@@ -118,11 +134,11 @@ class RN4020:
     #          some commands have return, some don't.
     #
     def _cmd(self,name):
-        if not self.simluation:
+        if not self.simulation:
             self.ser.write(name + "\n")
 
     def _cmdV(self,name):
-        if not self.simluation:
+        if not self.simulation:
             self._cmd(name)
             return(self._waitline("AOK",10,"ERR"))
         else:
@@ -215,7 +231,7 @@ class RN4020:
         return(self._cmdV("SR,00100000"))
 
     def setup(self):
-        if not self.simluation:
+        if not self.simulation:
             return(self._setFactory() and
                    self._setDeviceChar("Chap FCS","Chap Research","Chap FCS") and
                    self._setServices() and

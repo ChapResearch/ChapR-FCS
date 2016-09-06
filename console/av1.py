@@ -40,7 +40,7 @@ class AV1 (object):
     #
     # pack() - given a normal string, pack it into AV1-encoded bytes.  The output array is padded with a
     #          zero AV1 character if necessary.  If "count" is given, then the output array will have
-    #          that many AV1 characters in it.
+    #          that many bytes with packed AV1 characters.  "count" is NOT the number of AV1 characters.
     #
     @classmethod
     def pack(cls,string,*args):
@@ -49,9 +49,9 @@ class AV1 (object):
         inputPtr = 0
 
         if len(args) > 0:
-            count = args
+            count = args[0]
         else:
-            count = int(math.ceil(length * 6.0 / 8))
+            count = int(math.ceil(length * 6.0 / 8))     # the decimal point ensures that we do decimal arithmetic
 
         outarray = bytearray()
         outPtr = 0
@@ -79,15 +79,12 @@ class AV1 (object):
 
             inputPtr += 1
 
-        if length < count:            # need to pad a few bits
-            diff = count - length
+        if inputPtr % 4 != 0:
+            outPtr += 1
 
-            if inputPtr % 4 == 0:
-                bytes2Append = int(math.ceil(diff * 6.0 / 8))
-
-            if inputPtr % 4 == 1:
-            if inputPtr % 4 == 2:
-            if inputPtr % 4 == 3:
+        while outPtr < count:           # add a few zero bytes if needed
+            outarray.append(0)
+            outPtr += 1
 
         return outarray
 
