@@ -22,6 +22,8 @@ class RobotAssignmentScreen(Screen):
         self.tablePosition = (130,10)
         self.trashcanpic = pygame.image.load("Media/trashCan2.png").convert()
         self.trashcanpic = pygame.transform.scale(self.trashcanpic, (37,50))
+        self.refreshpic = pygame.image.load("Media/refresh.png").convert()
+        self.refreshpic = pygame.transform.scale(self.refreshpic, (50,50))
 
         self.cb1 = (150,150,150)
         self.cb2 = (50,50,50)
@@ -47,6 +49,8 @@ class RobotAssignmentScreen(Screen):
                                      **Button.standardButton("S","Done",self.screen))
         self.ButtonDel = self.buttons(graphic = self.trashcanpic, callback = self.trashButton,rock = "DelButton",
                                       size=(37,50), position=(130,270), rotation=0,labels=["",""])
+        self.ButtonRef = self.buttons(graphic = self.refreshpic, callback = self.refresh,rock = "RefreshButton",
+                                      size=(50,50), position=(300,270), rotation=0,labels=["",""])
         self.createSides()
 
         self.sWidth = self.screen.get_width()
@@ -292,6 +296,9 @@ class RobotAssignmentScreen(Screen):
         for robot in self.displayList:
             self.dataTable.changeData(button,data = robot)
             button += 1
+
+    def refresh(self):
+        pass
 
 
     def _process(self):
