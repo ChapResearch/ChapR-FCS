@@ -20,8 +20,8 @@ class RobotAssignmentScreen(Screen):
         self.match = match        
         
         self.tablePosition = (130,10)
-        self.trashcanpic = pygame.image.load("Media/Trashcan.png").convert()
-        self.trashcanpic = pygame.transform.scale(self.trashcanpic, (50,50))
+        self.trashcanpic = pygame.image.load("Media/trashCan2.png").convert()
+        self.trashcanpic = pygame.transform.scale(self.trashcanpic, (37,50))
 
         self.cb1 = (150,150,150)
         self.cb2 = (50,50,50)
@@ -46,8 +46,24 @@ class RobotAssignmentScreen(Screen):
         self.ButtonS = self.buttons(bgcolor = (255,255,255), callback=self.done, lcolor = (0,0,0),
                                      **Button.standardButton("S","Done",self.screen))
         self.ButtonDel = self.buttons(graphic = self.trashcanpic, callback = self.trashButton,rock = "DelButton",
-                                      size=(50,50), position=(130,275), rotation=0,labels=["",""])
+                                      size=(37,50), position=(130,270), rotation=0,labels=["",""])
         self.createSides()
+
+        self.sWidth = self.screen.get_width()
+        self.sHeight = self.screen.get_height()
+        self.boxHeight = self.sWidth/9
+        self.boxWidth = self.sHeight/3
+        self.one = "1"
+        self.two = "2"
+        self.myfont = pygame.font.SysFont("monospace", 30)
+        self.myfont.set_bold(True)
+        self.N1 = self.myfont.render(self.one,1,(255,255,255))
+        self.N2 = self.myfont.render(self.two,1,(255,255,255))
+        self.screen.blit(self.N1,(self.boxWidth/2-10,self.boxHeight+10))
+        self.screen.blit(self.N2,(self.boxWidth/2-10,self.sHeight-(self.boxHeight+40)))        
+        self.screen.blit(self.N1,(self.sWidth-(self.boxWidth/2)-10,self.boxHeight+10))
+        self.screen.blit(self.N2,(self.sWidth-(self.boxWidth/2)-10,self.sHeight-(self.boxHeight+40)))        
+
 
 
     #
@@ -229,6 +245,15 @@ class RobotAssignmentScreen(Screen):
         self.trashList = list()
         self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
         self._updateTableDisplayList()
+        #Set Labels to blank string to make sure Buttons are refreshed correctly
+        self.Button["NW"].setLabels("")
+        self.Button["NE"].setLabels("")
+        self.Button["SE"].setLabels("")
+        self.Button["SW"].setLabels("")
+        self.assignedTeams["NW"] = None
+        self.assignedTeams["NE"] = None
+        self.assignedTeams["SW"] = None
+        self.assignedTeams["SE"] = None
         if self.match.getTeam(Match.B1) is not None:
             self.assignedTeams["NW"] = self.match.getTeam(Match.B1).getNumber()
             self.trashList.append(self.match.getTeam(Match.B1).getNumber())
@@ -241,10 +266,21 @@ class RobotAssignmentScreen(Screen):
         if self.match.getTeam(Match.R2) is not None:
             self.assignedTeams["SE"] = self.match.getTeam(Match.R2).getNumber()
             self.trashList.append(self.match.getTeam(Match.R2).getNumber())
+        self.updateButtons()
         self.tableCreate()
         self.lastList = list()
         
         self.repaintTable()
+
+    #
+    # UpdateButtons - Used to update buttons to current match Objects
+    #
+    def updateButtons(self):
+        self.Button["NW"].setLabels((str)(self.assignedTeams["NW"]))
+        self.Button["NE"].setLabels((str)(self.assignedTeams["NE"]))
+        self.Button["SE"].setLabels((str)(self.assignedTeams["SE"]))
+        self.Button["SW"].setLabels((str)(self.assignedTeams["SW"]))
+            
  
     def repaintTable(self):
         self._updateTableDisplayList()
