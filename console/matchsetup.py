@@ -35,15 +35,15 @@ class PrepareMatchScreen(Screen):
                                      **Button.standardButton("NE",["Remote","Control"],self.screen))
         self.ButtonSW = self.buttons(bgcolor = (0,0,255), callback=self.robotAssignment,
                                      **Button.standardButton("SW",["Robot","Assign"],self.screen))
-        self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.done,
+        self.ButtonSE = self.buttons(bgcolor = (255,255,255), callback=self.done,lcolor=(0,0,0),
                                      **Button.standardButton("SE","Back",self.screen))
-        self.ButtonS = self.buttons(bgcolor = (0,0,255), callback=self.startMatch,
-                                     **Button.standardButton("S",["Start","Match"],self.screen))
+        self.ButtonS = self.buttons(bgcolor = (255,0,0), callback=self.startMatch,
+                                     **Button.standardButton("S",["Ready","Match"],self.screen))
 
     def systemOptions(self):
         return "SystemOptions"
 
-    def matchOptions(self):
+    def matchOptions(self,False):
         return "MatchOptions"
 
     def remoteControl(self):
