@@ -36,6 +36,8 @@ class NumberChangeScreen(Screen):
         self.ButtonSE = self.buttons(bgcolor = (0,0,255), callback=self.down, upCallback=self.release,
                                      holdCallback = self.holdCountDown,
                                      **Button.standardButton("SE","V",self.screen))
+        self.ButtonSW = self.buttons(bgcolor = (255,0,0), callback=self.permenance,
+                                     **Button.standardButton("SW","Permenance",self.screen))
 
         self.globalName = globalName
         self.mode = mode
@@ -45,6 +47,7 @@ class NumberChangeScreen(Screen):
         self.heldCountDown = False
         self.heldLastTime = datetime.datetime.now()
         self.needsUpdate = True
+        self.PT = True
 
     def drawNumber(self):
         self.screen.fill([0,0,0])             # just black, no graphic background image
@@ -86,11 +89,20 @@ class NumberChangeScreen(Screen):
         if self.number > 0:
             self.number -= 1
             self.drawNumber()
+
+    def permenance(self):
+        if self.PT == False:
+            self.PT = True
+            self.ButtonSW.setLabels("Permenant")
+        else:
+            self.PT = False
+            self.ButtonSW.setLabels("Temporary")
                 
     def done(self):
 #        setattr(globalVariables,self.globalName,self.number)
         setattr(Settings,self.globalName,self.number)
-        Settings.saveSettings()
+        if self.PT == True:
+            Settings.saveSettings()
         return("back")
 
     def _enter(self):
