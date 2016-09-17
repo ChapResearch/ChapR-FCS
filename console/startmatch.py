@@ -42,6 +42,11 @@ class StartMatchScreen(Screen):
         self.bigScreen = bigScreen
         self.bigStopped = False
         self.bigScreen.fill(0,0,0)
+        
+        self.dataTable = self.tables(fontsize=48,font="arial",align="center",cellWidth=self.screen.get_width(),color=(255,255,0),bgcolor=(0,0,0))
+        self.dataTable.addData("herro", name="state")
+        self.dataTable.endRow()
+        self.dataTable.position = (0,self.screen.get_height()/5*3)
 
         self.ButtonNW = self.buttons(bgcolor = (0,0,255), rock = "NW",fontsize = 20,
                                      **Button.standardButton("NW",["Stop",""],self.screen))
@@ -56,6 +61,8 @@ class StartMatchScreen(Screen):
         self.ButtonN = self.buttons(bgcolor = (0,0,0), callback=self.endMatch, lcolor = (0,0,0),
                                      **Button.standardButton("N","Yep",self.screen))
 
+        print("startmatc init")
+
     def done(self):
         PrepareMatchScreen.match.clear()
         return "back"
@@ -64,6 +71,11 @@ class StartMatchScreen(Screen):
         pass
 
     def endMatch(self):
+        self.ButtonNW.setLabels("")
+        self.ButtonSW.setLabels("")
+        self.ButtonNE.setLabels("")
+        self.ButtonSE.setLabels("")
+        self.match.clear()
         return "MainScreen"
     
     #Redraws the team numbers and stats on HDMI screen
@@ -148,6 +160,7 @@ class StartMatchScreen(Screen):
         self.bigScreen.cteam("SW",self.teamB2,True,10,13)
         print("Updated teams: R1")
         print("\""+self.teamR1+"\"")
+        self.changeHUD("Match Ready")
         # Start initilization once screen opens            
 
     def updateTeams(self):
@@ -173,6 +186,20 @@ class StartMatchScreen(Screen):
         self.ButtonNE.setLabels(["Stop",self.teamR1])
         self.ButtonSW.setLabels(["Stop",self.teamB2])
         self.ButtonSE.setLabels(["Stop",self.teamR2])
+
+    def changeHUD(self,state):
+        self.dataTable.setFlash("state",True);
+        self.dataTable.changeData("state",data = state,cellWidth=self.screen.get_width())        
+
+#        color = (255,255,0)
+#        fontpath = pygame.font.match_font("arial",True,False)
+#        workingFont = pygame.font.Font(fontpath,48)
+#        width, height = workingFont.size(state)        
+#        stateDisplay = workingFont.render(state,True,color)        
+#        x = (self.screen.get_width()-width)/2
+#        y = (self.screen.get_height()/5)*3
+#        self.screen.blit(stateDisplay,(x,y))
+        pass
 
     def _process(self):
 
@@ -239,5 +266,5 @@ class StartMatchScreen(Screen):
             self.clock.setTime(self.currentClockVal/60,self.currentClockVal%60)
             self.bigScreen.clockSet(self.currentClockVal/60,self.currentClockVal%60)        
             
-        return True                          # tells screen that a redraw is necessary
+#        return True                          # tells screen that a redraw is necessary
         
