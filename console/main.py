@@ -160,6 +160,9 @@ from systemtests import SystemTestsScreen
 from robotasignmentscreen import RobotAssignmentScreen
 from matchsetup import PrepareMatchScreen
 from startmatch import StartMatchScreen
+from settings import Settings
+
+Settings.loadSettings()
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
