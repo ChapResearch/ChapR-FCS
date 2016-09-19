@@ -21,7 +21,8 @@ class BLEinterface(object):
     # enterMode() - enter the given mode which should be from 0 to 4 (TBD).  Each mode
     #               has a particular behavior and supports other calls during the mode.
     #
-    def enterMode(self,mode,fieldName,match,R1=None,R2=None,B1=None,B2=None):
+    def enterMode(self,mode,fieldName,match=0,R1=None,R2=None,B1=None,B2=None):
+        print("Entering mode " + ("%d" % mode) + " for " + fieldName)
         self.mode = mode
         self.R1 = R1
         self.R2 = R2

@@ -8,7 +8,7 @@ import pygame
 from utils import textOutline, numberDraw, coordOffset
 from screen import Screen
 from buttons import Button
-import globalVariables
+import globalVariables as globals
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from tables import Table
 import virtkeyboard
@@ -51,11 +51,13 @@ class MainScreen(Screen):
         self.dataTable.position = self.tablePosition
 
     def setFieldName(self):
-        text = self.dataTable.getCellData("fieldName")
+        text = Settings.fieldName
         mykeyboard = virtkeyboard.VirtualKeyboard()
         userinput = mykeyboard.run(pygame.display.get_surface(), 200, text)
-        print "got user input of: " + userinput
-        return userinput
+        Settings.fieldName = userinput
+        Settings.saveSettings()
+        self.dataTable.changeData("fieldName",data = Settings.fieldName)
+        globals.BLE.enterMode(0,Settings.fieldName)
 
     def setMatchNumber(self):
         return("matchNumberChangeScreen")
@@ -71,6 +73,11 @@ class MainScreen(Screen):
 
     def about(self):
         return("AboutScreen")
+
+    def _enter(self):
+        # whenever this screen is shown, we are in the simple mode 0
+        # simply broadcasting our presence
+        globals.BLE.enterMode(0,Settings.fieldName)
 
     def _process(self):
         pass
