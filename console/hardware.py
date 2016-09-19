@@ -10,6 +10,8 @@ import os
 import datetime
 import pygame
 
+# only get the GPIO if we are not running simulated
+
 if not(os.getenv("DISPLAY")):
     import RPi.GPIO as GPIO
 
