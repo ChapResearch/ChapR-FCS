@@ -1,11 +1,8 @@
 package com.chapresearch.ftcchaprfcs;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -34,6 +31,7 @@ public class FCSMainActivity extends AppCompatActivity {
     public TextView teleopText;
     public TextView messageText;
     public TextView matchText;
+    public TextView matchNum;
     private FCSBLE fcsble = new FCSBLE();
 
     public ArrayAdapter<String> spinnerAdapter;
@@ -59,7 +57,8 @@ public class FCSMainActivity extends AppCompatActivity {
         autoText = (TextView) findViewById(R.id.autoText);
         teleopText = (TextView) findViewById(R.id.teleopText);
         messageText = (TextView) findViewById(R.id.errorMessage);
-        matchText = (TextView) findViewById(R.id.matchNumber);
+        matchText = (TextView) findViewById(R.id.matchText);
+        matchNum = (TextView) findViewById(R.id.matchNumber);
 
         fcsble.init((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE), getApplicationContext());
 
@@ -96,7 +95,7 @@ public class FCSMainActivity extends AppCompatActivity {
         }
 
         fcsble.startFCSConsoleScan(fcsBLECallBack);
-        confirmButton.setClickable(false);
+        confirmButton.setEnabled(false);
         confirmButton.setAlpha(.5f);
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
@@ -109,10 +108,9 @@ public class FCSMainActivity extends AppCompatActivity {
                 teleopText.setVisibility(View.INVISIBLE);
                 fieldOptions.setVisibility(View.INVISIBLE);
                 matchText.setVisibility(View.INVISIBLE);
+                matchNum.setVisibility(View.INVISIBLE);
                 messageText.setVisibility(View.VISIBLE);
                 backButton.setVisibility(View.VISIBLE);
-                //fcsble.scanLEDevice(true);
-                //fcsble.mBluetoothAdapter.startLeScan(bLeScanCallback);
                 fcsble.connectToFCS(spinnerAdapter.getItem(fieldOptions.getSelectedItemPosition()), fcsBLECallBack);
                 confirmCounter = 1;
             }
@@ -127,6 +125,7 @@ public class FCSMainActivity extends AppCompatActivity {
                 teleopText.setVisibility(View.VISIBLE);
                 fieldOptions.setVisibility(View.VISIBLE);
                 matchText.setVisibility(View.VISIBLE);
+                matchNum.setVisibility(View.VISIBLE);
                 messageText.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.INVISIBLE);
                 confirmCounter = 0;
@@ -136,6 +135,12 @@ public class FCSMainActivity extends AppCompatActivity {
 
     public FCSBLE.FCSBLECallback fcsBLECallBack =
             new FCSBLE.FCSBLECallback() {
+                @Override
+                public void updateFromScan() {
+                    confirmButton.setEnabled(true);
+                    confirmButton.setAlpha(1f);
+                }
+
                 @Override
                 public void updateMatchNum(final String match) {
                     Thread t = new Thread(new Runnable() {

@@ -91,7 +91,8 @@
         android:layout_alignStart="@+id/teleopText"
         android:textColor="#ffffff"
         android:background="@drawable/confirm_button"
-        android:radius="40dp" />
+        android:radius="40dp"
+        android:clickable="false" />
 
     <Button
         android:layout_width="match_parent"
