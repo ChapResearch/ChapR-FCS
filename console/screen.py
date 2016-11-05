@@ -136,7 +136,9 @@ class Screen(object):
     def process(self):
         self.enter()                              # the start-up code for entering a screen
         while True:
-            if self._process() or self.update():  # if the subclass needs it, or we need it, redraw
+            a = self._process()                   # if these are put on the IF line, only the first
+            b = self.update()                     #     may potentially be called - both need to be
+            if a or b:                            # if the subclass needs it, or we need it, redraw
                 self.draw()
 
             nextScreen = self.processEvents()     # process my events

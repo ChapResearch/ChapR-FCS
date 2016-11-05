@@ -33,11 +33,10 @@ from touchDriver import touchScreen
 from screen import Screen
 import multiprocessing as mp
 from signal import alarm, signal, SIGALRM
-import globalVariables
+import globalVariables as globals
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from hardware import HARDWARE
 from Team import Match
-from rn4020 import RN4020
 
 #
 #  ____   _                    _         _    _               
@@ -120,13 +119,21 @@ pygame.init()
 # | |_) || || |_| ||  __/| |_| (_) || (_) || |_ | | | |
 # |____/ |_| \__,_| \___| \__|\___/  \___/  \__||_| |_|
 #                                                      
-# Set up the bluetooth control.  The RN4020 is the hardward at the lowest
-# level.  However, we use a special BLE object to maintain everything from
-# bluetooth control, to the threads that monitor the protocol as the match
-# is progressing.
+# Set up the bluetooth control.  We're set-up to be able to operate with
+# different Bluetooth implementations.  Currently, this is written to be
+# in either simulation mode or RN4020 mode.  I can imagine a future test
+# that will determine if another BLE driver needs to be loaded instead.
+#
+# In any event, the BLEinterface object is what everyone uses to talk to
+# the BLE "thing"
 # 
 
-#bluetooth = BLEcontrol()
+if os.getenv("DISPLAY"):
+    from BLEinterfaceSimulation import BLEinterface
+else:
+    from BLEinterfaceRN4020 import BLEinterface
+        
+globals.BLE = BLEinterface()
 
 # set-up hardware, and run through the boot-up test sequence.  Each
 # time we boot, the system tests the buttons and bluetooth (as much as
@@ -161,6 +168,9 @@ from robotasignmentscreen import RobotAssignmentScreen
 from matchsetup import PrepareMatchScreen
 from startmatch import StartMatchScreen
 from bluetoothtests import BluetoothTestsScreen
+from settings import Settings
+
+Settings.loadSettings()
 
 # each one of these calls instantiates an object that ends-up on the
 # superclass "Screen" array of screens.  Screen switching is handled
@@ -194,7 +204,6 @@ BootScreens(smallScreen,bigScreen)#.process()
 ButtonTestScreen("ButtonTestScreen")#.process()
 OptionScreen("OptionScreen")#.process()
 StartMatchScreen("StartMatch",MatchObject,bigScreen)#.process()
-from bluetoothtests import BluetoothTestsScreen
 
 while(True):
         MainScreen("MainScreen").process()
