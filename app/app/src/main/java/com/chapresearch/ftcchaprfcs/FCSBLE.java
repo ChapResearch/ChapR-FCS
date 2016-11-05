@@ -36,7 +36,7 @@ public class FCSBLE {
     private static final long SCAN_PERIOD = 10000;
 
     private Map<String, String> consoles = new HashMap<>();
-    private Map<String, FCSBLEScanner> fcsConsoleRecords = new HashMap<>();
+    private Map<String, String> fcsMatchNumber = new HashMap<>();
 
     private FCSBLECallback UIConsoleScanCallback;
 
@@ -54,6 +54,11 @@ public class FCSBLE {
     private boolean inMatch = false;
 
     public interface FCSBLECallback {
+
+        public void updateFromScan();
+
+        public void updateMatchNum(String match);
+
         //
         // processConsole() - this routine is called once for every FCS console discovered during
         //                    the scan for consoles. This callback happens after the call to
@@ -61,8 +66,16 @@ public class FCSBLE {
         //
         public void processConsole(String name);
 
+        //
+        // consoleSelected() - this routine is called when a console is selected. It makes sure the
+        //                     correct message is displayed.
+        //
         public void consoleSelected();
 
+        //
+        // noConsoleSelected() - this routine is called when there is no console selected. It makes
+        //                       sure that the correct message is displayed.
+        //
         public void noConsoleSelected();
 
         //
@@ -98,6 +111,11 @@ public class FCSBLE {
         //                      100.
         //
         public int getBatteryStatus(int battery);
+
+        //
+        // resetToZero() - this routine is called if the FCS were to restart. It handles some
+        //                 exceptions.
+        public void resetToZero();
 
         //
         // startAutoInit() - this is called once the autonomous needs to be initialized.
@@ -183,15 +201,19 @@ public class FCSBLE {
         }
     }
 
+    public void updateMatch(String name){
+        UIConsoleScanCallback.updateMatchNum(fcsMatchNumber.get(name));
+    }
+
     public void startFCSConsoleScan(FCSBLECallback consoleCallback) {
         // Stops scanning after a pre-defined scan period.
-        bHandler.postDelayed(new Runnable() {
+        /*bHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mBluetoothAdapter.stopLeScan(bleFCSConsoleScanCallback);
                 UIConsoleScanCallback.consoleScanComplete();
             }
-        }, SCAN_PERIOD);
+        }, SCAN_PERIOD);*/
         mBluetoothAdapter.startLeScan(bleFCSConsoleScanCallback);
         consoles.clear();
 
@@ -199,19 +221,20 @@ public class FCSBLE {
     }
 
     public void connectToFCS(String consoleName, FCSBLECallback consoleCallback) {
+        mBluetoothAdapter.stopLeScan(bleFCSConsoleScanCallback);
         UIConsoleScanCallback = consoleCallback;
-        if (modeCounter == 0){
             if (!consoles.isEmpty()){
                 //Log.d("modeCounter", Integer.toString(modeCounter));
-                UIConsoleScanCallback.consoleSelected();
-                mBluetoothDeviceAddress = consoles.get(consoleName);
-                final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
-                mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
+                if (consoles.containsValue(consoleName)) {
+                    UIConsoleScanCallback.consoleSelected();
+                    mBluetoothDeviceAddress = consoles.get(consoleName);
+                    final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
+                    mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
+                }
             }
             else {
                 UIConsoleScanCallback.noConsoleSelected();
             }
-        }
     }
 
     public void afterConnectInteract(){
@@ -227,8 +250,10 @@ public class FCSBLE {
         if (modeCounter == 3){
             if (record.is_inNextMatch){
                 UIConsoleScanCallback.queueComplete(record.is_inNextMatch, getPosition());
+
             }
             if (record.is_invited){
+                modeCounter = 2;
                 mBluetoothAdapter.stopLeScan(bleFCSConsoleScanCallback);
                 final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
                 mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
@@ -245,17 +270,27 @@ public class FCSBLE {
                     record = new FCSBLEScanner(device, rssi, scanRecord, getBluetoothName());
 
                     if (record.is_ChapFCS) {
+                        if (record.mode == FCSBLEScanner.RunMode.SCAN_MODE){
+                            consoles.put(record.name, device.getAddress());
+                            fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));
+                            UIConsoleScanCallback.processConsole(record.name);
+                        }
                         if (record.mode == FCSBLEScanner.RunMode.ON_DECK) {
                             //Log.d("Address", device.getAddress());
                             //Log.d("RSSI", Integer.toString(rssi));
                             //Log.d("Name", record.name);
                             //Log.d("Match", Integer.toString(record.matchNumber));
                             //Log.d("My Name", mBluetoothAdapter.getName());
-
+                            UIConsoleScanCallback.updateFromScan();
+                            UIConsoleScanCallback.consoleScanComplete();
                             consoles.put(record.name, device.getAddress());
-                            fcsConsoleRecords.put(record.name, record);
+                            fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));
                             afterConnectInteract();
                             UIConsoleScanCallback.processConsole(record.name);
+                            if (modeCounter > 1){
+                                modeCounter = 0;
+                                UIConsoleScanCallback.resetToZero();
+                            }
                         }
                         if (record.mode == FCSBLEScanner.RunMode.READY){
                             afterConnectInteract();
@@ -272,11 +307,11 @@ public class FCSBLE {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d("GattCallBack", "Connected to GATT server.");
                 // Attempts to discover services after successful connection.
+                //mBluetoothGatt.discoverServices();
                 Log.d("GattCallBack", "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
-                //writeCustomCharacteristic();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                afterConnectInteract();
                 Log.d("GattCallBack", "Disconnected from GATT server.");
+                afterConnectInteract();
             }
         }
 

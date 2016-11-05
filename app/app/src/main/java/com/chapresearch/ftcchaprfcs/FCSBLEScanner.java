@@ -13,7 +13,7 @@ public class FCSBLEScanner {
     }
 
     public enum RunMode {
-        ON_DECK, READY, MATCH, NONE
+        SCAN_MODE, ON_DECK, READY, MATCH, NONE
     }
 
     public enum MatchCommand {
@@ -95,12 +95,15 @@ public class FCSBLEScanner {
         int mod = (int)bytes[7];
         switch (mod){
             case 0:
-                this.mode = RunMode.ON_DECK;
+                this.mode = RunMode.SCAN_MODE;
                 break;
             case 1:
-                this.mode = RunMode.READY;
+                this.mode = RunMode.ON_DECK;
                 break;
             case 2:
+                this.mode = RunMode.READY;
+                break;
+            case 3:
                 this.mode = RunMode.MATCH;
                 break;
         }

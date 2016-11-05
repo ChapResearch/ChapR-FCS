@@ -34,20 +34,6 @@
         android:layout_marginTop="68dp"
         android:layout_marginLeft="7dp" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/scanButton"
-        android:id="@+id/scanButton"
-        android:layout_marginRight="5dp"
-        android:layout_alignTop="@+id/fieldText"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="5dp"
-        android:textColor="#ffffff"
-        android:clickable="true" />
-
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,14 +49,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/autoText"
-        android:layout_marginTop="32dp"
-        android:layout_below="@+id/scanButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:text="@string/autoText"
         android:textColor="#ffffff"
         android:enabled="false"
-        android:inputType="none" />
+        android:inputType="none"
+        android:layout_below="@+id/fieldOptions"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="42dp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -106,7 +91,8 @@
         android:layout_alignStart="@+id/teleopText"
         android:textColor="#ffffff"
         android:background="@drawable/confirm_button"
-        android:radius="40dp" />
+        android:radius="40dp"
+        android:clickable="false" />
 
     <Button
         android:layout_width="match_parent"
@@ -143,5 +129,25 @@
         android:layout_marginRight="60dp"
         android:layout_toEndOf="@+id/teleopText"
         android:layout_marginTop="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Match"
+        android:id="@+id/matchText"
+        android:layout_below="@+id/fieldOptions"
+        android:layout_alignStart="@+id/fieldText"
+        android:layout_toStartOf="@+id/fieldOptions"
+        android:textAlignment="center"
+        android:textSize="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/matchNumber"
+        android:layout_alignBottom="@+id/matchText"
+        android:layout_toEndOf="@+id/matchText"
+        android:layout_marginStart="15dp"
+        android:textSize="15dp" />
 
 </RelativeLayout>

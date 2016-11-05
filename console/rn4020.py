@@ -4,76 +4,16 @@
 #   Interface to the rn4020.  Does all the bluetoothy stuff.
 #
 
-#
-# Here are the constants that define the UUIDs for this
-# service.  But first, here's how things are going to work
-# from a GATT perspective:
-#
-#  This "service" UUID, referred to here as UUID, will be
-#  the one that the console uses to broadcast on for both
-#  information and connections.  When central devices
-#  connect, they will provide a server for attributes as
-#  well.
-#
-#  The RN4020 has a built-in "Device Information Service"
-#  which is part of the "profile" of the console.  Although
-#  it is initially set to describe the RN4020 device itself,
-#  we hijack that description to make that part of the profile
-#  describe the console.
-
 from hardware import HARDWARE
 import serial
 import datetime
 import os
+import re
+from gatt import GATT
+import RPi.GPIO as GPIO
 
 class RN4020:
     """Implements intereface to RN4020"""
-
-    # class variables here - shared by all instances of this class
-
-    # the service UUID was generated with www.uuidgenerator.net and is really
-    # quite arbitrary.  Note that the dashes will be stripped before sending
-    # to the RN4020
-
-    UUID = "1840e436-bf53-45f1-a1dd-a56336e20377"
-
-    # private characteristics are defined for peripherals to query
-    # again, UUIDs were generated from the web site and are completely arbitrary
-    # the second argument is the type, where type is:
-    #
-    #   INDICATE                0'b00100000    Indicate value of characteristic WITH 
-    #                                            acknowledgment from server to client.
-    #   NOTIFY                  0'b00010000    Notify value of characteristic WITHOUT
-    #                                            acknowledgment from server to client.
-    #   WRITE                   0'b00001000    Write value of characteristic WITH
-    #                                            acknowledgment from client to server.
-    #   WRITE WITHOUT RESPONSE  0'b00000100    Write value of characteristic WITHOUT
-    #                                            acknowledgment from client to server.
-    #   READ                    0'b00000010    Read value of characteristic. Value is
-    #                                            sent from server to client.
-    #   BROADCAST               0'b00000001    Broadcast value of characteristic.
-    #
-    # The third arg is the size in bytes.
-
-    #
-    # PROPERTY TYPE = 0010 0000 = indicate            (other values aren't supported
-    #                 0001 0000 = notify                   by the RN4020 yet)
-    #                 0000 1000 = write with ack
-    #                 0000 0100 = write without ack
-    #                 0000 0010 = read
-    #
-    # TODO: read is turned on for the attributes below, for testing.  They do NOT need
-    #       to be read for distribiton. (0x08 instead of 0x0a)
-    #
-    #                      UUID                        PROPERTY TYPE   MAX BYTES
-    #           -------------------------------------  -------------   ---------
-    pchars = [ ["0d48b2e8-3312-11e6-ac61-9e71128cae77",    0x0a,         2],   # robot number (for joining)
-               ["0d48b6da-3312-11e6-ac61-9e71128cae77",    0x0a,        10],   # R1 report (see above for report format)
-               ["0d48b900-3312-11e6-ac61-9e71128cae77",    0x0a,        10],   # R2 report
-               ["0d48ba22-3312-11e6-ac61-9e71128cae77",    0x0a,        10],   # B1 report
-               ["0d48bb08-3312-11e6-ac61-9e71128cae77",    0x0a,        10]    # B2 report
-             ]
-
 
     #
     # __init__() - creates a serial object for the port and opens
@@ -81,52 +21,38 @@ class RN4020:
     #
     def __init__(self):
 
-        # the rn4020 module is only viable on the actual console platform, so simulation
-        # is a problem.  However, the module shouldn't break everything else during
-        # simulation, so this code makes it work right duing simulation.
-
-        self.simulation = True
-        if not os.getenv("DISPLAY"):
-            self.simulation = False
-            import RPi.GPIO as GPIO
-
-            # note that this thing doesn't keep the serial port parameters
-            # in instance variables because they're already in the serial
-            # class as ser.baudrate, ser.port, ser.timeout, etc.
-            self.ser = serial.Serial(HARDWARE.rn4020.tty,HARDWARE.rn4020.baud,timeout=1)
-            GPIO.setmode(GPIO.BCM)
-            GPIO.setwarnings(False)
-            #GPIO.setup(HARDWARE.rn4020.mldp,GPIO.OUT)        # CMD/MLDP drive low
-            #GPIO.setup(HARDWARE.rn4020.wake,GPIO.OUT)         # WAKE_SW drive high
-            GPIO.setup(HARDWARE.rn4020.connected,GPIO.IN)         # goes high when connected
-            #GPIO.output(HARDWARE.rn4020.mldp,GPIO.LOW)
-            #GPIO.output(HARDWARE.rn4020.wake,GPIO.HIGH)
+        # note that this thing doesn't keep the serial port parameters
+        # in instance variables because they're already in the serial
+        # class as ser.baudrate, ser.port, ser.timeout, etc.
+        self.ser = serial.Serial(HARDWARE.rn4020.tty,HARDWARE.rn4020.baud,timeout=1)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        #GPIO.setup(HARDWARE.rn4020.mldp,GPIO.OUT)        # CMD/MLDP drive low
+        #GPIO.setup(HARDWARE.rn4020.wake,GPIO.OUT)         # WAKE_SW drive high
+        GPIO.setup(HARDWARE.rn4020.connected,GPIO.IN)         # goes high when connected
+        #GPIO.output(HARDWARE.rn4020.mldp,GPIO.LOW)
+        #GPIO.output(HARDWARE.rn4020.wake,GPIO.HIGH)
 
     def sync(self):
         # (re)syncronizes with the rn4020
         pass
 
     def flush(self):
-        if not self.simulation:
-            t = self.ser.timeout
-            self.ser.timeout = .1
-            self.ser.readlines()
-            self.ser.timeout = t
+        t = self.ser.timeout
+        self.ser.timeout = .1
+        self.ser.readlines()
+        self.ser.timeout = t
 
     def dump(self):
-        if not self.simulation:
-            t = self.ser.timeout
-            self.ser.timeout = .1
-            print(self.ser.readlines())
-            self.ser.timeout = t
+        t = self.ser.timeout
+        self.ser.timeout = .1
+        print(self.ser.readlines())
+        self.ser.timeout = t
 
     def reboot(self):
-        if not self.simulation:
-            self.flush()
-            self._cmd("R,1")
-            return(self._waitline("Reboot",1) and self._waitline("CMD",2))
-        else:
-            return(True)
+        self.flush()
+        self._cmd("R,1")
+        return(self._waitline("Reboot",1) and self._waitline("CMD",2))
 
     #
     # _cmd() - execute the given command, and consume the return message
@@ -134,15 +60,34 @@ class RN4020:
     #          some commands have return, some don't.
     #
     def _cmd(self,name):
-        if not self.simulation:
-            self.ser.write(name + "\n")
+        self.ser.write(name + "\n")
 
     def _cmdV(self,name):
-        if not self.simulation:
-            self._cmd(name)
-            return(self._waitline("AOK",10,"ERR"))
-        else:
-            return(True)
+        self._cmd(name)
+        return(self._waitline("AOK",10,"ERR"))
+
+    def _cmdB(self,name):
+        self._cmd(name)
+        return(self._bufferlines("END",5,"ERR"))
+
+    #
+    # _mapHandles() - maps the long UUIDs to handles so that appropriate async
+    #                 mapping can be done when setting values.  This can only be
+    #                 called AFTER the services have been defined.  Returns TRUE
+    #                 if it worked, False otherwise.
+    #
+    def _mapHandles(self):
+        services = self._cmdB('LS')
+        for entry in GATT.PrivateChars:
+            uuid = entry["uuid"].translate(None,"-")
+            match = re.search("(?i)" + uuid + ",(....),",services)
+            if match:
+                entry["handle"] = match.group(1)
+            else:
+                print("no match")
+
+        print(GATT.PrivateChars)
+
 
     #
     # _setDeviceChar() - sets the device characteristics that will be
@@ -171,7 +116,29 @@ class RN4020:
     
     def _setFactory(self):
         return(self._cmdV("SF,2\n") and self.reboot())
-        
+
+    #
+    # _asyncReadline() - reads a line from the serial port, but only if there IS
+    #                    some data in the serial port.  If there is any data, it
+    #                    will potentially stall for the timeout given.  Otherwise,
+    #                    it will either return with a line immediately, or come
+    #                    back with "None".  The return data is stripped.
+    #
+    def _asyncReadline(self):
+        incoming = ""
+        first = True
+        while self.ser.in_waiting() > 0 or not first:
+            first = False
+            c = self.ser.read(1)             # may timeout if delayed char after first char read
+            incoming += c
+            if len(c) == 0 or c == "\n":
+                break
+        incoming = incoming.strip()
+        if len(incoming) == 0:
+            return None
+        else:
+            return incoming
+
     #
     # _waitline() - waits for a line consisting entirely of
     #               the argument.  Note that trailing "\r" and "\n"
@@ -180,6 +147,7 @@ class RN4020:
     #               specified.  If the badTrigger is specified,
     #               then it will match an cause immediate False
     #               return.
+    #               NOTE that timeout can be 
 
     def _waitline(self,trigger,timeout,badTrigger=None):
         target = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
@@ -190,6 +158,25 @@ class RN4020:
             if(badTrigger and incoming == badTrigger):
                 return(False)
         return(False)
+        
+    #
+    # _bufferlines() - buffers all of the data on lines leading up
+    #                  a line with "trigger" at the end.  The buffer
+    #                  is returned if things go OK, otherwise None
+    #                  is returned.  The "trigger" is not included in
+    #                  the buffer.
+    #
+    def _bufferlines(self,trigger,timeout,badTrigger=None):
+        target = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
+        buffer = ""
+        while(datetime.datetime.now() < target):
+            incoming = self.ser.readline().strip()
+            if(incoming == trigger):
+                return(buffer)
+            if(badTrigger and incoming == badTrigger):
+                return(None)
+            buffer += incoming + "\n"
+        return(None)
 
     #
     # _setServices() - sets the services that this application supports.  Note,
@@ -207,14 +194,14 @@ class RN4020:
     #                         It also sets the private service UUID that peripherals
     #                         will use to identify this application.  Note that the UUID
     #                         needs to be in smushed-hex form with just 32 hex digits
-    #                         as a string.  NOTE that the %02d is necessary, the RN4020
+    #                         as a string.  NOTE that the %02x is necessary, the RN4020
     #                         gets angry if there aren't 2 digits.
     #
     def _setPrivateServices(self):
         # first clear existing private services, then set our UUID
-        if(self._cmdV("PZ") and self._cmdV("PS," + RN4020.UUID.translate(None,"-"))):
-            for entry in RN4020.pchars:
-                cmd = "PC," + entry[0].translate(None,"-") + ",%02d,%02d" % (entry[1],entry[2])
+        if(self._cmdV("PZ") and self._cmdV("PS," + GATT.ServiceUUID.translate(None,"-"))):
+            for entry in GATT.PrivateChars:
+                cmd = "PC," + entry["uuid"].translate(None,"-") + ",%02x,%02x" % (entry["type"],entry["size"])
                 if(not(self._cmdV(cmd))):
                     return(False)
             return(True)
@@ -231,12 +218,72 @@ class RN4020:
         return(self._cmdV("SR,00100000"))
 
     def setup(self):
-        if not self.simulation:
-            return(self._setFactory() and
-                   self._setDeviceChar("Chap FCS","Chap Research","Chap FCS") and
-                   self._setServices() and
-                   self._setFeatures() and
-                   self._setPrivateServices() and
-                   self.reboot())
-        else:
-            return(True)
+        return(self._setFactory() and
+               self._setDeviceChar("Chap FCS","Chap Research","Chap FCS") and
+               self._setServices() and
+               self._setFeatures() and
+               self._setPrivateServices() and
+               self._mapHandles() and
+               self.reboot())
+
+    #
+    # broadcastMessage() - a simple broadcast of a particular message.
+    #
+    def broadcastMessage(self,bcastMessage):
+        print("going to broadcast \"" + bcastMessage + "\"")
+        self._cmd("Y")                    # need to stop any previous message/connection
+        self._cmdV("N," + bcastMessage)
+        self._cmdV("A")
+
+    #
+    # _pingPongBcast() - sub-routine for the pingPongMacro() call - sets up b-cast message
+    #
+    def _pingPongBcast(self,bcastTime,bcastMessage):
+        self._cmd("N," + bcastMessage)                    # prepare b-cast message
+        self._cmd("SM,1," + ("%08x" % (bcastTime*1000)))  # b-cast time
+        self._cmd("A")                                    # start broadcast
+
+    #
+    # _pingPongConnect() - sub-routine for the pingPongMacro() call - sets up connectable
+    #
+    def _pingPongConnect(self,connectableTime):
+        self._cmd("SM,2," + ("%08x" % (connectableTime*1000))) # connectable time
+        self._cmd("A")                                         # start avertising
+
+    #
+    # pingPongMacro() - sets up an RN4020 script to ping pong between broadcast and connectable
+    #                   advertisement, then starts the script.  Times in ms
+    #
+    def pingPongMacro(self,bcastTime,connectableTime,bcastMessage):
+
+        self._cmdV("WC")                                  # clear current script
+        self._cmd("@PW_ON")                               # called by WR by default
+        self._pingPongBcast(bcastTime,bcastMessage)
+
+        # when timer 1 goes off, terminate b-cast and start connectable advertisement
+
+        self._cmd("@TMR1")
+        self._cmd("Y")                                         # turn off previous b-cast
+        self._pingPongConnect(connectableTime)
+
+        # when timer 2 goes off, terminate the connectable advertisement and start broadcast again
+
+        self._cmd("@TMR2")
+        self._cmd("Y")                                    # turn off previous b-cast
+        self._pingPongBcast(bcastTime,bcastMessage)
+
+        # when a connection comes in, set up for incoming data
+
+        self._cmd("@CONN")
+        self._cmd("SM,2,FFFFFFFF")                        # turn off connection timer immediately
+#        self._cmd("SR,00101000")                          # turn ON UART output for write data
+
+        # after a client disconnects, get the timer going again, list like @TMR2 and @PW_ON
+
+        self._cmd("@DISCON")
+#        self._cmd("SR,00100000")                          # turn OFF UART output for write data
+        self._pingPongBcast(bcastTime,bcastMessage)
+
+        self._cmdB("\033")                                # escape terminates program
+
+        self._cmd("WR")                                   # starts it up
