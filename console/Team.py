@@ -22,7 +22,7 @@ class Match(object):
     R2 = 2
     B1 = 3
     B2 = 4
-    
+
     def __init__(self):
         self.positions = dict()
         self.positions[Match.R1] = None
@@ -55,15 +55,26 @@ class Match(object):
             if self.positions[team].getNumber() == teamN:
                 return self.positions[team]
         return None
-        
+
     #
+    # currentTeams() - self.currentTeams
+    #
+    def currentTeams(self):
+        return self.currentTeams
+
+    #
+    # getTrash() - self.trash
+    #
+    def getTrash(self):
+        return self.trash
+
     # addTeam() - called as part of a mechanism to check for incoming
     #             teams joining a match.  Note that a team that is already
     #             part of the current teams (or in the trash) is not added
     #             again.
     #
     def addTeam(self,team):
-        if team in self.currentTeams or team in self.trash or team in self.incomingTeams:
+        if team in self.currentTeams or team in self.trashTeams or team in self.incomingTeams:
             pass
         else:
             self.incomingTeams.append(team)
@@ -74,8 +85,8 @@ class Match(object):
     #
     def trashTeam(self,team):
         if team in self.currentTeams:
-            currentTeams.remove(team)
-            trashTeams.append(team)
+            self.currentTeams.remove(team)
+            self.trashTeams.append(team)
 
     #
     # emptyTrash() - put all teams BACK into the current teams.
@@ -83,6 +94,12 @@ class Match(object):
     def emptyTrash(self):
         self.currentTeams.extend(self.trashTeams)
         self.trashTeams = []
+
+    #
+    # removeTrash() - Removes a team from the trashTeams list
+    #
+    def removeTrash(self,team):
+        self.trashTeams.remove(team)
 
     #
     # clearTeams() - clear all teams and all trash.
@@ -98,3 +115,15 @@ class Match(object):
     def ackIncoming(self):
         self.currentTeams.extend(self.incomingTeams)
         self.incomingTeams = []
+        self.currentTeams.sort()
+
+    #
+    # addCurrent() - add's team to currentTeams
+    #
+    def addCurrent(self,team):
+        self.currentTeams.append(team)
+    #
+    # fakeTeams() - creates a fake set of incoming teams
+    #
+    def fakeTeams(self):
+            self.incomingTeams = [2468,118,5628,148,27,8886,1080,9999]

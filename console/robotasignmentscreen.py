@@ -18,6 +18,7 @@ class RobotAssignmentScreen(Screen):
         Screen.__init__(self,name)
 
         self.match = match        
+        self.match.fakeTeams()
         
         self.tablePosition = (130,10)
         self.trashcanpic = pygame.image.load("Media/trashCan2.png").convert()
@@ -31,7 +32,7 @@ class RobotAssignmentScreen(Screen):
         self.sideRed = (255,150,150)
 
         self.roboSel = None                   #  the index into the Table of robots
-        self.trashList = []
+#        self.trashList = []
         self.AssignButtonPressed = None        #This is set to one of NW NE SW SE or NOne
         self.assignedTeams = { "NW":None, "NE":None, "SW":None, "SE":None }
 
@@ -73,16 +74,16 @@ class RobotAssignmentScreen(Screen):
     #
     # _updateTableDIsplayList() - Update the display list acording to incoming list and trash list.
     #
-    def _updateTableDisplayList(self):
-        self.displayList =  list(set(self.incomingList)-set(self.trashList))
-        self.displayList.sort()
+#    def _updateTableDisplayList(self):
+#        self.displayList =  list(set(self.incomingList)-set(self.trashList))
+#        self.displayList.sort()
 
     #
     # _unassignButton() - Remove team from assigned button
     #                     the button is identified by rock
     #
     def _unassignButton(self, rock):
-        self.trashList.remove(self.assignedTeams[rock])
+        self.match.trashTeam(self.assignedTeams[rock])
         self.Button[rock].setLabels(None)
         
 
@@ -92,7 +93,8 @@ class RobotAssignmentScreen(Screen):
     #
     def _swapAssignedWithTable(self,rock):
         # First remove the team thats on the button
-        self.trashList.remove(self.assignedTeams[rock])
+        self.match.addCurrent(self.assignedTeams[rock])
+        self.match.removeTrash(self.assignedTeams[rock])
         # Next assign the current selcted table robot to Button
         self._assignTeamToButton(rock)
 
@@ -102,9 +104,9 @@ class RobotAssignmentScreen(Screen):
     #
     def _assignTeamToButton(self,rock):
         # move the flashing table robot to the button
-        self.trashList.append(self.displayList[self.roboSel])
-        self.assignedTeams[rock] = self.displayList[self.roboSel]
-        self.Button[rock].setLabels(str(self.displayList[self.roboSel]))
+        self.assignedTeams[rock] = self.match.currentTeams[self.roboSel]
+        self.Button[rock].setLabels(str(self.match.currentTeams[self.roboSel]))
+        self.match.trashTeam(self.match.currentTeams[self.roboSel])
         # Clean up and repaint table
         self.dataTable.setFlash(self.roboSel,False)
         self.roboSel = None
@@ -132,9 +134,9 @@ class RobotAssignmentScreen(Screen):
         self.assignedTeams[rock] = self.assignedTeams[self.AssignButtonPressed]
         self.assignedTeams[self.AssignButtonPressed] = temp
 
-    #nn
+    #
     # teamAssign() - Called whenever a corner buton is clicked
-    #  n              the rock identifies the buton that was presnsed.
+    #                the rock identifies the buton that was presnsed.
     #
     def teamAssign(self,rock):
         
@@ -156,31 +158,34 @@ class RobotAssignmentScreen(Screen):
             self.Button[rock].setFlash(True)
 
     def trashButton(self,rock):
-        self._updateTableDisplayList()
+        self.match.ackIncoming()
         # Trashes the robot from the table that was reviously clicked
         if self.roboSel is not None:
-            self.trashList.append(self.displayList[self.roboSel])
+            self.match.trashTeam(self.match.currentTeams[self.roboSel])
             self.dataTable.setFlash(self.roboSel,False)
             self.roboSel = None
             self.repaintTable()
         #Trashes the the previously selected assigned team
         elif self.AssignButtonPressed is not None:
             if self.assignedTeams[self.AssignButtonPressed] is not None:
-                self.trashList.append(self.assignedTeams[self.AssignButtonPressed])
+                self.match.addTeam(self.assignedTeams[self.AssignButtonPressed])
                 self.Button[self.AssignButtonPressed].setFlash(False)
                 self.Button[self.AssignButtonPressed].setLabels(None)
                 self.assignedTeams[self.AssignButtonPressed] = None
                 self.AssignButtonPressed = None
                 self.repaintTable()
-        else:
-            del self.trashList[:]
+        else:#########################################################################################
+#            del self.trashList[:]
+            self.match.emptyTrash()
             for team in self.assignedTeams:
+                print(self.assignedTeams[team])
                 if self.assignedTeams[team] is not None:
-                    self.trashList.append(self.assignedTeams[team])
-            self._updateTableDisplayList()
+                    print self.assignedTeams.get(team)
+                    self.match.trashTeam(self.assignedTeams.get(team))
+            self.match.ackIncoming()
             self.repaintTable()
             pass
-
+######################################################################################################
     def tableButton(self,rock):
 
         # If a robot from the table was previously selected
@@ -196,9 +201,10 @@ class RobotAssignmentScreen(Screen):
                 self.roboSel = rock
         # If an assigned team button has been selected previously
         elif self.AssignButtonPressed is not None:
-            for teams in self.trashList:
+            for teams in self.match.trashTeams:
                 if teams == self.assignedTeams[self.AssignButtonPressed]:
-                   self.trashList.remove(teams)
+                   self.match.addCurrent(teams)
+                   self.match.removeTrash(teams)
             self.Button[self.AssignButtonPressed].setLabels(None)
             self.Button[self.AssignButtonPressed].setFlash(False)
             self.assignedTeams[self.AssignButtonPressed] = None
@@ -208,8 +214,8 @@ class RobotAssignmentScreen(Screen):
             self.dataTable.setFlash(rock,True)
             self.roboSel = rock
 
-    def delete(self):
-        trashList.append()
+#    def delete(self):
+ #       trashList.append()
 
     def done(self):
         self.match.add(Match.B1,self.assignedTeams["NW"])
@@ -246,9 +252,10 @@ class RobotAssignmentScreen(Screen):
 
     def _enter(self):
 #        self.incomingList = BLE.OnDeckList()
-        self.trashList = list()
-        self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
-        self._updateTableDisplayList()
+#        self.trashList = list()
+#        self.incomingList = match.currentTeams()
+        self.match.ackIncoming()
+
         #Set Labels to blank string to make sure Buttons are refreshed correctly
         self.Button["NW"].setLabels("")
         self.Button["NE"].setLabels("")
@@ -258,18 +265,22 @@ class RobotAssignmentScreen(Screen):
         self.assignedTeams["NE"] = None
         self.assignedTeams["SW"] = None
         self.assignedTeams["SE"] = None
+
+        # These set of instruction add the numbers to buttons and to trash list
         if self.match.getTeam(Match.B1) is not None:
             self.assignedTeams["NW"] = self.match.getTeam(Match.B1).getNumber()
-            self.trashList.append(self.match.getTeam(Match.B1).getNumber())
+
         if self.match.getTeam(Match.R1) is not None:
             self.assignedTeams["NE"] = self.match.getTeam(Match.R1).getNumber()
-            self.trashList.append(self.match.getTeam(Match.R1).getNumber())
+
         if self.match.getTeam(Match.B2) is not None:
             self.assignedTeams["SW"] = self.match.getTeam(Match.B2).getNumber()
-            self.trashList.append(self.match.getTeam(Match.B2).getNumber())
+
         if self.match.getTeam(Match.R2) is not None:
             self.assignedTeams["SE"] = self.match.getTeam(Match.R2).getNumber()
-            self.trashList.append(self.match.getTeam(Match.R2).getNumber())
+
+
+        # Updates and table creates
         self.updateButtons()
         self.tableCreate()
         self.lastList = list()
@@ -287,27 +298,30 @@ class RobotAssignmentScreen(Screen):
             
  
     def repaintTable(self):
-        self._updateTableDisplayList()
         button = 0
-        self.incomingList.sort(cmp=None, key=None, reverse=False)
+        self.match.currentTeams.sort(cmp=None, key=None, reverse=False)
         for button in range(0,10):
             self.dataTable.changeData(button,data = "")
             button = 0
-        for robot in self.displayList:
+        for robot in self.match.currentTeams:
             self.dataTable.changeData(button,data = robot)
             button += 1
 
-    def refresh(self):
+    def refresh(self,rock):
+        self.getStatus()
         pass
 
-
+    def getStatus(self):
+        print(self.match.currentTeams)
+        print(self.match.incomingTeams)
+        print(self.match.trashTeams)
+ 
     def _process(self):
 #       self.incominglist = BLE.OnDeckList()
         returnvalue = False
 
         # STuff Happens here idk what it is
 
-        self.incomingList = [6710,5628,80161,12345,7975,2468,8666,9048,118,27]
-        self._updateTableDisplayList()        
-        self.lastList = self.incomingList
+        self.lastList = self.match.incomingTeams
+        self.match.ackIncoming()        
         return returnvalue
