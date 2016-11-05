@@ -25,7 +25,6 @@ public class FCSMainActivity extends AppCompatActivity {
 
     public RelativeLayout screenLayout;
     public Button confirmButton;
-    public Button scanButton;
     public Button backButton;
     public Spinner autoSelector;
     public Spinner teleopSelector;
@@ -52,7 +51,6 @@ public class FCSMainActivity extends AppCompatActivity {
 
         screenLayout = (RelativeLayout) findViewById(R.id.screenLayout);
         confirmButton = (Button) findViewById(R.id.confirmButton);
-        scanButton = (Button) findViewById(R.id.scanButton);
         backButton = (Button) findViewById(R.id.backButton);
         autoSelector = (Spinner) findViewById(R.id.autoPicker);
         teleopSelector = (Spinner) findViewById(R.id.teleOpPicker);
@@ -61,6 +59,7 @@ public class FCSMainActivity extends AppCompatActivity {
         autoText = (TextView) findViewById(R.id.autoText);
         teleopText = (TextView) findViewById(R.id.teleopText);
         messageText = (TextView) findViewById(R.id.errorMessage);
+        matchText = (TextView) findViewById(R.id.matchNumber);
 
         fcsble.init((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE), getApplicationContext());
 
@@ -92,9 +91,16 @@ public class FCSMainActivity extends AppCompatActivity {
             return;
         }
 
+        if (fieldOptions.isActivated()){
+            fcsble.updateMatch(spinnerAdapter.getItem(fieldOptions.getSelectedItemPosition()));
+        }
+
+        fcsble.startFCSConsoleScan(fcsBLECallBack);
+        confirmButton.setClickable(false);
+        confirmButton.setAlpha(.5f);
+
         confirmButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                scanButton.setVisibility(View.INVISIBLE);
                 confirmButton.setVisibility(View.INVISIBLE);
                 autoSelector.setVisibility(View.INVISIBLE);
                 teleopSelector.setVisibility(View.INVISIBLE);
@@ -102,6 +108,7 @@ public class FCSMainActivity extends AppCompatActivity {
                 autoText.setVisibility(View.INVISIBLE);
                 teleopText.setVisibility(View.INVISIBLE);
                 fieldOptions.setVisibility(View.INVISIBLE);
+                matchText.setVisibility(View.INVISIBLE);
                 messageText.setVisibility(View.VISIBLE);
                 backButton.setVisibility(View.VISIBLE);
                 //fcsble.scanLEDevice(true);
@@ -112,7 +119,6 @@ public class FCSMainActivity extends AppCompatActivity {
         });
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                scanButton.setVisibility(View.VISIBLE);
                 confirmButton.setVisibility(View.VISIBLE);
                 autoSelector.setVisibility(View.VISIBLE);
                 teleopSelector.setVisibility(View.VISIBLE);
@@ -120,22 +126,10 @@ public class FCSMainActivity extends AppCompatActivity {
                 autoText.setVisibility(View.VISIBLE);
                 teleopText.setVisibility(View.VISIBLE);
                 fieldOptions.setVisibility(View.VISIBLE);
+                matchText.setVisibility(View.VISIBLE);
                 messageText.setVisibility(View.INVISIBLE);
                 backButton.setVisibility(View.INVISIBLE);
                 confirmCounter = 0;
-            }
-        });
-
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //fcsble.mBluetoothAdapter.stopLeScan(bLeScanCallback);
-                //mBluetoothAdapter.startLeScan(bLeScanCallback);
-                fcsble.startFCSConsoleScan(fcsBLECallBack);
-                scanButton.setText("Wait...");
-                scanButton.setClickable(false);
-                confirmButton.setAlpha(.5f);
-                confirmButton.setClickable(false);
             }
         });
     }
@@ -143,31 +137,102 @@ public class FCSMainActivity extends AppCompatActivity {
     public FCSBLE.FCSBLECallback fcsBLECallBack =
             new FCSBLE.FCSBLECallback() {
                 @Override
-                public void processConsole(String name) {
-                    for (int i = 1; i <= spinnerAdapter.getCount(); i++){
-                        if (spinnerAdapter.getItem(i-1).equals(name)){
-                            counter++;
+                public void updateMatchNum(final String match) {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    matchText.setText(match);
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    if (counter == 0){
-                        spinnerAdapter.add(name);
-                    }
+                    });
+                    t.start();
+                }
+
+                @Override
+                public void processConsole(final String name) {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    for (int i = 1; i <= spinnerAdapter.getCount(); i++){
+                                        if (spinnerAdapter.getItem(i-1).equals(name)){
+                                            counter++;
+                                        }
+                                    }
+                                    if (counter == 0){
+                                        spinnerAdapter.add(name);
+                                    }
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
                 public void consoleSelected() {
-                    messageText.setText("Attempting Connection...");
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    messageText.setText("Attempting Connection...");
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
                 public void noConsoleSelected() {
-                    messageText.setText("Please go back and select a field to join");
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    messageText.setText("Please go back and select a field to join");
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
                 public void consoleScanComplete() {
-                    scanButton.setText("Scan");
-                    scanButton.setClickable(true);
                     confirmButton.setAlpha(1f);
                     confirmButton.setClickable(true);
                 }
@@ -330,6 +395,39 @@ public class FCSMainActivity extends AppCompatActivity {
 
                     float batteryPct = level / (float)scale;
                     return (int)batteryPct;
+                }
+
+                @Override
+                public void resetToZero() {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    messageText.setTextColor(Color.BLACK);
+                                    confirmButton.setVisibility(View.VISIBLE);
+                                    autoSelector.setVisibility(View.VISIBLE);
+                                    teleopSelector.setVisibility(View.VISIBLE);
+                                    fieldText.setVisibility(View.VISIBLE);
+                                    autoText.setVisibility(View.VISIBLE);
+                                    teleopText.setVisibility(View.VISIBLE);
+                                    fieldOptions.setVisibility(View.VISIBLE);
+                                    matchText.setVisibility(View.VISIBLE);
+                                    messageText.setVisibility(View.INVISIBLE);
+                                    backButton.setVisibility(View.INVISIBLE);
+                                    confirmCounter = 0;
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
