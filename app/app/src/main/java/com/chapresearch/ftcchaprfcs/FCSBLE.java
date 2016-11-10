@@ -55,8 +55,6 @@ public class FCSBLE {
 
     public interface FCSBLECallback {
 
-        public void updateFromScan();
-
         public void updateMatchNum(String match);
 
         //
@@ -231,6 +229,9 @@ public class FCSBLE {
                     final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
                     mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
                 }
+                else {
+                    return;
+                }
             }
             else {
                 UIConsoleScanCallback.noConsoleSelected();
@@ -269,6 +270,8 @@ public class FCSBLE {
 
                     record = new FCSBLEScanner(device, rssi, scanRecord, getBluetoothName());
 
+                    //Log.d("Connectable", Boolean.toString(record.is_connectable));
+
                     if (record.is_ChapFCS) {
                         if (record.mode == FCSBLEScanner.RunMode.SCAN_MODE){
                             consoles.put(record.name, device.getAddress());
@@ -276,12 +279,6 @@ public class FCSBLE {
                             UIConsoleScanCallback.processConsole(record.name);
                         }
                         if (record.mode == FCSBLEScanner.RunMode.ON_DECK) {
-                            //Log.d("Address", device.getAddress());
-                            //Log.d("RSSI", Integer.toString(rssi));
-                            //Log.d("Name", record.name);
-                            //Log.d("Match", Integer.toString(record.matchNumber));
-                            //Log.d("My Name", mBluetoothAdapter.getName());
-                            UIConsoleScanCallback.updateFromScan();
                             UIConsoleScanCallback.consoleScanComplete();
                             consoles.put(record.name, device.getAddress());
                             fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));

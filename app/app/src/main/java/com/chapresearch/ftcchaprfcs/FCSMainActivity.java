@@ -135,11 +135,6 @@ public class FCSMainActivity extends AppCompatActivity {
 
     public FCSBLE.FCSBLECallback fcsBLECallBack =
             new FCSBLE.FCSBLECallback() {
-                @Override
-                public void updateFromScan() {
-                    confirmButton.setEnabled(true);
-                    confirmButton.setAlpha(1f);
-                }
 
                 @Override
                 public void updateMatchNum(final String match) {
@@ -239,7 +234,7 @@ public class FCSMainActivity extends AppCompatActivity {
                 @Override
                 public void consoleScanComplete() {
                     confirmButton.setAlpha(1f);
-                    confirmButton.setClickable(true);
+                    confirmButton.setEnabled(true);
                 }
 
                 @Override
