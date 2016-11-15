@@ -25,11 +25,16 @@ from rn4020 import RN4020
 class BLEinterface(object):
 
     def __init__(self):
-        print("initializing rn4020 BLE")
         self.rn4020 = RN4020()            # powers up the rn4020 and initializes it
-        self.rn4020.setup()
+        if not self.rn4020.setup():
+            print("ERROR: problem initializing rn4020")
         self.mode = None                  # the mode governs how the BLE operates
         self.mode1Rotation = 0            # determines who transmits stats in mode 1
+
+    def simpleBLETest(self):
+        self.rn4020._cmd("WP")
+        self.rn4020._cmd("Y")
+        self.rn4020._cmd("A")
 
     #
     # enterMode() - enter the given mode which should be from 0 to 4 (TBD).  Each mode
@@ -62,9 +67,13 @@ class BLEinterface(object):
     #                       - blocks while reading serial port, but returns upon team, or lack of any serial data
     #
     def getIncomingTeam(self):
-        line = _asyncReadLine()
+        line = self.rn4020._asyncReadline()
         if line:
-            print(line)
+            isWrite = self.rn4020.checkWriteLine(line)
+            if isWrite:
+                print("write")
+                return isWrite
+        return None
 
     #
     # getRobotStats() - returns stats for the latest robot that reported on its stats.  Much like the
