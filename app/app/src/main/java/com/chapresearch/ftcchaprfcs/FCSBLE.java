@@ -50,7 +50,6 @@ public class FCSBLE {
     private static final String B2 = "0d48bb08-3312-11e6-ac61-9e71128cae77";                    // 10 byte report
 
     private int modeCounter = 0;
-    private int connectDone = 0;
     private boolean inMatch = false;
 
     public interface FCSBLECallback {
@@ -223,11 +222,11 @@ public class FCSBLE {
         UIConsoleScanCallback = consoleCallback;
             if (!consoles.isEmpty()){
                 //Log.d("modeCounter", Integer.toString(modeCounter));
-                if (consoles.containsValue(consoleName)) {
+                if (consoles.containsKey(consoleName)) {
                     UIConsoleScanCallback.consoleSelected();
                     mBluetoothDeviceAddress = consoles.get(consoleName);
                     final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
-                    mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
+                    mBluetoothGatt = device.connectGatt(mContext, true, mGattCallback);
                 }
                 else {
                     return;
@@ -239,7 +238,7 @@ public class FCSBLE {
     }
 
     public void afterConnectInteract(){
-        while (modeCounter == 1 && connectDone == 1){
+        while (modeCounter == 1){
             modeCounter = 2;
             Log.d("modeCounter", Integer.toString(modeCounter));
             UIConsoleScanCallback.successfulQueue();
@@ -257,7 +256,7 @@ public class FCSBLE {
                 modeCounter = 2;
                 mBluetoothAdapter.stopLeScan(bleFCSConsoleScanCallback);
                 final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
-                mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
+                mBluetoothGatt = device.connectGatt(mContext, true, mGattCallback);
             }
         }
     }
@@ -274,6 +273,10 @@ public class FCSBLE {
 
                     if (record.is_ChapFCS) {
                         if (record.mode == FCSBLEScanner.RunMode.SCAN_MODE){
+                            if (modeCounter > 0){
+                                UIConsoleScanCallback.resetToZero();
+                                modeCounter = 0;
+                            }
                             consoles.put(record.name, device.getAddress());
                             fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));
                             UIConsoleScanCallback.processConsole(record.name);
@@ -284,10 +287,6 @@ public class FCSBLE {
                             fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));
                             afterConnectInteract();
                             UIConsoleScanCallback.processConsole(record.name);
-                            if (modeCounter > 1){
-                                modeCounter = 0;
-                                UIConsoleScanCallback.resetToZero();
-                            }
                         }
                         if (record.mode == FCSBLEScanner.RunMode.READY){
                             afterConnectInteract();
@@ -319,8 +318,8 @@ public class FCSBLE {
                 if (mBluetoothGattService != null) {
                     Log.i("GattCallBack", "Service characteristic UUID found: " + mBluetoothGattService.getUuid().toString());
                     if (record.mode == FCSBLEScanner.RunMode.ON_DECK){
-                        writeRobotNumJoin();
                         modeCounter = 1;
+                        writeRobotNumJoin();
                     }
                     if (record.mode == FCSBLEScanner.RunMode.READY){
                         writeRobotBattery(record.color, record.position, UIConsoleScanCallback.getBatteryStatus(1));
@@ -352,7 +351,6 @@ public class FCSBLE {
             /*get the write characteristic from the service*/
             BluetoothGattCharacteristic mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(RobotNumJoin));
             mWriteCharacteristic.setValue(myRobotName);
-            connectDone = 1;
             if (mBluetoothGatt.writeCharacteristic(mWriteCharacteristic) == false) {
                 Log.w("GattCallBack", "Failed to write characteristic");
             }
@@ -394,7 +392,6 @@ public class FCSBLE {
                     mWriteCharacteristic.setValue(Integer.toString(percentage));
                 }
             }
-            connectDone = 2;
             if (mBluetoothGatt.writeCharacteristic(mWriteCharacteristic) == false) {
                 Log.w("GattCallBack", "Failed to write characteristic");
             }
