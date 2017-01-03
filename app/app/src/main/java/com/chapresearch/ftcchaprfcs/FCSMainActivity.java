@@ -133,11 +133,6 @@ public class FCSMainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume(){
-
-    }
-
     public FCSBLE.FCSBLECallback fcsBLECallBack =
             new FCSBLE.FCSBLECallback() {
 
