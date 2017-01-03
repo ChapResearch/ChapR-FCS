@@ -133,6 +133,11 @@ public class FCSMainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume(){
+
+    }
+
     public FCSBLE.FCSBLECallback fcsBLECallBack =
             new FCSBLE.FCSBLECallback() {
 
@@ -197,6 +202,7 @@ public class FCSMainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     messageText.setText("Attempting Connection...");
+                                    confirmCounter = 0;
                                 }
                             }) ;
                             try {

@@ -9,6 +9,7 @@
     <string name="confirmButton">Confirm</string>
     <string name="backButton">Back</string>
     <string name="unknown_device">none found</string>
+    <string name="match">Match</string>
 
     <string-array name="OpModes">
         <item>-None-</item>

@@ -32,7 +32,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="68dp"
-        android:layout_marginLeft="7dp" />
+        android:layout_marginLeft="7dp"
+        tools:ignore="LabelFor,RtlHardcoded"
+        android:paddingTop="13dp" />
 
     <Spinner
         android:layout_width="match_parent"
@@ -43,7 +45,8 @@
         android:entries="@array/OpModes"
         android:layout_below="@+id/autoText"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        tools:ignore="RtlHardcoded" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -55,7 +58,8 @@
         android:inputType="none"
         android:layout_below="@+id/fieldOptions"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="42dp" />
+        android:layout_marginTop="42dp"
+        tools:ignore="LabelFor" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -68,7 +72,8 @@
         android:layout_alignTop="@+id/autoPicker"
         android:layout_alignLeft="@+id/fieldText"
         android:layout_alignStart="@+id/fieldText"
-        android:enabled="false" />
+        android:enabled="false"
+        tools:ignore="LabelFor,RtlHardcoded" />
 
     <Spinner
         android:layout_width="match_parent"
@@ -79,7 +84,8 @@
         android:entries="@array/OpModes"
         android:layout_below="@+id/teleopText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        tools:ignore="RtlHardcoded" />
 
     <Button
         android:layout_width="match_parent"
@@ -92,7 +98,8 @@
         android:textColor="#ffffff"
         android:background="@drawable/confirm_button"
         android:radius="40dp"
-        android:clickable="false" />
+        android:clickable="false"
+        tools:ignore="RtlHardcoded" />
 
     <Button
         android:layout_width="match_parent"
@@ -104,7 +111,8 @@
         android:layout_alignParentEnd="true"
         android:textColor="#ffffff"
         android:visibility="invisible"
-        android:background="@drawable/back_button" />
+        android:background="@drawable/back_button"
+        tools:ignore="RtlHardcoded" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -116,7 +124,8 @@
         android:visibility="invisible"
         android:textColor="#ffffff"
         android:textSize="40sp"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        tools:ignore="RtlHardcoded" />
 
     <Spinner
         android:layout_width="match_parent"
@@ -128,18 +137,19 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="60dp"
         android:layout_toEndOf="@+id/teleopText"
-        android:layout_marginTop="15dp" />
+        android:layout_marginTop="15dp"
+        tools:ignore="RtlHardcoded" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Match"
+        android:text="@string/match"
         android:id="@+id/matchText"
         android:layout_below="@+id/fieldOptions"
         android:layout_alignStart="@+id/fieldText"
         android:layout_toStartOf="@+id/fieldOptions"
         android:textAlignment="center"
-        android:textSize="20dp" />
+        android:textSize="20sp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -148,6 +158,6 @@
         android:layout_alignBottom="@+id/matchText"
         android:layout_toEndOf="@+id/matchText"
         android:layout_marginStart="15dp"
-        android:textSize="15dp" />
+        android:textSize="15sp" />
 
 </RelativeLayout>
