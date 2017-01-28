@@ -1,30 +1,30 @@
 #
-# miniClock.py
+# ConsoleClock.py
 #
-#   Configures and runs the clock on the console screen.  This is only ever called
-#   by the startMatch screen.
+#   Configures and runs the consoleClock.  This is only ever called
+#   by the HDMI python process.
 #
 
 from clock import Clock
 from globalVariables import RED
 import pygame
 
-class MiniClock(Clock):
+class consoleClock(Clock):
 
-    defaultHeight = .2           # default height is 50% of screen height
+    defaultHeight = .35           # default height is 50% of screen height
     defaultColor = RED
 
     def __init__(self,screen,bgcolor):
         screenHeight = screen.get_height()
         screenWidth = screen.get_width()
-        targetHeight = MiniClock.defaultHeight * screenHeight
+        targetHeight = consoleClock.defaultHeight * screenHeight
 
-        Clock.__init__(self,targetHeight,MiniClock.defaultColor)
+        Clock.__init__(self,targetHeight,consoleClock.defaultColor)
 
         width = self.clockFace.get_width()
         height = self.clockFace.get_height()
 
-        self.dimensions = pygame.Rect((screenWidth-width)/2,100,width,height)
+        self.dimensions = pygame.Rect((screenWidth-width)/2,(screenHeight-height)/4+20,width,height)
         self.screen = screen
         self.bgcolor = bgcolor
 
