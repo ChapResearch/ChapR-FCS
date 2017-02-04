@@ -18,7 +18,7 @@ class RobotAssignmentScreen(Screen):
         Screen.__init__(self,name)
 
         self.match = match        
-        self.match.fakeTeams()
+#        self.match.fakeTeams()
         
         self.tablePosition = (130,10)
         self.trashcanpic = pygame.image.load("Media/trashCan2.png").convert()
@@ -158,7 +158,7 @@ class RobotAssignmentScreen(Screen):
             self.Button[rock].setFlash(True)
 
     def trashButton(self,rock):
-        self.match.ackIncoming()
+#        self.match.ackIncoming()
         # Trashes the robot from the table that was reviously clicked
         if self.roboSel is not None:
             self.match.trashTeam(self.match.currentTeams[self.roboSel])
@@ -182,7 +182,7 @@ class RobotAssignmentScreen(Screen):
                 if self.assignedTeams[team] is not None:
                     print self.assignedTeams.get(team)
                     self.match.trashTeam(self.assignedTeams.get(team))
-            self.match.ackIncoming()
+ #           self.match.ackIncoming()
             self.repaintTable()
             pass
 ######################################################################################################
@@ -309,15 +309,18 @@ class RobotAssignmentScreen(Screen):
 
     def refresh(self,rock):
         self.getStatus()
-        pass
+        self.match.ackIncoming()
+        self.repaintTable()
 
     def getStatus(self):
-        print(self.match.currentTeams)
-        print(self.match.incomingTeams)
-        print(self.match.trashTeams)
+        print("ct: " + str(self.match.currentTeams))
+        print("it: " + str(self.match.incomingTeams))
+        print("tT: " + str(self.match.trashTeams))
  
     def _process(self):
-#       self.incominglist = BLE.OnDeckList()
+        self.match.getBLE()
+        return False
+"""       self.incominglist = BLE.OnDeckList()
         returnvalue = False
 
         # STuff Happens here idk what it is
@@ -325,3 +328,4 @@ class RobotAssignmentScreen(Screen):
         self.lastList = self.match.incomingTeams
         self.match.ackIncoming()        
         return returnvalue
+"""
