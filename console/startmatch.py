@@ -10,7 +10,7 @@ import pygame
 from screen import Screen
 from buttons import Button
 from tables import Table
-from HDMIclock import HDMIClock
+from consoleClock import consoleClock
 from globalVariables import RED,GREEN,BLUE,YELLOW,BLACK,WHITE
 from Team import Match
 import os
@@ -38,7 +38,7 @@ class StartMatchScreen(Screen):
 
         self.match = match
 
-        self.clock = HDMIClock(self.screen,BLACK)
+        self.clock = consoleClock(self.screen,BLACK)
         self.bigScreen = bigScreen
         self.bigStopped = False
         self.bigScreen.fill(0,0,0)
@@ -91,6 +91,7 @@ class StartMatchScreen(Screen):
     def stopMatch(self):
         self.clock.stop()
         self.bigScreen.clockStop()
+        self.changeHUD("Match Paused")
         self.matchState = StartMatchScreen.STOP
         # Make North Button Appear
         self.ButtonN.setLabels(["End","Match"])
@@ -108,6 +109,7 @@ class StartMatchScreen(Screen):
         self.matchState = StartMatchScreen.INIT
         print("Initialized")
         self.matchState - StartMatchScreen.INITsT
+        self.changeHUD("Initialized")
         self.ButtonS.callback = self.startAutonomous
         self.ButtonS.setLabels(["Start","Autonomous"])
         
@@ -120,6 +122,7 @@ class StartMatchScreen(Screen):
         self.ButtonS.setLabels(["Pause","Teleop"])
         self.clock.setTime(self.currentClockVal/60,self.currentClockVal%60)
         self.bigScreen.clockSet(self.currentClockVal/60,self.currentClockVal%60)        
+        self.changeHUD("Teleop")
         self.ButtonS.callback = self.stopMatch
         # Make North Button Dissapear
         self.ButtonN.setLabels("")
@@ -133,6 +136,7 @@ class StartMatchScreen(Screen):
         self.matchState = StartMatchScreen.AUTO
         self.clock.setTime(self.currentClockVal/60,self.currentClockVal%60)
         self.bigScreen.clockSet(self.currentClockVal/60,self.currentClockVal%60)
+        self.changeHUD("Autonomous")
         self.ButtonS.callback = self.stopMatch
         # Make North Button Dissapear
         self.ButtonN.setLabels("")
@@ -228,6 +232,7 @@ class StartMatchScreen(Screen):
 
         # If Autonomous has run and ended
         if self.matchState == StartMatchScreen.AUTOsT:
+            self.changeHUD("Teleop Ready")
             self.ButtonS.callback = self.startTeleop
             self.ButtonS.setLabels(["Start","Teleop"])
             self.ButtonN.setLabels(["End","Match"])
@@ -246,6 +251,7 @@ class StartMatchScreen(Screen):
                 self.bigScreen.clockColor(RED)
                 self.soundFX = pygame.mixer.Sound(os.path.join('Media','StartEndGame.wav'))
                 self.soundFX.play()
+                self.changeHUD("End Game")
             if not self.bigStopped and self.clock.time == 0:
                 self.bigScreen.clockSet(self.clock.time) # make sure in sync
                 self.soundFX = pygame.mixer.Sound(os.path.join('Media','EndTeleop.wav'))
@@ -258,6 +264,7 @@ class StartMatchScreen(Screen):
             self.ButtonN.callback = self.none
             self.ButtonN.bgcolor = (255,255,255)
             self.ButtonS.setLabels(["End","Game"])
+            self.changeHUD("Match Over")
             self.ButtonS.callback = self.endMatch
 
         # Stop State

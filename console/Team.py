@@ -1,3 +1,6 @@
+
+import globalVariables as globals
+
 #
 # Team is an Object used to store the data of a team including:
 #
@@ -127,3 +130,11 @@ class Match(object):
     #
     def fakeTeams(self):
             self.incomingTeams = [2468,118,5628,148,27,8886,1080,9999]
+
+    #
+    # getBLE() - Gets incoming Team from BLE and inserts it into Incoming Teams list
+    #
+    def getBLE(self):
+        newTeam = globals.BLE.getIncomingTeam()
+        if newTeam is not None:
+            self.incomingTeams.append(newTeam)
