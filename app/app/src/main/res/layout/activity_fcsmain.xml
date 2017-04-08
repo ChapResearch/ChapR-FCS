@@ -42,7 +42,8 @@
         android:layout_alignLeft="@+id/fieldText"
         android:layout_alignStart="@+id/fieldText"
         android:enabled="false"
-        tools:ignore="LabelFor,RtlHardcoded" />
+        tools:ignore="LabelFor,RtlHardcoded"
+        android:textSize="18sp" />
 
     <Spinner
         android:layout_width="match_parent"
@@ -82,53 +83,43 @@
         android:visibility="invisible"
         android:background="@drawable/back_button"
         tools:ignore="RtlHardcoded" />
+
     <TextView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/matchNumber"
+        android:layout_alignBottom="@+id/matchText"
+        android:layout_toEndOf="@+id/autoText"
+        android:textSize="18sp"
+        android:layout_alignTop="@+id/matchText"
+        android:layout_marginLeft="0dp"
+        tools:ignore="RtlHardcoded"
+        android:layout_marginTop="3dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/errorMessage"
-        android:layout_above="@+id/teleOpPicker"
-        android:layout_alignRight="@+id/autoPicker"
-        android:layout_alignEnd="@+id/autoPicker"
-        android:visibility="invisible"
+        android:id="@+id/autoText"
+        android:text="@string/autoText"
         android:textColor="#ffffff"
-        android:textSize="40sp"
-        android:textAlignment="center"
-        tools:ignore="RtlHardcoded" />
+        android:enabled="false"
+        android:inputType="none"
+        android:layout_marginTop="30dp"
+        tools:ignore="LabelFor"
+        android:layout_below="@+id/matchNumber"
+        android:layout_alignParentStart="true"
+        android:textSize="18sp" />
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/fieldOptions"
         android:background="#030202"
-        android:spinnerMode="dropdown"
-        android:layout_below="@+id/chapFCSLogo"
-        android:layout_alignParentEnd="true"
         android:layout_marginRight="60dp"
-        android:layout_toEndOf="@+id/teleopText"
-        android:layout_marginTop="15dp"
-        tools:ignore="RtlHardcoded" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/matchNumber"
-        android:layout_alignBottom="@+id/matchText"
-        android:layout_toEndOf="@+id/matchText"
-        android:layout_marginStart="15dp"
-        android:textSize="15sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/match"
-        android:id="@+id/matchText"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:layout_below="@+id/fieldText"
-        android:layout_alignStart="@+id/fieldText"
-        android:elevation="1dp"
-        tools:targetApi="lollipop" />
+        android:layout_marginTop="10dp"
+        tools:ignore="RtlHardcoded"
+        android:layout_below="@+id/chapFCSLogo"
+        android:layout_toEndOf="@+id/autoText" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -142,20 +133,33 @@
         android:textColor="#ffffff"
         android:layout_marginLeft="0dp"
         tools:ignore="LabelFor,RtlHardcoded"
-        android:layout_below="@+id/chapFCSLogo"
+        android:layout_alignTop="@+id/fieldOptions"
         android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/autoText"
-        android:text="@string/autoText"
+        android:text="@string/match"
+        android:id="@+id/matchText"
+        android:elevation="1dp"
+        tools:targetApi="lollipop"
+        android:layout_marginTop="20dp"
+        android:textSize="18sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_below="@+id/fieldText"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/errorMessage"
+        android:visibility="invisible"
         android:textColor="#ffffff"
-        android:enabled="false"
-        android:inputType="none"
-        android:layout_marginTop="15dp"
-        tools:ignore="LabelFor"
-        android:layout_below="@+id/matchNumber"
+        android:textSize="40sp"
+        android:textAlignment="center"
+        tools:ignore="RtlHardcoded"
+        android:layout_above="@+id/teleOpPicker"
         android:layout_alignParentStart="true" />
 
 </RelativeLayout>
