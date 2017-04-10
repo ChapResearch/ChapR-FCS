@@ -42,9 +42,17 @@ class GATT (object):
     #                                                                   PROPERY   MAX     16-BIT
     #                             UUID                                    TYPE   BYTES    HANDLE
     #                           -------------------------------------  --------- ------ -----------
-    PrivateChars = [ dict(uuid="0d48b2e8-3312-11e6-ac61-9e71128cae77",type=0x0a,size=2, handle=None),  # robot number (for joining)
-                     dict(uuid="0d48b6da-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None),  # R1 report (see report format)
-                     dict(uuid="0d48b900-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None),  # R2 report
-                     dict(uuid="0d48ba22-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None),  # B1 report
-                     dict(uuid="0d48bb08-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None)   # B2 report
+    PrivateChars = [
+        dict(name="Robot#",uuid="0d48b2e8-3312-11e6-ac61-9e71128cae77",type=0x0a,size=2, handle=None),  # robot number (for joining)
+        dict(name="R1 Rep",uuid="0d48b6da-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None),  # R1 report (see report format)
+        dict(name="R2 Rep",uuid="0d48b900-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None),  # R2 report
+        dict(name="B1 Rep",uuid="0d48ba22-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None),  # B1 report
+        dict(name="B2 Rep",uuid="0d48bb08-3312-11e6-ac61-9e71128cae77",type=0x0a,size=10,handle=None)   # B2 report
     ]
+
+    @classmethod
+    def lookup(cls,handle):
+        for record in GATT.PrivateChars:
+            if record["handle"] == handle:
+                return record
+        return None
