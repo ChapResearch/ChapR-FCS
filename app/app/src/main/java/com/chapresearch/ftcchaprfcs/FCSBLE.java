@@ -239,7 +239,7 @@ public class FCSBLE {
     public void afterConnectInteract(){
         while (modeCounter == 1){
             modeCounter = 2;
-            Log.d("modeCounter", Integer.toString(modeCounter));
+            //Log.d("modeCounter", Integer.toString(modeCounter));
             UIConsoleScanCallback.successfulQueue();
         }
         if (modeCounter == 2){
@@ -258,6 +258,10 @@ public class FCSBLE {
                 mBluetoothGatt = device.connectGatt(mContext, true, mGattCallback);
             }
         }
+    }
+
+    public void matchUpdater(){
+        updateMatch(String.valueOf(FCSMainActivity.fieldOptions.getSelectedItem()));
     }
 
     public BluetoothAdapter.LeScanCallback bleFCSConsoleScanCallback =
@@ -279,6 +283,7 @@ public class FCSBLE {
                             consoles.put(record.name, device.getAddress());
                             fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));
                             UIConsoleScanCallback.processConsole(record.name);
+                            matchUpdater();
                         }
                         if (record.mode == FCSBLEScanner.RunMode.ON_DECK) {
                             UIConsoleScanCallback.consoleScanComplete();
@@ -286,6 +291,7 @@ public class FCSBLE {
                             fcsMatchNumber.put(record.name, Integer.toString(record.matchNumber));
                             afterConnectInteract();
                             UIConsoleScanCallback.processConsole(record.name);
+                            matchUpdater();
                         }
                         if (record.mode == FCSBLEScanner.RunMode.READY){
                             afterConnectInteract();
