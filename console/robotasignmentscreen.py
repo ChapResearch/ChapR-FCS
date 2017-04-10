@@ -8,7 +8,7 @@ from screen import Screen
 from buttons import Button
 from tables import Table
 from utils import textOutline, numberDraw
-import globalVariables
+import globalVariables as globals
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from Team import Match
 
@@ -69,7 +69,20 @@ class RobotAssignmentScreen(Screen):
         self.screen.blit(self.N1,(self.sWidth-(self.boxWidth/2)-10,self.boxHeight+10))
         self.screen.blit(self.N2,(self.sWidth-(self.boxWidth/2)-10,self.sHeight-(self.boxHeight+40)))        
 
+        self.refangle = 0
 
+    #
+    # rot_center() - little utility function (should be somewhere else really) that
+    #                will rotate an image around it's center - needs to be square btw
+    #
+    def rot_center(self,image,angle):
+        """rotate an image while keeping its center and size"""
+        orig_rect = image.get_rect()
+        rot_image = pygame.transform.rotate(image, angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rot_image = rot_image.subsurface(rot_rect).copy()
+        return rot_image
 
     #
     # _updateTableDIsplayList() - Update the display list acording to incoming list and trash list.
@@ -319,6 +332,11 @@ class RobotAssignmentScreen(Screen):
  
     def _process(self):
         self.match.getBLE()
+        if len(self.match.incomingTeams) > 0:
+            self.refangle -= 10
+            self.ButtonRef.graphic = self.rot_center(self.refreshpic, self.refangle)
+            return True
+
         return False
 """       self.incominglist = BLE.OnDeckList()
         returnvalue = False
