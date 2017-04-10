@@ -32,14 +32,21 @@ class BluetoothTestsScreen(Screen):
         globals.BLE.enterMode(1,Settings.fieldName,153)
 
     def stopbroadcast(self):
+        globals.BLE.enterMode(0,Settings.fieldName,153)
         pass
 #        self.bluetooth.rn4020._cmd("Y")
 #        self.bluetooth._cmd("Y")
 
     def connection(self):
-        pass
-#        self.bluetooth.rn4020._cmd("A")
-#        self.bluetooth._cmd("A")
+        globals.BLE.simpleBLETest()
 
     def done(self):
         return "back"
+
+    def _process(self):
+        # need to continue to call bluetooth to see if anything
+        # is on its way in a write
+        team = globals.BLE.getIncomingTeam()
+        if team:
+            print(team)
+
