@@ -16,6 +16,7 @@
 
 from BLEprotocol import BLEprotocol
 from rn4020 import RN4020
+from gatt import GATT
 
 #
 # NOTE - this class should only be used in a NON-SIMULATED environment.  If you are
@@ -43,10 +44,13 @@ class BLEinterface(object):
     #               when something interesting happens (like asking for a different xmit in mode 1)
     #
     def enterMode(self,mode,fieldName,match=None,R1=None,R2=None,B1=None,B2=None):
+        if match:
+            match = int(match)
+
         print("setting mode " + ("%d" % mode))
         self.mode = mode
         if mode == 0:
-            message = BLEprotocol.mode0Message(fieldName)
+            message = BLEprotocol.mode0Message(fieldName,match)
             self.rn4020.broadcastMessage(message)
         elif mode == 1:
             message = BLEprotocol.mode1Message(fieldName,match)
@@ -69,10 +73,29 @@ class BLEinterface(object):
     def getIncomingTeam(self):
         line = self.rn4020._asyncReadline()
         if line:
-            isWrite = self.rn4020.checkWriteLine(line)
+            isWrite = self.rn4020.checkWriteLine(line)    # return is a tuple of [ handle, data(hex) ] or None
             if isWrite:
                 print("write")
-                return isWrite
+
+                handle = isWrite[0]
+                data = isWrite[1]
+
+                record = GATT.lookup(handle)
+                if record:
+                    # we got a record, correct write?
+                    if record["name"] == 'Robot#':
+                        # OK! we have a good number (in hex) - so decode and return the data, which is supposed
+                        #   to be an integer, so condition it as such
+                        # team = data.decode('hex')
+                        team = data[:-1].decode('hex')     # there is a trailing period for some reason currently
+                        return int(team)
+                    else:
+                        print("write to wrong attribute")
+                        return None
+                else:
+                    print("bad handle lookup")
+                    return None
+
         return None
 
     #
