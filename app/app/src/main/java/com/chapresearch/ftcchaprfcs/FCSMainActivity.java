@@ -421,7 +421,6 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                 @Override
                                 public void run() {
-                                    messageText.setTextColor(Color.BLACK);
                                     confirmButton.setVisibility(View.VISIBLE);
                                     autoSelector.setVisibility(View.VISIBLE);
                                     teleopSelector.setVisibility(View.VISIBLE);
@@ -430,6 +429,7 @@ public class FCSMainActivity extends AppCompatActivity {
                                     teleopText.setVisibility(View.VISIBLE);
                                     fieldOptions.setVisibility(View.VISIBLE);
                                     matchText.setVisibility(View.VISIBLE);
+                                    matchNum.setVisibility(View.VISIBLE);
                                     messageText.setVisibility(View.INVISIBLE);
                                     backButton.setVisibility(View.INVISIBLE);
                                     confirmButton.setEnabled(false);
