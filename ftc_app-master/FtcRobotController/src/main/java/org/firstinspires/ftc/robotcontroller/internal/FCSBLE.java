@@ -342,6 +342,7 @@ public class FCSBLE {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             mBluetoothGatt.disconnect();
+            afterConnectInteract();
         }
     };
 
