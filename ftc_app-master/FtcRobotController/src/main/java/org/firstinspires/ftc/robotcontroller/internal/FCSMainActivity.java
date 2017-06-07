@@ -434,6 +434,7 @@ public class FCSMainActivity extends Activity {
                                     matchNum.setVisibility(View.VISIBLE);
                                     messageText.setVisibility(View.INVISIBLE);
                                     backButton.setVisibility(View.INVISIBLE);
+                                    screenLayout.setBackgroundColor(Color.BLACK);
                                     confirmButton.setEnabled(false);
                                     confirmButton.setAlpha(.5f);
                                     confirmCounter = 0;
