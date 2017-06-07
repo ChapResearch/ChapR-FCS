@@ -101,12 +101,14 @@ public class FCSBLE {
         public void queueComplete(boolean accepted, String position);
 
         //
-        // getBatteryStatus() - this is the FCSBLE asking the FCSMainActivity() for battery status.
-        //                      The "battery" argument is either 1 or 2 where 1 is the Robot Battery
-        //                      and 2 is the Robot Controller Battery. It returns a number from 0 to
-        //                      100.
+        // getRobotBatteryStatus() - this is the FCSBLE asking the FCSMainActivity() for battery
+        //                           status. The "battery" argument is either 1 or 2 where 1 is the
+        //                           Robot Battery and 2 is the Robot Controller Battery. It returns
+        //                           a number from 0 to 100.
         //
-        public int getBatteryStatus(int battery);
+        public int getRobotBatteryStatus();
+
+        public int getPhoneBatteryStatus();
 
         //
         // resetToZero() - this routine is called if the FCS were to restart. It handles some
@@ -327,7 +329,9 @@ public class FCSBLE {
                         writeRobotNumJoin();
                     }
                     if (record.mode == FCSBLEScanner.RunMode.READY){
-                        writeRobotBattery(record.color, record.position, UIConsoleScanCallback.getBatteryStatus(1));
+                        if (record.is_invited){
+                            writeRobotBattery(record.color, record.position, UIConsoleScanCallback.getRobotBatteryStatus());
+                        }
                     }
                 } else {
                     Log.i("GattCallBack", "Service characteristic not found for UUID: " + FCSConsoleServiceID);
@@ -342,63 +346,63 @@ public class FCSBLE {
     };
 
 
-        public void writeRobotNumJoin() {
-            if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-                Log.w("GattCallBack", "BluetoothAdapter not initialized");
-                return;
-            }
-            /*check if the service is available on the device*/
-            BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID.fromString(FCSConsoleServiceID));
-            if (mCustomService == null) {
-                Log.w("GattCallBack", "Custom BLE Service not found");
-                return;
-            }
-            /*get the write characteristic from the service*/
-            BluetoothGattCharacteristic mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(RobotNumJoin));
-            mWriteCharacteristic.setValue(myRobotName);
-            if (mBluetoothGatt.writeCharacteristic(mWriteCharacteristic) == false) {
-                Log.w("GattCallBack", "Failed to write characteristic");
-            }
+    public void writeRobotNumJoin() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w("GattCallBack", "BluetoothAdapter not initialized");
+            return;
         }
+        /*check if the service is available on the device*/
+        BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID.fromString(FCSConsoleServiceID));
+        if (mCustomService == null) {
+            Log.w("GattCallBack", "Custom BLE Service not found");
+            return;
+        }
+        /*get the write characteristic from the service*/
+        BluetoothGattCharacteristic mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(RobotNumJoin));
+        mWriteCharacteristic.setValue(myRobotName);
+        if (mBluetoothGatt.writeCharacteristic(mWriteCharacteristic) == false) {
+            Log.w("GattCallBack", "Failed to write characteristic");
+        }
+    }
 
-        public void writeRobotBattery(FCSBLEScanner.AllianceColor color, int position, int percentage) {
-            if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-                Log.w("GattCallBack", "BluetoothAdapter not initialized");
-                return;
-            }
-                /*check if the service is available on the device*/
-            BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID.fromString(FCSConsoleServiceID));
-            if (mCustomService == null) {
-                Log.w("GattCallBack", "Custom BLE Service not found");
-                return;
-            }
-            BluetoothGattCharacteristic mWriteCharacteristic = null;
-            if (color == FCSBLEScanner.AllianceColor.RED){
-                if (position == 1){
-                        /*get the write characteristic from the service*/
-                    mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(R1));
-                    mWriteCharacteristic.setValue(Integer.toString(percentage));
-                }
-                else {
-                        /*get the write characteristic from the service*/
-                    mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(R2));
-                    mWriteCharacteristic.setValue(Integer.toString(percentage));
-                }
+    public void writeRobotBattery(FCSBLEScanner.AllianceColor color, int position, int percentage) {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w("GattCallBack", "BluetoothAdapter not initialized");
+            return;
+        }
+            /*check if the service is available on the device*/
+        BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID.fromString(FCSConsoleServiceID));
+        if (mCustomService == null) {
+            Log.w("GattCallBack", "Custom BLE Service not found");
+            return;
+        }
+        BluetoothGattCharacteristic mWriteCharacteristic = null;
+        if (color == FCSBLEScanner.AllianceColor.RED){
+            if (position == 1){
+                    /*get the write characteristic from the service*/
+                mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(R1));
+                mWriteCharacteristic.setValue(Integer.toString(percentage));
             }
             else {
-                if (position == 1){
-                        /*get the write characteristic from the service*/
-                    mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(B1));
-                    mWriteCharacteristic.setValue(Integer.toString(percentage));
-                }
-                else {
-                        /*get the write characteristic from the service*/
-                    mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(B2));
-                    mWriteCharacteristic.setValue(Integer.toString(percentage));
-                }
-            }
-            if (mBluetoothGatt.writeCharacteristic(mWriteCharacteristic) == false) {
-                Log.w("GattCallBack", "Failed to write characteristic");
+                    /*get the write characteristic from the service*/
+                mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(R2));
+                mWriteCharacteristic.setValue(Integer.toString(percentage));
             }
         }
+        else {
+            if (position == 1){
+                    /*get the write characteristic from the service*/
+                mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(B1));
+                mWriteCharacteristic.setValue(Integer.toString(percentage));
+            }
+            else {
+                    /*get the write characteristic from the service*/
+                mWriteCharacteristic = mCustomService.getCharacteristic(UUID.fromString(B2));
+                mWriteCharacteristic.setValue(Integer.toString(percentage));
+            }
+        }
+        if (mBluetoothGatt.writeCharacteristic(mWriteCharacteristic) == false) {
+            Log.w("GattCallBack", "Failed to write characteristic");
+        }
+    }
 }

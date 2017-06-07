@@ -405,13 +405,13 @@ public class FCSMainActivity extends Activity {
                 }
 
                 @Override
-                public int getBatteryStatus(int battery) {
+                public int getRobotBatteryStatus() {
+                    return 0;
+                }
 
-                    int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                    int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-                    float batteryPct = level / (float)scale;
-                    return (int)batteryPct;
+                @Override
+                public int getPhoneBatteryStatus() {
+                    return 0;
                 }
 
                 @Override
