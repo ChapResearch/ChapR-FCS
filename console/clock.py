@@ -30,6 +30,7 @@ class Clock(object):
         self.clockFace = self.setFont(height,fontColor,outlineColor)
         self.time = 0
         self.running = False
+        self.nextTick = 0
 
     def setFont(self,height,fontColor,outlineColor = WHITE):
         self.font = pygame.font.Font(Clock.defaultFont,int(height))
@@ -58,7 +59,7 @@ class Clock(object):
         else:
             self.time = mins * 60 + secs      # interpret first arg as minutes
         self.nextTick = pygame.time.get_ticks() + 1000
-        print("next tick set to %d" % self.nextTick)
+        #print("next tick set to %d" % self.nextTick)
         self.drawTime()
 
     def drawTime(self):
@@ -82,4 +83,6 @@ class Clock(object):
             self.drawTime()
             self.nextTick += 1000                        # by just inc'ing, keeps in sync with clock
             return True
+        elif pygame.time.get_ticks() >= self.nextTick:
+            self.nextTick += 1000
         return False

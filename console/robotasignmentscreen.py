@@ -70,6 +70,14 @@ class RobotAssignmentScreen(Screen):
         self.screen.blit(self.N2,(self.sWidth-(self.boxWidth/2)-10,self.sHeight-(self.boxHeight+40)))        
 
 
+    def rot_center(self,image, angle):
+        """rotate an image while keeping its center and size"""
+        orig_rect = image.get_rect()
+        rot_image = pygame.transform.rotate(image, angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rot_image = rot_image.subsurface(rot_rect).copy()
+        return rot_image
 
     #
     # _updateTableDIsplayList() - Update the display list acording to incoming list and trash list.
@@ -251,6 +259,7 @@ class RobotAssignmentScreen(Screen):
         pygame.draw.rect(self.screen,self.sideRed,(widthRed,0,self.width/2,self.height),0)
 
     def _enter(self):
+        self.refangle = 0
 #        self.incomingList = BLE.OnDeckList()
 #        self.trashList = list()
 #        self.incomingList = match.currentTeams()
@@ -319,7 +328,13 @@ class RobotAssignmentScreen(Screen):
  
     def _process(self):
         self.match.getBLE()
+        if len(self.match.incomingTeams) > 0:
+            self.refangle -= 1
+            self.ButtonRef.graphic = self.rot_center(self.refreshpic,self.refangle)
+            return True
+
         return False
+
 """       self.incominglist = BLE.OnDeckList()
         returnvalue = False
 
