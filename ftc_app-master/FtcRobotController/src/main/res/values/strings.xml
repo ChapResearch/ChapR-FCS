@@ -68,8 +68,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <string name="match">Match</string>
   <string name="competition_mode_menu_item">Competition Mode</string>
 
-  <string-array name="OpModes">
-    <item>-None-</item>
-  </string-array>
-
 </resources>

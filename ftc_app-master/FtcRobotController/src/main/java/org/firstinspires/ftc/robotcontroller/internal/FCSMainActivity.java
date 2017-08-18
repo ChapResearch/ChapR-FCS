@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qualcomm.ftcrobotcontroller.R;
+import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
+
+import java.lang.reflect.Field;
 
 
 public class FCSMainActivity extends Activity {
@@ -37,7 +41,9 @@ public class FCSMainActivity extends Activity {
     public TextView matchNum;
     private FCSBLE fcsble = new FCSBLE();
 
-    public ArrayAdapter<String> spinnerAdapter;
+    public ArrayAdapter<String> fieldOptionsAdapter;
+    public ArrayAdapter<String> autoOptionsAdapter;
+    public ArrayAdapter<String> teleOptionsAdapter;
 
     public int confirmCounter;
     private int counter;
@@ -67,13 +73,29 @@ public class FCSMainActivity extends Activity {
 
         fcsble.setMyRobotName(fcsble.getBluetoothName());
 
-        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
-        fieldOptions.setAdapter(spinnerAdapter);
+        fieldOptionsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        autoOptionsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        teleOptionsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        fieldOptions.setAdapter(fieldOptionsAdapter);
+        autoSelector.setAdapter(autoOptionsAdapter);
+        teleopSelector.setAdapter(teleOptionsAdapter);
 
         confirmCounter = 0;
 
-        if (spinnerAdapter.isEmpty()){
-            spinnerAdapter.add("-None-");
+        if (fieldOptionsAdapter.isEmpty()){
+            fieldOptionsAdapter.add("-None-");
+            autoOptionsAdapter.add("-None-");
+            teleOptionsAdapter.add("-None-");
+        }
+
+        try {
+            Field annotatedOpModeField = AnnotatedOpModeRegistrar.class.getDeclaredField("annotatedOpModeList");
+            annotatedOpModeField.setAccessible(true);
+            Log.i("FCS TEST", (String) annotatedOpModeField.get(new AnnotatedOpModeRegistrar()));
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         //mBluetoothService.initialize();
@@ -100,7 +122,7 @@ public class FCSMainActivity extends Activity {
         fieldOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fcsble.updateMatch(spinnerAdapter.getItem(position));
+                fcsble.updateMatch(fieldOptionsAdapter.getItem(position));
             }
 
             @Override
@@ -122,7 +144,7 @@ public class FCSMainActivity extends Activity {
                 matchNum.setVisibility(View.INVISIBLE);
                 messageText.setVisibility(View.VISIBLE);
                 backButton.setVisibility(View.VISIBLE);
-                fcsble.connectToFCS(spinnerAdapter.getItem(fieldOptions.getSelectedItemPosition()), fcsBLECallBack);
+                fcsble.connectToFCS(fieldOptionsAdapter.getItem(fieldOptions.getSelectedItemPosition()), fcsBLECallBack);
                 confirmCounter = 1;
             }
         });
@@ -168,13 +190,13 @@ public class FCSMainActivity extends Activity {
 
                                 @Override
                                 public void run() {
-                                    for (int i = 1; i <= spinnerAdapter.getCount(); i++){
-                                        if (spinnerAdapter.getItem(i-1).equals(name)){
+                                    for (int i = 1; i <= fieldOptionsAdapter.getCount(); i++){
+                                        if (fieldOptionsAdapter.getItem(i-1).equals(name)){
                                             counter++;
                                         }
                                     }
                                     if (counter == 0){
-                                        spinnerAdapter.add(name);
+                                        fieldOptionsAdapter.add(name);
                                     }
                                 }
                             }) ;
