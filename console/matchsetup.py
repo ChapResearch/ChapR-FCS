@@ -9,6 +9,7 @@ from buttons import Button
 from tables import Table
 from utils import textOutline, numberDraw
 from settings import Settings
+import globalVariables as globals
 from globalVariables import RED,GREEN,BLUE,YELLOW
 from Team import Match
 
@@ -106,6 +107,7 @@ class PrepareMatchScreen(Screen):
         self.endGameImage = numberDraw(Settings.endGameTime,0,RED,20,boxWidth=0,outlined=False)
 
     def _enter(self):
+        globals.BLE.enterMode(1,Settings.fieldName,153)   # start asking for incoming teams
         self._setLogo()
         self._setTitle("Next Match",italic=True,color=(255,0,0))
         self.numberDraw()
@@ -130,9 +132,9 @@ class PrepareMatchScreen(Screen):
         self.tableDraw()
 
     def _process(self):
-        if self.testchange:
+        self.match.getBLE()                      # capture incoming teams
+        if True or self.testchange:
             return False
-
         else:
             self.dataTable.changeData(0)
             self.testchange = True

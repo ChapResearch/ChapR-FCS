@@ -10,6 +10,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -25,7 +26,7 @@ public class FCSMainActivity extends AppCompatActivity {
     public Button backButton;
     public Spinner autoSelector;
     public Spinner teleopSelector;
-    public Spinner fieldOptions;
+    public static Spinner fieldOptions;
     public TextView fieldText;
     public TextView autoText;
     public TextView teleopText;
@@ -90,13 +91,21 @@ public class FCSMainActivity extends AppCompatActivity {
             return;
         }
 
-        if (fieldOptions.isActivated()){
-            fcsble.updateMatch(spinnerAdapter.getItem(fieldOptions.getSelectedItemPosition()));
-        }
-
         fcsble.startFCSConsoleScan(fcsBLECallBack);
         confirmButton.setEnabled(false);
         confirmButton.setAlpha(.5f);
+
+        fieldOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                fcsble.updateMatch(spinnerAdapter.getItem(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                return;
+            }
+        });
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -117,17 +126,7 @@ public class FCSMainActivity extends AppCompatActivity {
         });
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                confirmButton.setVisibility(View.VISIBLE);
-                autoSelector.setVisibility(View.VISIBLE);
-                teleopSelector.setVisibility(View.VISIBLE);
-                fieldText.setVisibility(View.VISIBLE);
-                autoText.setVisibility(View.VISIBLE);
-                teleopText.setVisibility(View.VISIBLE);
-                fieldOptions.setVisibility(View.VISIBLE);
-                matchText.setVisibility(View.VISIBLE);
-                matchNum.setVisibility(View.VISIBLE);
-                messageText.setVisibility(View.INVISIBLE);
-                backButton.setVisibility(View.INVISIBLE);
+                fcsBLECallBack.resetToZero();
                 confirmCounter = 0;
             }
         });
@@ -145,7 +144,7 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                 @Override
                                 public void run() {
-                                    matchText.setText(match);
+                                    matchNum.setText(match);
                                 }
                             }) ;
                             try {
@@ -234,8 +233,25 @@ public class FCSMainActivity extends AppCompatActivity {
 
                 @Override
                 public void consoleScanComplete() {
-                    confirmButton.setAlpha(1f);
-                    confirmButton.setEnabled(true);
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    confirmButton.setAlpha(1f);
+                                    confirmButton.setEnabled(true);
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
@@ -248,6 +264,7 @@ public class FCSMainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     messageText.setText("Waiting...");
+                                    backButton.setVisibility(View.INVISIBLE);
                                 }
                             }) ;
                             try {
@@ -263,9 +280,6 @@ public class FCSMainActivity extends AppCompatActivity {
                 @Override
                 public void queueComplete(boolean accepted, String position) {
                     if (accepted){
-                        if (confirmCounter == 1) {
-                            backButton.setVisibility(View.INVISIBLE);
-                        }
                         if (position.equals("R1")){
                             Thread t = new Thread(new Runnable() {
                                 @Override
@@ -407,7 +421,6 @@ public class FCSMainActivity extends AppCompatActivity {
 
                                 @Override
                                 public void run() {
-                                    messageText.setTextColor(Color.BLACK);
                                     confirmButton.setVisibility(View.VISIBLE);
                                     autoSelector.setVisibility(View.VISIBLE);
                                     teleopSelector.setVisibility(View.VISIBLE);
@@ -416,6 +429,7 @@ public class FCSMainActivity extends AppCompatActivity {
                                     teleopText.setVisibility(View.VISIBLE);
                                     fieldOptions.setVisibility(View.VISIBLE);
                                     matchText.setVisibility(View.VISIBLE);
+                                    matchNum.setVisibility(View.VISIBLE);
                                     messageText.setVisibility(View.INVISIBLE);
                                     backButton.setVisibility(View.INVISIBLE);
                                     confirmButton.setEnabled(false);

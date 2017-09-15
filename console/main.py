@@ -169,6 +169,7 @@ from matchsetup import PrepareMatchScreen
 from startmatch import StartMatchScreen
 from bluetoothtests import BluetoothTestsScreen
 from settings import Settings
+from networktests import NetworkTestsScreen
 
 Settings.loadSettings()
 
@@ -198,6 +199,7 @@ RunMatchScreen("RunMatch",bigScreen)
 AboutScreen("AboutScreen")#.process()
 SystemTestsScreen("SystemTests")
 BluetoothTestsScreen("BluetoothTests")
+NetworkTestsScreen("NetworkTests")
 RobotAssignmentScreen("RobotAssignmentScreen",MatchObject)#.process()
 PrepareMatchScreen("PrepareMatch",MatchObject)#.process()
 BootScreens(smallScreen,bigScreen)#.process()

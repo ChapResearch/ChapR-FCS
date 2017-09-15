@@ -133,9 +133,9 @@ class BLEprotocol(object):
     #                  the match, but since it is labeled as mode 0, it should be ignored.
     #
     @classmethod
-    def mode0Message(cls,fieldName):
+    def mode0Message(cls,fieldName,match):
         mode = 0
-        message = BLEprotocol.messageHeader(mode,fieldName,0)
+        message = BLEprotocol.messageHeader(mode,fieldName,match)
         return message
 
     #

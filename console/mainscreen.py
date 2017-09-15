@@ -77,7 +77,7 @@ class MainScreen(Screen):
     def _enter(self):
         # whenever this screen is shown, we are in the simple mode 0
         # simply broadcasting our presence
-        globals.BLE.enterMode(0,Settings.fieldName)
+        globals.BLE.enterMode(0,Settings.fieldName,Settings.matchNumber)
 
     def _process(self):
         pass

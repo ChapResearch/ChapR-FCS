@@ -29,7 +29,7 @@ class SystemTestsScreen(Screen):
         return "ButtonTestScreen" 
 
     def networktest(self):
-        pass
+        return "NetworkTests" 
 
     def audiotest(self):
         self.redraw() 
