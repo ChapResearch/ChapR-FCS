@@ -6,10 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.app.Activity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,9 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qualcomm.ftcrobotcontroller.R;
-import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeMeta;
 
-import java.lang.reflect.Field;
+import java.util.List;
+
+import static com.qualcomm.robotcore.eventloop.opmode.OpModeMeta.Flavor.AUTONOMOUS;
 
 
 public class FCSMainActivity extends Activity {
@@ -44,6 +44,8 @@ public class FCSMainActivity extends Activity {
     public ArrayAdapter<String> fieldOptionsAdapter;
     public ArrayAdapter<String> autoOptionsAdapter;
     public ArrayAdapter<String> teleOptionsAdapter;
+
+    private List<OpModeMeta> opModes;
 
     public int confirmCounter;
     private int counter;
@@ -81,21 +83,28 @@ public class FCSMainActivity extends Activity {
         teleopSelector.setAdapter(teleOptionsAdapter);
 
         confirmCounter = 0;
+        opModes = FtcRobotControllerActivity.eventLoop.getOpModeManager().getOpModes();
+
+        for (int i = 0; i < opModes.size(); i++){
+            switch (opModes.get(i).flavor){
+                case AUTONOMOUS:
+                    autoOptionsAdapter.add(opModes.get(i).name);
+                    break;
+                case TELEOP:
+                    teleOptionsAdapter.add(opModes.get(i).name);
+                    break;
+            }
+
+        }
 
         if (fieldOptionsAdapter.isEmpty()){
             fieldOptionsAdapter.add("-None-");
-            autoOptionsAdapter.add("-None-");
-            teleOptionsAdapter.add("-None-");
         }
-
-        try {
-            Field annotatedOpModeField = AnnotatedOpModeRegistrar.class.getDeclaredField("annotatedOpModeList");
-            annotatedOpModeField.setAccessible(true);
-            Log.i("FCS TEST", (String) annotatedOpModeField.get(new AnnotatedOpModeRegistrar()));
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if (autoOptionsAdapter.isEmpty()){
+            autoOptionsAdapter.add("-None-");
+        }
+        if (teleOptionsAdapter.isEmpty()){
+            teleOptionsAdapter.add("-None-");
         }
 
         //mBluetoothService.initialize();
