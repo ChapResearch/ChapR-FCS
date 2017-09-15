@@ -71,6 +71,7 @@ class RobotAssignmentScreen(Screen):
 
         self.refangle = 0
 
+
     #
     # rot_center() - little utility function (should be somewhere else really) that
     #                will rotate an image around it's center - needs to be square btw
@@ -264,6 +265,7 @@ class RobotAssignmentScreen(Screen):
         pygame.draw.rect(self.screen,self.sideRed,(widthRed,0,self.width/2,self.height),0)
 
     def _enter(self):
+        self.refangle = 0
 #        self.incomingList = BLE.OnDeckList()
 #        self.trashList = list()
 #        self.incomingList = match.currentTeams()
@@ -338,6 +340,7 @@ class RobotAssignmentScreen(Screen):
             return True
 
         return False
+
 """       self.incominglist = BLE.OnDeckList()
         returnvalue = False
 
