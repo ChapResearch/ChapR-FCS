@@ -23,6 +23,8 @@ public class FCSBLEScanner {
         TELEOP_INIT,
         TELEOP_START,
         ENDGAME_START,
+        MATCH_PAUSE,
+        MATCH_RESUME,
         ABORT
     }
 
@@ -227,6 +229,11 @@ public class FCSBLEScanner {
                             case 6:
                                 this.command = MatchCommand.ABORT;
                                 break;
+                            case 7:
+                                this.command = MatchCommand.MATCH_PAUSE;
+                                break;
+                            case 8:
+                                this.command = MatchCommand.MATCH_RESUME;
                         }
                         break;
                     case 2:
@@ -253,6 +260,11 @@ public class FCSBLEScanner {
                             case 6:
                                 this.command = MatchCommand.ABORT;
                                 break;
+                            case 7:
+                                this.command = MatchCommand.MATCH_PAUSE;
+                                break;
+                            case 8:
+                                this.command = MatchCommand.MATCH_RESUME;
                         }
                         break;
                 }
@@ -283,6 +295,11 @@ public class FCSBLEScanner {
                             case 6:
                                 this.command = MatchCommand.ABORT;
                                 break;
+                            case 7:
+                                this.command = MatchCommand.MATCH_PAUSE;
+                                break;
+                            case 8:
+                                this.command = MatchCommand.MATCH_RESUME;
                         }
                         break;
                     case 2:
@@ -309,6 +326,11 @@ public class FCSBLEScanner {
                             case 6:
                                 this.command = MatchCommand.ABORT;
                                 break;
+                            case 7:
+                                this.command = MatchCommand.MATCH_PAUSE;
+                                break;
+                            case 8:
+                                this.command = MatchCommand.MATCH_RESUME;
                         }
                         break;
                 }

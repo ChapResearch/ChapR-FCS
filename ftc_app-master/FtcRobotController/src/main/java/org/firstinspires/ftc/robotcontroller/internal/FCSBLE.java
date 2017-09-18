@@ -298,6 +298,38 @@ public class FCSBLE {
                         if (record.mode == FCSBLEScanner.RunMode.READY){
                             afterConnectInteract();
                         }
+                        if (record.mode == FCSBLEScanner.RunMode.MATCH){
+                            switch (record.command){
+                                case AUTO_INIT:
+                                    UIConsoleScanCallback.startAutoInit();
+                                    break;
+                                case AUTO_START:
+                                    UIConsoleScanCallback.startAuto();
+                                    break;
+                                case TELEOP_INIT:
+                                    UIConsoleScanCallback.startTeleInit();
+                                    break;
+                                case TELEOP_START:
+                                    UIConsoleScanCallback.startTele();
+                                    break;
+                                case ENDGAME_START:
+                                    UIConsoleScanCallback.startEndGame();
+                                    break;
+                                case ABORT:
+                                    UIConsoleScanCallback.matchStop();
+                                    break;
+                                case MATCH_PAUSE:
+                                    UIConsoleScanCallback.matchPause();
+                                    break;
+                                case MATCH_RESUME:
+                                    UIConsoleScanCallback.matchResume();
+                                    break;
+                                case NONE:
+                                    UIConsoleScanCallback.stopAuto();
+                                    UIConsoleScanCallback.stopTele();
+                                    break;
+                            }
+                        }
                     }
                 }
 

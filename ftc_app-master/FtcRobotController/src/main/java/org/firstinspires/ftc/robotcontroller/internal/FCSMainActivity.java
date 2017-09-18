@@ -22,7 +22,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeMeta;
 
 import java.util.List;
 
-import static com.qualcomm.robotcore.eventloop.opmode.OpModeMeta.Flavor.AUTONOMOUS;
 
 
 public class FCSMainActivity extends Activity {
@@ -85,6 +84,16 @@ public class FCSMainActivity extends Activity {
         confirmCounter = 0;
         opModes = FtcRobotControllerActivity.eventLoop.getOpModeManager().getOpModes();
 
+        if (fieldOptionsAdapter.isEmpty()){
+            fieldOptionsAdapter.add("-None-");
+        }
+        if (autoOptionsAdapter.isEmpty()){
+            autoOptionsAdapter.add("-None-");
+        }
+        if (teleOptionsAdapter.isEmpty()){
+            teleOptionsAdapter.add("-None-");
+        }
+
         for (int i = 0; i < opModes.size(); i++){
             switch (opModes.get(i).flavor){
                 case AUTONOMOUS:
@@ -95,16 +104,6 @@ public class FCSMainActivity extends Activity {
                     break;
             }
 
-        }
-
-        if (fieldOptionsAdapter.isEmpty()){
-            fieldOptionsAdapter.add("-None-");
-        }
-        if (autoOptionsAdapter.isEmpty()){
-            autoOptionsAdapter.add("-None-");
-        }
-        if (teleOptionsAdapter.isEmpty()){
-            teleOptionsAdapter.add("-None-");
         }
 
         //mBluetoothService.initialize();
@@ -483,42 +482,65 @@ public class FCSMainActivity extends Activity {
 
                 @Override
                 public void startAutoInit() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().initActiveOpMode(String.valueOf(autoSelector.getSelectedItem()));
                 }
 
                 @Override
                 public void startAuto() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().startActiveOpMode();
                 }
 
                 @Override
                 public void stopAuto() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().stopActiveOpMode();
                 }
 
                 @Override
                 public void startTeleInit() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().initActiveOpMode(String.valueOf(teleopSelector.getSelectedItem()));
                 }
 
                 @Override
                 public void startTele() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().startActiveOpMode();
                 }
 
                 @Override
                 public void startEndGame() {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
 
+                                @Override
+                                public void run() {
+                                    screenLayout.setBackgroundColor(Color.YELLOW);
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    screenLayout.setBackgroundColor(Color.BLACK);
+                                }
+                            }) ;
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
                 }
 
                 @Override
                 public void stopTele() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().stopActiveOpMode();
                 }
 
                 @Override
                 public void matchPause() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().stopActiveOpMode();
                 }
 
                 @Override
@@ -528,7 +550,7 @@ public class FCSMainActivity extends Activity {
 
                 @Override
                 public void matchStop() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().stopActiveOpMode();
                 }
             };
 }
