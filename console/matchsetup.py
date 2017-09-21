@@ -107,7 +107,7 @@ class PrepareMatchScreen(Screen):
         self.endGameImage = numberDraw(Settings.endGameTime,0,RED,20,boxWidth=0,outlined=False)
 
     def _enter(self):
-        globals.BLE.enterMode(1,Settings.fieldName,153)   # start asking for incoming teams
+        globals.BLE.enterMode(1,Settings.fieldName,Settings.matchNumber)   # start asking for incoming teams
         self._setLogo()
         self._setTitle("Next Match",italic=True,color=(255,0,0))
         self.numberDraw()
