@@ -515,16 +515,10 @@ public class FCSMainActivity extends Activity {
                                 @Override
                                 public void run() {
                                     screenLayout.setBackgroundColor(Color.YELLOW);
-                                    try {
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    screenLayout.setBackgroundColor(Color.BLACK);
                                 }
                             }) ;
                             try {
-                                Thread.sleep(500);
+                                Thread.sleep(1000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -545,7 +539,7 @@ public class FCSMainActivity extends Activity {
 
                 @Override
                 public void matchResume() {
-
+                    FtcRobotControllerActivity.eventLoop.getOpModeManager().startActiveOpMode();
                 }
 
                 @Override
