@@ -52,7 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Arnhav's Linear Teleop", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Template TeleOp", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 public class TemplateOpMode_Line extends LinearOpMode {
 
     /* Declare OpMode members. */
