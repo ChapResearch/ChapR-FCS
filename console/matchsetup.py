@@ -25,7 +25,7 @@ class PrepareMatchScreen(Screen):
         self.teamB2 = ""
         self.teamR2 = ""
 
-        self.tablePosition = (20,130)
+        self.tablePosition = (20,120)
         self.teamTablePosition = (170,200) 
 
         self.screen.fill([0,0,0])             # just black, no graphic background image
@@ -63,9 +63,13 @@ class PrepareMatchScreen(Screen):
         print("done")
         return "RobotAssignmentScreen"
 
+#
+# tableDraw() - creates the middle part of the screen with match information
+#               and team information.
+#
     def tableDraw(self):
         self.dataTable = self.tables(fontsize=20,font="arial",align="right",callback=self.setTimes,bgcolor=(0,0,0))
-        self.teamTable = self.tables(fontsize=20,font="arial",align="right",cellWidth=45,cellHeight=20)
+        self.teamTable = self.tables(fontsize=20,font="arial",align="right",cellWidth=55,cellHeight=20)
 
         # Create the dataTable
         self.dataTable.addData("Next Match:  ",name="matchlabel",flashing=False)
@@ -87,15 +91,28 @@ class PrepareMatchScreen(Screen):
 
         # Create the teamsTable
 
-        self.teamTable.addData(self.teamB1, name = "Team1")
-        self.teamTable.addSpacer(5)
-        self.teamTable.addData(self.teamR1, name = "Team2")
-        self.teamTable.endRow()
-        self.teamTable.addData(self.teamB2, name = "Team3")
-        self.teamTable.addSpacer(5)
-        self.teamTable.addData(self.teamR2, name = "Team4")
-        self.teamTable.endRow()
+        teamB1 = "" 
+        teamB2 = "" 
+        teamR1 = "" 
+        teamR2 = "" 
 
+        if self.teamB1 is not None:
+            teamB1 = self.teamB1
+        if self.teamB2 is not None:
+            teamB2 = self.teamB2
+        if self.teamR1 is not None:
+            teamR1 = self.teamR1
+        if self.teamR2 is not None:
+            teamR2 = self.teamR2
+
+        self.teamTable.addData(teamB1, name = "Team1",color=(0,0,255))
+        self.teamTable.addSpacer(3)
+        self.teamTable.addData(teamR1, name = "Team2",color=(255,0,0))
+        self.teamTable.endRow()
+        self.teamTable.addData(teamB2, name = "Team3",color=(0,0,255))
+        self.teamTable.addSpacer(3)
+        self.teamTable.addData(teamR2, name = "Team4",color=(255,0,0))
+        self.teamTable.endRow()
 
         self.dataTable.position = self.tablePosition
         self.teamTable.position = self.teamTablePosition
