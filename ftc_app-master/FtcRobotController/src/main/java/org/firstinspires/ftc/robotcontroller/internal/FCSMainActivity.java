@@ -49,6 +49,8 @@ public class FCSMainActivity extends Activity {
     public int confirmCounter;
     private int counter;
 
+    private int tempTestCount = 0;
+
     IntentFilter ifilter;
     Intent batteryStatus;
 
@@ -373,6 +375,11 @@ public class FCSMainActivity extends Activity {
                                             if (confirmCounter == 1) {
                                                 messageText.setVisibility(View.VISIBLE);
                                             }
+                                            if (tempTestCount == 0){
+                                                fcsBLECallBack.startAutoInit();
+                                                tempTestCount = 1;
+                                            }
+                                            fcsBLECallBack.startAuto();
                                         }
                                     }) ;
                                     try {
@@ -482,7 +489,8 @@ public class FCSMainActivity extends Activity {
 
                 @Override
                 public void startAutoInit() {
-                    FtcRobotControllerActivity.eventLoop.getOpModeManager().initActiveOpMode(String.valueOf(autoSelector.getSelectedItem()));
+                    if (!String.valueOf(autoSelector.getSelectedItem()).equals("-None-"))
+                        FtcRobotControllerActivity.eventLoop.getOpModeManager().initActiveOpMode(String.valueOf(autoSelector.getSelectedItem()));
                 }
 
                 @Override
@@ -497,7 +505,8 @@ public class FCSMainActivity extends Activity {
 
                 @Override
                 public void startTeleInit() {
-                    FtcRobotControllerActivity.eventLoop.getOpModeManager().initActiveOpMode(String.valueOf(teleopSelector.getSelectedItem()));
+                    if (!String.valueOf(autoSelector.getSelectedItem()).equals("-None-"))
+                        FtcRobotControllerActivity.eventLoop.getOpModeManager().initActiveOpMode(String.valueOf(teleopSelector.getSelectedItem()));
                 }
 
                 @Override
