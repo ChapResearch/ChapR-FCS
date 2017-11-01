@@ -174,11 +174,11 @@ class HDMI:
         else:
             utils.showImage(image,position,fade)
 
-    def cteam(self,position,number,ping,rBat,pBat,stats=True):
+    def cteam(self,position,number,ping,rBat,pBat,stats=True,joystick=False):
         if self.role == "server":
-            self._command("CTEAM",position,number,ping,rBat,pBat,stats)
+            self._command("CTEAM",position,number,ping,rBat,pBat,stats,joystick)
         else:
-            StatsDisplay.display(self.screen,self.screenSize,position,number,ping,rBat,pBat,stats)
+            StatsDisplay.display(self.screen,self.screenSize,position,number,ping,rBat,pBat,stats,joystick)
             
 
     #

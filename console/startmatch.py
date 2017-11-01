@@ -159,10 +159,10 @@ class StartMatchScreen(Screen):
     #-The stats variable determines whether stats are drawn
     def redrawStats(self,stats=True):
         self.bigScreen.fill(0,0,0)
-        self.bigScreen.cteam("NW","148",4,95,88,stats)
-        self.bigScreen.cteam("NE","2468",1,35,56,stats)
-        self.bigScreen.cteam("SW","5628",3,100,100,stats)
-        self.bigScreen.cteam("SE","10241",3,10,13,stats)        
+        self.bigScreen.cteam("NW","148",4,95,88,stats,False)
+        self.bigScreen.cteam("NE","2468",1,35,56,stats,True)
+        self.bigScreen.cteam("SW","5628",3,100,100,stats,False)
+        self.bigScreen.cteam("SE","10241",3,10,13,stats,False)  
 
 
     def initialize(self):
@@ -175,49 +175,22 @@ class StartMatchScreen(Screen):
         
     def _enter(self):
 
+        self.changeState(self.ENTER)
+
         # tell the waiting teams that they are "IN"
-        globals.BLE.enterMode(2,Settings.fieldName,Settings.matchNumber,
-                              self.match.getTeam(Match.R1).getNumber(),self.match.getTeam(Match.R2).getNumber(),
-                              self.match.getTeam(Match.B1).getNumber(),self.match.getTeam(Match.B2).getNumber())
+        #globals.BLE.enterMode(2,Settings.fieldName,Settings.matchNumber,
+         #                     self.match.getTeam(Match.R1).getNumber(),self.match.getTeam(Match.R2).getNumber(),
+          #                    self.match.getTeam(Match.B1).getNumber(),self.match.getTeam(Match.B2).getNumber())
 
         print(self.clock.time)
-        # Resetup all variable use to run match
-        self.soundFX = pygame.mixer.Sound(os.path.join('Media','StartAuto.wav'))
-        self.matchState = StartMatchScreen.ENTER
-        self.currentClockVal = Settings.autoTime + Settings.teleopTime  + Settings.endGameTime
-        self.timeout = -1
-
-        #setup clock
-        self.clock.setTime(self.currentClockVal/60,self.currentClockVal%60)
-        self.bigScreen.clockSet(self.currentClockVal/60,self.currentClockVal%60)
-        self.clock.stop()
-        self.bigScreen.clockStop()
-        self.clock.setColor(YELLOW)
-        self.bigScreen.clockColor(YELLOW)
-        self.autoTimeout = self.currentClockVal - Settings.autoTime
-        self.teleopTimeout = self.currentClockVal - Settings.autoTime - Settings.teleopTime
-
-        #Setup Buttons
-        self.ButtonS.setLabels("Initialize")
-        self.ButtonS.bgcolor = (255,255,255)
-        self.ButtonN.setLabels("Yep")
-        self.ButtonN.bgcolor = (0,0,0)
-        self.ButtonSE.setLabels(["Stop",""])
-        self.ButtonSW.setLabels(["Stop",""])
-        self.ButtonNE.setLabels(["Stop",""])
-        self.ButtonNW.setLabels(["Stop",""])
-        self.updateTeams()
 
         #Draw teams and stats on HDMI screen
-        self.updateTeams()
         self.bigScreen.cteam("NE",self.teamR1,True,75,21)
         self.bigScreen.cteam("SE",self.teamR2,False,35,61)
         self.bigScreen.cteam("NW",self.teamB1,True,99,100)
         self.bigScreen.cteam("SW",self.teamB2,True,10,13)
         print("Updated teams: R1")
         print("\""+self.teamR1+"\"")
-        self.changeHUD("Match Ready")
-        # Start initilization once screen opens            
 
 #
 #   changeState()--- Calls all necesary methods to change state, update hud, 
@@ -236,6 +209,18 @@ class StartMatchScreen(Screen):
 #                       depending on the state that it is passed
 #
     def repaintScreen(self,state):
+        if state==self.ENTER:
+            self.ButtonS.setLabels("Initialize")
+            self.ButtonS.bgcolor = (255,255,255)
+            self.ButtonN.setLabels("Yep")
+            self.ButtonN.bgcolor = (0,0,0)
+            self.ButtonSE.setLabels(["Stop",""])
+            self.ButtonSW.setLabels(["Stop",""])
+            self.ButtonNE.setLabels(["Stop",""])
+            self.ButtonNW.setLabels(["Stop",""])
+            self.updateTeams()
+            self.changeHUD("Match Ready")
+
         if state==self.INIT_AUTO_STATE:
             self.ButtonS.callback = self.changeState
             self.ButtonS.rock = self.AUTO_STATE
@@ -342,6 +327,10 @@ class StartMatchScreen(Screen):
 #                        plays repective sound for the state that is being changed to
 #
     def playSound(self,state):
+        if state==self.ENTER:
+            self.soundFX = pygame.mixer.Sound(os.path.join('Media','StartAuto.wav'))
+            return
+
         if state==self.AUTO_STATE:
             self.soundFX.play()            
             return
@@ -424,6 +413,18 @@ class StartMatchScreen(Screen):
 #
     def clockUpdate(self,state):
         print("inside clockUpdate()")
+        if state==self.ENTER:
+            self.currentClockVal = Settings.autoTime + Settings.teleopTime  + Settings.endGameTime
+            self.timeout = -1
+            self.clock.setTime(self.currentClockVal/60,self.currentClockVal%60)
+            self.bigScreen.clockSet(self.currentClockVal/60,self.currentClockVal%60)
+            self.clock.stop()
+            self.bigScreen.clockStop()
+            self.clock.setColor(YELLOW)
+            self.bigScreen.clockColor(YELLOW)
+            self.autoTimeout = self.currentClockVal - Settings.autoTime
+            self.teleopTimeout = self.currentClockVal - Settings.autoTime - Settings.teleopTime
+
         if state==self.AUTO_STATE:
             self.clock.run()
             self.bigScreen.clockRun()

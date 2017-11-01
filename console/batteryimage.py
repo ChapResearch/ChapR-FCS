@@ -43,3 +43,6 @@ class BatteryImage(object):
             return BatteryImage.bat1
         elif num <= 4:
             return BatteryImage.bat1            
+
+
+            
