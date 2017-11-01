@@ -138,3 +138,11 @@ class Match(object):
         newTeam = globals.BLE.getIncomingTeam()
         if newTeam is not None:
             self.incomingTeams.append(newTeam)
+
+    #
+    # getBLErobotStatus() - While robots are reporting battery/status info, this will
+    #                       get it and put it where it belongs.
+    #
+    def getBLErobotStats(self):
+        # just call it for now - does nothing with return
+        self.globals.BLE.getRobotStats()

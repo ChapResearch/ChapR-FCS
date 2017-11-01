@@ -1,5 +1,3 @@
-
-
 #
 #
 # StartMatchScreen - The screen meant to run the match timer, and if robotControl is enabled it will start and stop the robots.
@@ -12,6 +10,7 @@ from buttons import Button
 from tables import Table
 from consoleClock import consoleClock
 from globalVariables import RED,GREEN,BLUE,YELLOW,BLACK,WHITE
+import globalVariables as globals
 from Team import Match
 import os
 from statsdisplay import StatsDisplay
@@ -175,6 +174,12 @@ class StartMatchScreen(Screen):
         self.ButtonS.setLabels(["Start","Autonomous"])
         
     def _enter(self):
+
+        # tell the waiting teams that they are "IN"
+        globals.BLE.enterMode(2,Settings.fieldName,Settings.matchNumber,
+                              self.match.getTeam(Match.R1).getNumber(),self.match.getTeam(Match.R2).getNumber(),
+                              self.match.getTeam(Match.B1).getNumber(),self.match.getTeam(Match.B2).getNumber())
+
         print(self.clock.time)
         # Resetup all variable use to run match
         self.soundFX = pygame.mixer.Sound(os.path.join('Media','StartAuto.wav'))
@@ -546,74 +551,3 @@ class StartMatchScreen(Screen):
             elif self.timeout == 0:
                 self.changeState(self.MATCH_END)
                 self.timeoutReached = True
-            
-
-        # If the end of initilization has been reached
-#        if self.matchState == StartMatchScreen.INITsT:
-           
-        # Start Autonomous
-"""
-        if self.matchState == StartMatchScreen.AUTO:
-            self.clock.run()
-            self.bigScreen.clockRun()
-            self.clock.update()
-            if self.clock.time == Settings.teleopTime:
-                self.clock.setColor(GREEN)
-                self.bigScreen.clockColor(GREEN)
-            if not self.bigStopped and self.clock.time == Settings.teleopTime:
-                self.currentClockVal = self.clock.time
-                self.bigScreen.clockStop()
-                self.bigScreen.clockSet(self.clock.time) # make sure in sync
-                self.clock.stop()
-#                self.bigStopped = True
-                self.soundFX = pygame.mixer.Sound(os.path.join('Media','EndAuto.wav'))
-                self.soundFX.play()
-                self.matchState = StartMatchScreen.AUTOsT
-
-        # If Autonomous has run and ended
-        if self.matchState == StartMatchScreen.AUTOsT:
-            self.changeHUD("Teleop Ready")
-            self.ButtonS.callback = self.startTeleop
-            self.ButtonS.setLabels(["Start","Teleop"])
-            self.ButtonN.setLabels(["End","Match"])
-            self.ButtonN.callBack = self.endMatch
-            self.ButtonN.bgcolor = (255,255,255)
-
-        # Start TELEOP
-        if self.matchState == StartMatchScreen.TELEOP:
-#            print(self.clock.time)
-            self.clock.run()
-            self.bigScreen.clockRun()
-#            print(self.clock.time)
-            self.clock.update()
-            if self.clock.time == Settings.endGameTime:
-                self.clock.setColor(RED)
-                self.bigScreen.clockColor(RED)
-                self.soundFX = pygame.mixer.Sound(os.path.join('Media','StartEndGame.wav'))
-                self.soundFX.play()
-                #self.changeHUD("End Game")
-            if not self.bigStopped and self.clock.time == 0:
-                self.bigScreen.clockSet(self.clock.time) # make sure in sync
-                self.soundFX = pygame.mixer.Sound(os.path.join('Media','EndTeleop.wav'))
-                self.soundFX.play()
-                self.matchState = StartMatchScreen.TELEOPsT
-
-        # If Match Has Ended
-        if self.matchState == StartMatchScreen.TELEOPsT:
-            #self.ButtonN.setLabels(["Match","Over"])
-            #self.ButtonN.callback = self.none
-            #self.ButtonN.bgcolor = (255,255,255)
-            #self.ButtonS.setLabels(["End","Game"])
-            #self.changeHUD("Match Over")
-            #self.ButtonS.callback = self.endMatch
-            self.stopMatch()
-
-        # Stop State
-        if self.stopped:
-            self.currentClockVal = self.clock.time
-            self.clock.setTime(self.currentClockVal/60,self.currentClockVal%60)
-            self.bigScreen.clockSet(self.currentClockVal/60,self.currentClockVal%60)        
-"""
-
-#        return True                          # tells screen that a redraw is necessary
-        
